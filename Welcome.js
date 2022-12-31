@@ -22,6 +22,11 @@ export function WelcomeScreen({route, navigation}) {
                 <Text style={styles.mainText}>Register</Text>
             </TouchableOpacity>
 
+            <TouchableOpacity style={styles.mainButton}
+                onPress={() => {navigation.navigate('Firebase');}}>
+                <Text style={styles.mainText}>Firebase</Text>
+            </TouchableOpacity>
+
         </View>
     );
 }
