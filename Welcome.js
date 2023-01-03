@@ -14,17 +14,17 @@ export function WelcomeScreen({route, navigation}) {
 
             <TouchableOpacity style={styles.mainButton}
                 onPress={() => {navigation.navigate('Tasks');}}>
-                <Text style={styles.mainText}>Tasks</Text>
+                <Text style={styles.buttonText}>Tasks</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.mainButton}
                 onPress={() => {navigation.navigate('Register');}}>
-                <Text style={styles.mainText}>Register</Text>
+                <Text style={styles.buttonText}>Register</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.mainButton}
                 onPress={() => {navigation.navigate('Firebase');}}>
-                <Text style={styles.mainText}>Firebase</Text>
+                <Text style={styles.buttonText}>Firebase</Text>
             </TouchableOpacity>
 
         </View>

@@ -52,6 +52,14 @@ module.exports = StyleSheet.create({
       backgroundColor: "cornflowerblue",
       justifyContent:"center"
     },
+    button: {
+      height: 47,
+      borderRadius: 5,
+      width: 80,
+      alignItems: 'center',
+      backgroundColor: "cornflowerblue",
+      justifyContent:"center"
+    },
     smallButton: {
       width: "40%",
       height: 40,
@@ -63,7 +71,7 @@ module.exports = StyleSheet.create({
       backgroundColor: "cornflowerblue",
       justifyContent:"center"
     },
-    mainText: {
+    buttonText: {
       textAlign:"center",
       textAlignVertical:"center",
       color:"white",
@@ -200,5 +208,46 @@ module.exports = StyleSheet.create({
       justifyContent: "center",
       alignItems: 'center',
       // marginTop: 100
+    },
+    innerContainer: {
+      marginLeft: 45,      
+      flexDirection: 'column',
+      alignItems: 'center',
+    },
+    itemHeading: {
+      fontWeight: "bold",
+      fontSize: 18,
+      marginRight: 22,
+    },
+    formContainer: {
+      flexDirection: 'row',
+      height: 80,
+      marginLeft: 10,
+      marginRight: 10,
+      marginTop: 100
+    },
+    containerX: {
+      backgroundColor: "#e5e5e5",
+      padding: 15,
+      borderRadius: 15,
+      margin: 5,
+      marginHorizontal: 10,
+      flexDirection: 'row',
+      alignItems: 'center',
+      // paddingTop: 300,
+    },
+    input: {
+      height:48,
+      borderRadius: 5,
+      overflow: 'hidden',
+      paddingLeft: 16,
+      flex: 1,
+      marginRight: 5,
+      backgroundColor: "white"
+    },
+    todoIcon: {
+      marginTop: 5,
+      fontSize: 20,
+      marginLeft: 14,
     },
   });

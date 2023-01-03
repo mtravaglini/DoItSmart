@@ -20,6 +20,8 @@ import {
   TableView,
 } from 'react-native-tableview-simple';
 
+// import custom functions
+import { scheduleTasks } from './Functions.js';
 
 // use custom style sheet
 const styles = require('./Style.js');
@@ -61,7 +63,7 @@ export function TasksScreen({ route, navigation }) {
       "Effort": 15,
       "Recurrence": "D",
       "Lifeline": "",
-      "Deadline": "2023-01-31",
+      "Deadline": "2023-01-30",
       "Assignee": "Jack"
     },
 
@@ -71,14 +73,15 @@ export function TasksScreen({ route, navigation }) {
       "Effort": 2,
       "Recurrence": "D",
       "Lifeline": "",
-      "Deadline": "2023-01-31",
+      "Deadline": "2023-01-27",
       "Assignee": "Jack"
     }
 
   ]
 
   if (tasks.length == 0) {
-    setTasks(retrieved_tasks);
+    var scheduled_tasks = scheduleTasks(retrieved_tasks);
+    setTasks(scheduled_tasks);
     setLoading(false);
   }
 
