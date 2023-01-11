@@ -1,156 +1,155 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-  Text,
-  View,
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  SafeAreaView,
-  TouchableWithoutFeedback,
-  Keyboard
+    ActivityIndicator,
+    FlatList,
+    Keyboard,
+    KeyboardAvoidingView,
+    Pressable,
+    SafeAreaView,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    TouchableWithoutFeedback,
+    View,
 } from 'react-native';
-import {
-  useState,
-  useEffect,
-} from 'react';
-import {
-  ScrollView,
-} from 'react-native-gesture-handler';
-import {
-  Cell,
-  TableView,
-} from 'react-native-tableview-simple';
-
-// import custom functions
-import { scheduleTasks } from './Functions.js';
+// import { useNavigation } from '@react-navigation/native';
+import { FontAwesome } from '@expo/vector-icons';
+import { app, db, serverTimestamp } from './firebase.config';
 
 // use custom style sheet
 const styles = require('./Style.js');
 
-
 export function TasksScreen({ route, navigation }) {
 
-  const [tasks, setTasks] = useState([]);
-  const [isLoading, setLoading] = useState(true);
+    const [todos, setTodos] = useState([]);
+    const todoRef = db.collection("todos");
+    // const reference = firebase.database("https://taskmanager-cm3070-default-rtdb.europe-west1.firebasedatabase.app").ref('/users/100');
+
+    const [addData, setAddData] = useState('');
+
+    const [isLoading, setLoading] = useState(true);
 
 
-  // Retrieve all user's tasks here
-  // FOR TESTING
-  retrieved_tasks = [
+    useEffect(() => {
+        todoRef
+            .orderBy('createdAt', 'desc')
+            .onSnapshot(
+                querySnapshot => {
+                    const todos = []
+                    querySnapshot.forEach((doc) => {
+                        // const {heading} = doc.data();
+                        const heading = doc.data().heading;
+                        todos.push({
+                            id: doc.id,
+                            heading
+                        })
+                    })
+                    setTodos(todos)
+                }
+            )
 
-    {
-      "Name": "Make Bed",
-      "Priority": 1,
-      "Effort": 5,
-      "Recurrence": "D",
-      "Lifeline": "",
-      "Deadline": "2023-01-31",
-      "Assignee": "Jack"
-    },
+        setLoading(false);
 
-    {
-      "Name": "Get Dressed",
-      "Priority": 2,
-      "Effort": 15,
-      "Recurrence": "D",
-      "Lifeline": "",
-      "Deadline": "2023-01-31",
-      "Assignee": "Jack"
-    },
+    }, [])
 
-    {
-      "Name": "Eat Breakfast",
-      "Priority": 2,
-      "Effort": 15,
-      "Recurrence": "D",
-      "Lifeline": "",
-      "Deadline": "2023-01-30",
-      "Assignee": "Jack"
-    },
+    // delete  a todo
 
-    {
-      "Name": "Brush Teeth",
-      "Priority": 3,
-      "Effort": 2,
-      "Recurrence": "D",
-      "Lifeline": "",
-      "Deadline": "2023-01-27",
-      "Assignee": "Jack"
+    const deleteTodo = (todos) => {
+        todoRef
+            .doc(todos.id)
+            .delete()
+            .then(() => {
+                // success message
+                alert("Deleted!");
+            })
+            .catch(error => {
+                alert(error);
+            })
     }
 
-  ]
+    // add  a todo
 
-  if (tasks.length == 0) {
-    var scheduled_tasks = scheduleTasks(retrieved_tasks);
-    setTasks(scheduled_tasks);
-    setLoading(false);
-  }
+    const addTodo = () => {
+        // check we have one to add
+        if (addData && addData.length > 0) {
+            const timestamp = Math.floor(Date.now() / 1000) //serverTimestamp();
+            const data = {
+                heading: addData,
+                createdAt: timestamp
+            }
+            todoRef
+                .add(data)
+                .then(() => {
+                    setAddData('');
+                    Keyboard.dismiss();
+                    // success message
+                    // alert("Added!");
+                })
+                .catch(error => {
+                    alert(error);
+                })
+        }
+
+    }
 
 
-  return (
-    // <View style={styles.container}>
-    //   <Text>Tasks</Text>
-    // </View>
-
-
-
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <SafeAreaView style={styles.safeView}>
-          <View>
-
-            {/* show acivity indicator when waiting to return to portfolio screen after 
+    return (
+        <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                <SafeAreaView style={styles.safeView}>
+                    <View>
+                        <View style={styles.formContainer}>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Enter a new to do item"
+                                onChangeText={(heading) => setAddData(heading)}
+                                value={addData}
+                                underlineColorAndroid='transparent'
+                                autoCapitalize='none'
+                            />
+                            <TouchableOpacity
+                                style={styles.button}
+                                onPress={addTodo}>
+                                <Text
+                                    style={styles.buttonText}
+                                >Add</Text>
+                            </TouchableOpacity>
+                        </View>
+                        {/* show acivity indicator when waiting to return to portfolio screen after 
             user presses save button */}
-            {isLoading ? (
-              <ActivityIndicator size="large" color="cornflowerblue" />
-            ) : (
-              <ScrollView>
-                <TableView appearance="light">
-                  {/* show message depending on if any results returned or not */}
-                  <Text>
-                    {' '}
-                    {tasks.length == 0
-                      ? 'All done!'
-                      : 'Tasks:'}
-                  </Text>
-
-                  {/* go through array of tasks
-                  add a table cell for each one */}
-                  {React.Children.toArray(
-                    tasks.map((task) => (
-                      <Cell
-                        cellStyle="Subtitle"
-                        title={
-                          task['Name']
-                        }
-                        detail={task['Deadline']}
-                        detailTextStyle={{ fontsize: 30 }}
-                      // when user selects a ticker, invoke the add ticker screen
-                      // onPress={() =>
-                      //   navigation.navigate('TaskDetail', {
-                      //     username: usernameText,
-                      //     symbol: ticker['1. symbol'],
-                      //     symbolName: ticker['2. name'],
-                      //     symbolCurrency: ticker['8. currency'],
-                      //   })
-                      // }
-                      />
-                    ))
-                  )}
-                </TableView>
-                {/* text item so show messages to the user on the screen
-                <Text>{screenMsg}</Text> */}
-              </ScrollView>
-            )}
-          </View>
-        </SafeAreaView>
-      </TouchableWithoutFeedback>
-    </KeyboardAvoidingView>
-
-
-
-
-  );
+                        {isLoading ? (
+                            <ActivityIndicator size="large" color="cornflowerblue" />
+                        ) : (
+                            <FlatList
+                                data={todos}
+                                numColumns={1}
+                                renderItem={({ item }) => (
+                                    <View>
+                                        <Pressable
+                                            style={styles.containerX}
+                                            onPress={() => navigation.navigate('TaskDetail', { item })}
+                                        >
+                                            <FontAwesome
+                                                name='trash-o'
+                                                color='red'
+                                                onPress={() => deleteTodo(item)}
+                                                style={styles.todoIcon}
+                                            />
+                                            <View style={styles.innerContainer}>
+                                                <Text style={styles.itemHeading} >
+                                                    {item.heading}
+                                                </Text>
+                                            </View>
+                                        </Pressable>
+                                    </View>
+                                )}
+                            />
+                        )}
+                    </View>
+                </SafeAreaView>
+            </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
+    );
 }
-

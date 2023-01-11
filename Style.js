@@ -250,4 +250,8 @@ module.exports = StyleSheet.create({
       fontSize: 20,
       marginLeft: 14,
     },
+    safeView: {
+      // flex: 1,
+      paddingTop: Platform.OS === "android" ? 30 : 0,
+    },
   });
