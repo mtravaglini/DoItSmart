@@ -6,6 +6,7 @@ import {
     KeyboardAvoidingView,
     Pressable,
     SafeAreaView,
+    ScrollView,
     Text,
     TextInput,
     TouchableOpacity,
@@ -60,7 +61,7 @@ export function TasksScreen({ route, navigation }) {
             .delete()
             .then(() => {
                 // success message
-                alert("Deleted!");
+                // alert("Deleted!");
             })
             .catch(error => {
                 alert(error);
@@ -94,51 +95,48 @@ export function TasksScreen({ route, navigation }) {
 
 
     return (
-        <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        >
-            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                <SafeAreaView style={styles.safeView}>
+        <SafeAreaView style={styles.safeView}>
+            <KeyboardAvoidingView
+                style={{ flex: 1 }}
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+                <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                     <View>
                         <View style={styles.formContainer}>
                             <TextInput
                                 style={styles.input}
-                                placeholder="Enter a new to do item"
+                                placeholder="Enter new task here"
                                 onChangeText={(heading) => setAddData(heading)}
                                 value={addData}
                                 underlineColorAndroid='transparent'
                                 autoCapitalize='none'
                             />
                             <TouchableOpacity
-                                style={styles.button}
+                                style={styles.inputButton}
                                 onPress={addTodo}>
                                 <Text
                                     style={styles.buttonText}
                                 >Add</Text>
                             </TouchableOpacity>
                         </View>
-                        {/* show acivity indicator when waiting to return to portfolio screen after 
-            user presses save button */}
+                        {/* show acivity indicator when waiting to return to tasks screen */}
                         {isLoading ? (
                             <ActivityIndicator size="large" color="cornflowerblue" />
                         ) : (
-                            <FlatList
+                            <FlatList style={{height: "75%"}}
                                 data={todos}
-                                numColumns={1}
+                                ListEmptyComponent={<Text style={[styles.taskHeading, { marginLeft: "20%" }]}>All done! Add more tasks!</Text>}
                                 renderItem={({ item }) => (
                                     <View>
                                         <Pressable
-                                            style={styles.containerX}
-                                            onPress={() => navigation.navigate('TaskDetail', { item })}
-                                        >
+                                            style={styles.taskContainer}
+                                            onPress={() => navigation.navigate('TaskDetail', { item })}>
                                             <FontAwesome
+                                                style={styles.taskDelIcon}
                                                 name='trash-o'
                                                 color='red'
-                                                onPress={() => deleteTodo(item)}
-                                                style={styles.todoIcon}
-                                            />
-                                            <View style={styles.innerContainer}>
-                                                <Text style={styles.itemHeading} >
+                                                onPress={() => deleteTodo(item)} />
+                                            <View >
+                                                <Text style={styles.taskHeading} >
                                                     {item.heading}
                                                 </Text>
                                             </View>
@@ -148,8 +146,8 @@ export function TasksScreen({ route, navigation }) {
                             />
                         )}
                     </View>
-                </SafeAreaView>
-            </TouchableWithoutFeedback>
-        </KeyboardAvoidingView>
+                </TouchableWithoutFeedback>
+            </KeyboardAvoidingView>
+        </SafeAreaView>
     );
 }
