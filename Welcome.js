@@ -14,7 +14,7 @@ export function WelcomeScreen({ route, navigation }) {
     return (
         <SafeAreaView style={[styles.safeView, styles.container]}>
             
-                <View style={styles.titleContainer}>
+                <View style={styles.mainTitleContainer}>
                     <Text style={styles.titleText}>
                         Do It. Smart.
                     </Text>

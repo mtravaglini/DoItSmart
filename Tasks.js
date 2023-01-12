@@ -38,11 +38,12 @@ export function TasksScreen({ route, navigation }) {
                 querySnapshot => {
                     const todos = []
                     querySnapshot.forEach((doc) => {
-                        // const {heading} = doc.data();
-                        const heading = doc.data().heading;
+                        const taskTitle = doc.data().title;
+                        const taskDate = new Date(doc.data().createdAt);
                         todos.push({
                             id: doc.id,
-                            heading
+                            taskTitle: taskTitle,
+                            taskDate: taskDate
                         })
                     })
                     setTodos(todos)
@@ -73,9 +74,9 @@ export function TasksScreen({ route, navigation }) {
     const addTodo = () => {
         // check we have one to add
         if (addData && addData.length > 0) {
-            const timestamp = Math.floor(Date.now() / 1000) //serverTimestamp();
+            const timestamp = Math.floor(Date.now()) //serverTimestamp();
             const data = {
-                heading: addData,
+                title: addData,
                 createdAt: timestamp
             }
             todoRef
@@ -101,11 +102,16 @@ export function TasksScreen({ route, navigation }) {
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                     <View>
-                        <View style={styles.formContainer}>
+                        <View style={styles.pageTitleContainer}>
+                            <Text style={styles.titleText}>
+                                Tasks
+                            </Text>
+                        </View>
+                        <View style={styles.inputBtnFormContainer}>
                             <TextInput
-                                style={styles.input}
+                                style={styles.inputShort}
                                 placeholder="Enter new task here"
-                                onChangeText={(heading) => setAddData(heading)}
+                                onChangeText={(taskTitle2) => setAddData(taskTitle2)}
                                 value={addData}
                                 underlineColorAndroid='transparent'
                                 autoCapitalize='none'
@@ -122,9 +128,9 @@ export function TasksScreen({ route, navigation }) {
                         {isLoading ? (
                             <ActivityIndicator size="large" color="cornflowerblue" />
                         ) : (
-                            <FlatList style={{height: "75%"}}
+                            <FlatList style={{ height: "75%" }}
                                 data={todos}
-                                ListEmptyComponent={<Text style={[styles.taskHeading, { marginLeft: "20%" }]}>All done! Add more tasks!</Text>}
+                                ListEmptyComponent={<Text style={[styles.taskText, { marginLeft: "20%" }]}>All done! Add more tasks!</Text>}
                                 renderItem={({ item }) => (
                                     <View>
                                         <Pressable
@@ -135,11 +141,13 @@ export function TasksScreen({ route, navigation }) {
                                                 name='trash-o'
                                                 color='red'
                                                 onPress={() => deleteTodo(item)} />
-                                            <View >
-                                                <Text style={styles.taskHeading} >
-                                                    {item.heading}
-                                                </Text>
-                                            </View>
+                                            {/* <View > */}
+                                            <Text style={styles.taskText} >
+                                                {/* {item.id}  */}
+                                                {item.taskTitle}
+                                                {/* {item.taskDate}  */}
+                                            </Text>
+                                            {/* </View> */}
                                         </Pressable>
                                     </View>
                                 )}

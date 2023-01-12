@@ -12,7 +12,7 @@ module.exports = StyleSheet.create({
   // ########################################
 
   // main title screen text
-  titleContainer: {
+  mainTitleContainer: {
     alignItems: 'center',
     paddingTop: "25%",
     paddingBottom: "25%",
@@ -31,11 +31,21 @@ module.exports = StyleSheet.create({
   },
   // ########################################
 
+    // page title screen text
+    pageTitleContainer: {
+      alignItems: 'center',
+      paddingTop: "5%",
+      paddingBottom: "5%",
+      paddingLeft: "10%",
+      paddingRight: "10%"
+    },
+    // ########################################
+
   // standard buttons
   mainButton: {
     width: "75%",
     height: 50,
-    borderRadius: 25,
+    borderRadius: 15,
     marginTop: 10,
     marginBottom: 10,
     backgroundColor: "cornflowerblue",
@@ -50,18 +60,15 @@ module.exports = StyleSheet.create({
   },
   // ########################################
 
-
-
-
   // ########## input + button form
-  formContainer: {
+  inputBtnFormContainer: {
     flexDirection: 'row',
     height: 80,
     marginLeft: 10,
     marginRight: 10,
     marginTop: 15,
   },
-  input: {
+  inputShort: {
     height: 48,
     width: "70%",
     borderRadius: 15,
@@ -74,7 +81,7 @@ module.exports = StyleSheet.create({
   },
   inputButton: {
     height: 48,
-    borderRadius: 5,
+    borderRadius: 15,
     width: "28%",
     alignItems: 'center',
     backgroundColor: "cornflowerblue",
@@ -82,13 +89,39 @@ module.exports = StyleSheet.create({
   },
   // ########################################
 
+    // ########## input + title form
+    inputFormContainer: {
+      flexDirection: 'column',
+      height: 80,
+      marginLeft: 10,
+      marginRight: 10,
+      marginTop: 15,
+    },
+    input: {
+      height: 48,
+      width: "95%",
+      borderRadius: 15,
+      overflow: 'hidden',
+      paddingLeft: 10,
+      // marginLeft: 0,
+      marginRight: "2%",
+      fontSize: 18,
+      backgroundColor: "white"
+    },
+    inputLabel: {
+      paddingLeft: 10,
+      fontSize: 10,
+    },
+    // ########################################
+
   // task list 
   taskContainer: {
     backgroundColor: "#e5e5e5",
-    padding: 15,
+    // padding: 15,
     borderRadius: 15,
-    margin: 5,
-    marginHorizontal: 10,
+    margin: "1%",
+    height: 48,
+    marginHorizontal: "5%",
     flexDirection: 'row',
     alignItems: 'center',
     // paddingTop: 300,
@@ -98,7 +131,7 @@ module.exports = StyleSheet.create({
     marginLeft: "5%",
     marginRight: "5%",
   },
-  taskHeading: {
+  taskText: {
     fontWeight: "bold",
     fontSize: 18,
     marginRight: 22,
@@ -123,7 +156,7 @@ module.exports = StyleSheet.create({
     right: "2%",
     width: "40%",
     height: 40,
-    borderRadius: 50,
+    borderRadius: 15,
     justifyContent: "center",
     alignItems: 'center',
     marginTop: 100
