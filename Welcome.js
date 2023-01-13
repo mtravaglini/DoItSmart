@@ -29,6 +29,16 @@ export function WelcomeScreen({ route, navigation }) {
                     <Text style={styles.buttonText}>Register</Text>
                 </TouchableOpacity>
 
+                <TouchableOpacity style={styles.mainButton}
+                    onPress={() => { navigation.navigate('Groups'); }}>
+                    <Text style={styles.buttonText}>Groups</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.mainButton}
+                    onPress={() => { navigation.navigate('Resources'); }}>
+                    <Text style={styles.buttonText}>Resources</Text>
+                </TouchableOpacity>
+
         </SafeAreaView>
     );
 }
