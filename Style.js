@@ -11,7 +11,7 @@ module.exports = StyleSheet.create({
   },
   // ########################################
 
-  // main title screen text
+  // main title screen text ########################################
   mainTitleContainer: {
     alignItems: 'center',
     paddingTop: "25%",
@@ -31,17 +31,19 @@ module.exports = StyleSheet.create({
   },
   // ########################################
 
-    // page title screen text
-    pageTitleContainer: {
-      alignItems: 'center',
-      paddingTop: "5%",
-      paddingBottom: "5%",
-      paddingLeft: "10%",
-      paddingRight: "10%"
-    },
-    // ########################################
+  // page title screen text ########################################
+  pageTitleContainer: {
+    alignItems: 'center',
+  },
+  pageTitleText: {
+    fontSize: 25,
+    fontWeight: "bold",
+    fontFamily: Platform.OS === "android" ? "sans-serif-thin" : "AppleSDGothicNeo-Thin",
+    color: "cornflowerblue",
+  },
+  // ########################################
 
-  // standard buttons
+  // standard buttons ########################################
   mainButton: {
     width: "75%",
     height: 50,
@@ -60,7 +62,7 @@ module.exports = StyleSheet.create({
   },
   // ########################################
 
-  // ########## input + button form
+  // input + button form ########################################
   inputBtnFormContainer: {
     flexDirection: 'row',
     height: 80,
@@ -89,33 +91,33 @@ module.exports = StyleSheet.create({
   },
   // ########################################
 
-    // ########## input + title form
-    inputFormContainer: {
-      flexDirection: 'column',
-      height: 80,
-      marginLeft: 10,
-      marginRight: 10,
-      marginTop: 15,
-    },
-    input: {
-      height: 48,
-      width: "95%",
-      borderRadius: 15,
-      overflow: 'hidden',
-      paddingLeft: 10,
-      // marginLeft: 0,
-      marginRight: "2%",
-      fontSize: 18,
-      backgroundColor: "white"
-    },
-    inputLabel: {
-      paddingLeft: 10,
-      fontSize: 10,
-    },
-    // ########################################
+  // input + title form ########################################
+  inputFormContainer: {
+    flexDirection: 'column',
+    height: 80,
+    marginLeft: 10,
+    marginRight: 10,
+    marginTop: 15,
+  },
+  input: {
+    height: 48,
+    width: "95%",
+    borderRadius: 15,
+    overflow: 'hidden',
+    paddingLeft: 10,
+    // marginLeft: 0,
+    marginRight: "2%",
+    fontSize: 18,
+    backgroundColor: "white"
+  },
+  inputLabel: {
+    paddingLeft: 10,
+    fontSize: 10,
+  },
+  // ########################################
 
-  // task list 
-  taskContainer: {
+  // task list  ########################################
+  listContainer: {
     backgroundColor: "#e5e5e5",
     // padding: 15,
     borderRadius: 15,
@@ -126,19 +128,19 @@ module.exports = StyleSheet.create({
     alignItems: 'center',
     // paddingTop: 300,
   },
-  taskDelIcon: {
+  listDelIcon: {
     fontSize: 30,
     marginLeft: "5%",
     marginRight: "5%",
   },
-  taskText: {
+  listText: {
     fontWeight: "bold",
     fontSize: 18,
     marginRight: 22,
   },
   // ########################################
 
-  // MISC
+  // MISC ########################################
   textDisplay: {
     borderBottomWidth: 3,
     borderColor: "cornflowerblue",
