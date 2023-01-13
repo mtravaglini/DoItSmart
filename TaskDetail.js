@@ -26,7 +26,7 @@ export function TaskDetailScreen({ route, navigation }) {
           <View>
 
             <View style={styles.pageTitleContainer}>
-              <Text style={styles.titleText}>
+              <Text style={styles.pageTitleText}>
                 Task Detail
               </Text>
             </View>
@@ -36,7 +36,7 @@ export function TaskDetailScreen({ route, navigation }) {
               <TextInput
                 style={styles.input}
                 placeholder="Task title"
-                // onChangeText={(taskTitle) => setAddData(taskTitle)}
+                // onChangeText={(taskTitle) => setNewData(taskTitle)}
                 value={route.params.item.taskTitle}
                 underlineColorAndroid='transparent'
                 autoCapitalize='none'
@@ -47,7 +47,7 @@ export function TaskDetailScreen({ route, navigation }) {
                 editable={false} selectTextOnFocus={false}
                 style={styles.input}
                 placeholder="Date Created"
-                // onChangeText={(taskTitle) => setAddData(taskTitle)}
+                // onChangeText={(taskTitle) => setNewData(taskTitle)}
                 value={route.params.item.taskDate.toISOString().slice(0, 19).replace(/-/g, "/").replace("T", " ")}
                 underlineColorAndroid='transparent'
                 autoCapitalize='none'
@@ -57,7 +57,7 @@ export function TaskDetailScreen({ route, navigation }) {
               <TextInput
                 style={styles.input}
                 placeholder="Assigned to"
-                // onChangeText={(taskTitle) => setAddData(taskTitle)}
+                // onChangeText={(taskTitle) => setNewData(taskTitle)}
                 value={route.params.item.assignedTo}
                 underlineColorAndroid='transparent'
                 autoCapitalize='none'
@@ -71,7 +71,7 @@ export function TaskDetailScreen({ route, navigation }) {
                 }]}
                 multiline={true} // ios fix for centering it at the top-left corner 
                 placeholder="Notes"
-                // onChangeText={(taskTitle) => setAddData(taskTitle)}
+                // onChangeText={(taskTitle) => setNewData(taskTitle)}
                 value={route.params.item.taskNotes}
                 underlineColorAndroid='transparent'
                 autoCapitalize='none'
@@ -81,7 +81,7 @@ export function TaskDetailScreen({ route, navigation }) {
               <TextInput
                 style={styles.input}
                 placeholder="Start Date"
-                // onChangeText={(taskTitle) => setAddData(taskTitle)}
+                // onChangeText={(taskTitle) => setNewData(taskTitle)}
                 value={route.params.item.startDate == undefined ?
                   new Date(Date.now()).toISOString().slice(0, 19).replace(/-/g, "/").replace("T", " ")
                   :
@@ -94,7 +94,7 @@ export function TaskDetailScreen({ route, navigation }) {
               <TextInput
                 style={styles.input}
                 placeholder="End Before Date"
-                // onChangeText={(taskTitle) => setAddData(taskTitle)}
+                // onChangeText={(taskTitle) => setNewData(taskTitle)}
                 value={route.params.item.endDate == undefined ?
                   new Date(Date.now()).toISOString().slice(0, 19).replace(/-/g, "/").replace("T", " ")
                   :
@@ -104,13 +104,12 @@ export function TaskDetailScreen({ route, navigation }) {
               />
 
               <View style={{ flexDirection: "row" }}>
-
                 <View style={{ flexDirection: "column" }}>
                   <Text style={styles.inputLabel}>Priority</Text>
                   <TextInput
                     style={[styles.input]}
                     placeholder="Priority"
-                    // onChangeText={(taskTitle) => setAddData(taskTitle)}
+                    // onChangeText={(taskTitle) => setNewData(taskTitle)}
                     value={route.params.item.taskPriority}
                     underlineColorAndroid='transparent'
                     autoCapitalize='none'
@@ -122,15 +121,33 @@ export function TaskDetailScreen({ route, navigation }) {
                   <TextInput
                     style={[styles.input]}
                     placeholder="Effort"
-                    // onChangeText={(taskTitle) => setAddData(taskTitle)}
+                    // onChangeText={(taskTitle) => setNewData(taskTitle)}
                     value={route.params.item.taskPriority}
                     underlineColorAndroid='transparent'
                     autoCapitalize='none'
                   />
                 </View>
-
               </View>
 
+              <Text style={styles.inputLabel}>Group</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Group"
+                // onChangeText={(taskTitle) => setNewData(taskTitle)}
+                value={route.params.item.taskGroup}
+                underlineColorAndroid='transparent'
+                autoCapitalize='none'
+              />
+
+              <Text style={styles.inputLabel}>Resources</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Resources"
+                // onChangeText={(taskTitle) => setNewData(taskTitle)}
+                value={route.params.item.taskResources}
+                underlineColorAndroid='transparent'
+                autoCapitalize='none'
+              />
 
             </View>
           </View>

@@ -22,31 +22,28 @@ const styles = require('./Style.js');
 
 export function TasksScreen({ route, navigation }) {
 
-    const [todos, setTodos] = useState([]);
-    const todoRef = db.collection("todos");
-    // const reference = firebase.database("https://taskmanager-cm3070-default-rtdb.europe-west1.firebasedatabase.app").ref('/users/100');
+    const tasksRef = db.collection("tasks");
 
-    const [addData, setAddData] = useState('');
-
+    const [tasks, setTodos] = useState([]);
+    const [newData, setNewData] = useState('');
     const [isLoading, setLoading] = useState(true);
 
-
     useEffect(() => {
-        todoRef
+        tasksRef
             .orderBy('createdAt', 'desc')
             .onSnapshot(
                 querySnapshot => {
-                    const todos = []
+                    const tasks = []
                     querySnapshot.forEach((doc) => {
                         const taskTitle = doc.data().title;
                         const taskDate = new Date(doc.data().createdAt);
-                        todos.push({
+                        tasks.push({
                             id: doc.id,
                             taskTitle: taskTitle,
                             taskDate: taskDate
                         })
                     })
-                    setTodos(todos)
+                    setTodos(tasks)
                 }
             )
 
@@ -56,9 +53,9 @@ export function TasksScreen({ route, navigation }) {
 
     // delete  a todo
 
-    const deleteTodo = (todos) => {
-        todoRef
-            .doc(todos.id)
+    const deleteTodo = (tasks) => {
+        tasksRef
+            .doc(tasks.id)
             .delete()
             .then(() => {
                 // success message
@@ -73,16 +70,16 @@ export function TasksScreen({ route, navigation }) {
 
     const addTodo = () => {
         // check we have one to add
-        if (addData && addData.length > 0) {
+        if (newData && newData.length > 0) {
             const timestamp = Math.floor(Date.now()) //serverTimestamp();
             const data = {
-                title: addData,
+                title: newData,
                 createdAt: timestamp
             }
-            todoRef
+            tasksRef
                 .add(data)
                 .then(() => {
-                    setAddData('');
+                    setNewData('');
                     Keyboard.dismiss();
                     // success message
                     // alert("Added!");
@@ -103,7 +100,7 @@ export function TasksScreen({ route, navigation }) {
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                     <View>
                         <View style={styles.pageTitleContainer}>
-                            <Text style={styles.titleText}>
+                            <Text style={styles.pageTitleText}>
                                 Tasks
                             </Text>
                         </View>
@@ -111,8 +108,8 @@ export function TasksScreen({ route, navigation }) {
                             <TextInput
                                 style={styles.inputShort}
                                 placeholder="Enter new task here"
-                                onChangeText={(taskTitle2) => setAddData(taskTitle2)}
-                                value={addData}
+                                onChangeText={(taskTitle2) => setNewData(taskTitle2)}
+                                value={newData}
                                 underlineColorAndroid='transparent'
                                 autoCapitalize='none'
                             />
@@ -129,20 +126,20 @@ export function TasksScreen({ route, navigation }) {
                             <ActivityIndicator size="large" color="cornflowerblue" />
                         ) : (
                             <FlatList style={{ height: "75%" }}
-                                data={todos}
-                                ListEmptyComponent={<Text style={[styles.taskText, { marginLeft: "20%" }]}>All done! Add more tasks!</Text>}
+                                data={tasks}
+                                ListEmptyComponent={<Text style={[styles.listText, { marginLeft: "20%" }]}>All done! Add more tasks!</Text>}
                                 renderItem={({ item }) => (
                                     <View>
                                         <Pressable
-                                            style={styles.taskContainer}
+                                            style={styles.listContainer}
                                             onPress={() => navigation.navigate('TaskDetail', { item })}>
                                             <FontAwesome
-                                                style={styles.taskDelIcon}
+                                                style={styles.listDelIcon}
                                                 name='trash-o'
                                                 color='red'
                                                 onPress={() => deleteTodo(item)} />
                                             {/* <View > */}
-                                            <Text style={styles.taskText} >
+                                            <Text style={styles.listText} >
                                                 {/* {item.id}  */}
                                                 {item.taskTitle}
                                                 {/* {item.taskDate}  */}
