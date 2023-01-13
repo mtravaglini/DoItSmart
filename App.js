@@ -8,6 +8,8 @@ import { WelcomeScreen } from './Welcome.js';
 import { RegisterScreen } from './Register.js';
 import { TasksScreen } from './Tasks.js';
 import { TaskDetailScreen } from './TaskDetail.js';
+import { GroupsScreen } from './Groups.js';
+import { ResourcesScreen } from './Resources.js';
 
 // create the Navigation stack
 const Stack = createStackNavigator();
@@ -20,6 +22,8 @@ export default function App() {
         <Stack.Screen name="Register" component={RegisterScreen} />
         <Stack.Screen name="Tasks" component={TasksScreen} />
         <Stack.Screen name="TaskDetail" component={TaskDetailScreen} />
+        <Stack.Screen name="Groups" component={GroupsScreen} />
+        <Stack.Screen name="Resources" component={ResourcesScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
