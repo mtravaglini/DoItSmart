@@ -27,52 +27,48 @@ export function RegisterScreen({ route, navigation }) {
   const [passwordConf, setPasswordConf] = useState('');
   const [screenMsg, setScreenMsg] = useState('');
 
-  const RegisterNewUser = async (name, email, password, passwordConf) => {
+  const RegisterNewUser = async () => {
 
     if (password != passwordConf) {
       console.log("Passwords don't match");
-      return ({
-        "code": 1,
-        "message": "Passwords don't match."
-      })
+      setScreenMsg("Passwords don't match.");
+      return 1;
     }
-  
+
+
     try {
-    await createUserWithEmailAndPassword(auth, email, password);
+      await createUserWithEmailAndPassword(auth, email, password);
     } catch (error) {
       const errorCode = error.code;
       const errorMessage = error.message;
       console.log("Sign in failed");
       console.log(errorCode);    // ..
       console.log(errorMessage);    // ..
+      setScreenMsg(errorMessage);
+      return 1;
     }
-  
-    // updateProfile(auth.currentUser, {
-    //   displayName: name
-    // }).then(() => {
-    //   // Profile updated!
-    //   // ...
-    //   console.log("Profile updated!");
-    // }).catch((error) => {
-    //   const errorCode = error.code;
-    //   const errorMessage = error.message;
-    //   console.log("Profile update failed");
-    //   console.log(errorCode);    // ..
-    //   console.log(errorMessage);    // ..
-    //   return ({
-    //     "code": 1,
-    //     "message": errorMessage
-    //   })
-    // });
-  
-    console.log("Registered successfully");
-    return ({
-      "code": 0,
-      "message": "Registered successfully"
-    })
-  
+
+
+    try {
+      await updateProfile(auth.currentUser, {displayName: name});
+    } catch (error) {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      console.log("Update profile failed.");
+      console.log(errorCode);    // ..
+      console.log(errorMessage);    // ..
+      setScreenMsg(errorMessage);
+      return 1;
+    }
+
+    console.log("Registered successfully.");
+    console.log("currentuser=",auth.currentUser);
+    console.log("email=",auth.currentUser.email);
+    
+    setScreenMsg("");
+    return 0;
   }
-  
+
 
   return (
     <SafeAreaView style={[styles.safeView]}>
@@ -138,31 +134,35 @@ export function RegisterScreen({ route, navigation }) {
 
               <View style={{ alignItems: "center" }}>
                 <TouchableOpacity style={styles.mainButton}
-                  onPress={RegisterNewUser}
-                  // onPress={() => {
-                  //   var result = RegisterNewUser(name, email, password, passwordConf)
-                  //   if (result.code == 0) {
-                  //     navigation.navigate('Tasks');
-                  //   }
-                  //   setScreenMsg(result.message)
-                  // }
-                  // }
-                  disabled={!name || !email || !password || !passwordConf}
+                  // onPress={RegisterNewUser}
+                  onPress={async () => {
+                    await RegisterNewUser().then(
+                      (result) => {
+                        // var result = RegisterNewUser();
+                        console.log("return code=", result)
+                        if (result == 0) {
+                          navigation.navigate('Tasks', {"uid": auth.currentUser.displayName});
+                        }
+                      })
+                  }}
+                  
+                  
+                disabled={!name || !email || !password || !passwordConf}
                 >
-                  <Text
-                    style={styles.buttonText}
-                  >Register
-                  </Text>
-                </TouchableOpacity>
+                <Text
+                  style={styles.buttonText}
+                >Register
+                </Text>
+              </TouchableOpacity>
 
-                <Text>{screenMsg}</Text>
+              <Text>{screenMsg}</Text>
 
-              </View>
             </View>
-
           </View>
-        </TouchableWithoutFeedback>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+
+        </View>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
+    </SafeAreaView >
   );
 }

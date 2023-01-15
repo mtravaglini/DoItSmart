@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 // import { useNavigation } from '@react-navigation/native';
 import { FontAwesome } from '@expo/vector-icons';
-import { app, db } from './firebase.config';
+import { auth, db } from './firebase.config';
 
 // use custom style sheet
 const styles = require('./Style.js');
@@ -24,6 +24,7 @@ export function TasksScreen({ route, navigation }) {
 
     const tasksRef = db.collection("tasks");
 
+    const [uid, setUid] = useState(route.params.uid);
     const [tasks, setTodos] = useState([]);
     const [newData, setNewData] = useState('');
     const [isLoading, setLoading] = useState(true);
@@ -73,6 +74,7 @@ export function TasksScreen({ route, navigation }) {
         if (newData && newData.length > 0) {
             const timestamp = Math.floor(Date.now()) //serverTimestamp();
             const data = {
+                uid: uid,
                 title: newData,
                 createdAt: timestamp
             }
@@ -101,7 +103,7 @@ export function TasksScreen({ route, navigation }) {
                     <View>
                         <View style={styles.pageTitleContainer}>
                             <Text style={styles.pageTitleText}>
-                                Tasks
+                                Tasks for {uid}
                             </Text>
                         </View>
                         <View style={styles.inputBtnFormContainer}>
