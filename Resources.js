@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 // import { useNavigation } from '@react-navigation/native';
 import { FontAwesome } from '@expo/vector-icons';
-import { app, db, serverTimestamp } from './firebase.config';
+import { app, db } from './firebase.config';
 
 // use custom style sheet
 const styles = require('./Style.js');
