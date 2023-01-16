@@ -12,7 +12,7 @@ import {
 import { useState } from 'react';
 // import { SafeAreaView } from 'react-native-safe-area-context';
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { auth } from './firebase.config';
+import { auth, db } from './firebase.config';
 
 // use custom style sheet
 const styles = require('./Style.js');
@@ -30,41 +30,46 @@ export function RegisterScreen({ route, navigation }) {
   const RegisterNewUser = async () => {
 
     if (password != passwordConf) {
-      console.log("Passwords don't match");
+      // console.log("Passwords don't match");
       setScreenMsg("Passwords don't match.");
       return 1;
     }
 
-
     try {
       await createUserWithEmailAndPassword(auth, email, password);
     } catch (error) {
-      const errorCode = error.code;
+      // const errorCode = error.code;
       const errorMessage = error.message;
-      console.log("Sign in failed");
-      console.log(errorCode);    // ..
-      console.log(errorMessage);    // ..
+      // console.log("Sign in failed");
+      // console.log(errorCode);    // ..
+      // console.log(errorMessage);    // ..
       setScreenMsg(errorMessage);
       return 1;
     }
 
+    const usersRef = db.collection("users");
 
-    try {
-      await updateProfile(auth.currentUser, {displayName: name});
-    } catch (error) {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      console.log("Update profile failed.");
-      console.log(errorCode);    // ..
-      console.log(errorMessage);    // ..
-      setScreenMsg(errorMessage);
-      return 1;
+    const timestamp = Math.floor(Date.now()) //serverTimestamp();
+    const data = {
+      uid: auth.currentUser.uid,
+      name: name,
+      email: email,
+      createdAt: timestamp
     }
+    usersRef
+      .add(data)
+      .then(() => {
+        // success message
+        // alert("Added!");
+      })
+      .catch(error => {
+        alert(error);
+      })
 
-    console.log("Registered successfully.");
-    console.log("currentuser=",auth.currentUser);
-    console.log("email=",auth.currentUser.email);
-    
+    // console.log("Registered successfully.");
+    // console.log("currentuser=", auth.currentUser);
+    // console.log("uid=", auth.currentUser.uid);
+
     setScreenMsg("");
     return 0;
   }
@@ -133,36 +138,36 @@ export function RegisterScreen({ route, navigation }) {
 
 
               <View style={{ alignItems: "center" }}>
-                <TouchableOpacity style={styles.mainButton}
-                  // onPress={RegisterNewUser}
+                <TouchableOpacity style={[styles.mainButton,
+                { opacity: (!name || !email || !password || !passwordConf) ? 0.5 : 1.0 }
+                ]}
                   onPress={async () => {
                     await RegisterNewUser().then(
                       (result) => {
-                        // var result = RegisterNewUser();
-                        console.log("return code=", result)
+                        // console.log("return code=", result)
                         if (result == 0) {
-                          navigation.navigate('Tasks', {"uid": auth.currentUser.displayName});
+                          navigation.navigate('Tasks', { uid: auth.currentUser.uid });
+                          // navigation.navigate('Tasks');
                         }
-                      })
+                      }
+                    )
                   }}
-                  
-                  
-                disabled={!name || !email || !password || !passwordConf}
+                  disabled={!name || !email || !password || !passwordConf}
                 >
-                <Text
-                  style={styles.buttonText}
-                >Register
-                </Text>
-              </TouchableOpacity>
+                  <Text
+                    style={styles.buttonText}
+                  >Register
+                  </Text>
+                </TouchableOpacity>
 
-              <Text>{screenMsg}</Text>
+                <Text>{screenMsg}</Text>
 
+              </View>
             </View>
-          </View>
 
-        </View>
-      </TouchableWithoutFeedback>
-    </KeyboardAvoidingView>
+          </View>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
     </SafeAreaView >
   );
 }
