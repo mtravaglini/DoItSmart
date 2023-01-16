@@ -102,8 +102,11 @@ export function TasksScreen({ route, navigation }) {
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                     <View>
                         <View style={styles.pageTitleContainer}>
-                            <Text style={styles.pageTitleText}>
-                                Tasks for {uid}
+                        <Text style={styles.pageTitleText}>
+                                Tasks
+                            </Text>
+                            <Text style={styles.pageSubTitleText}>
+                                {uid}
                             </Text>
                         </View>
                         <View style={styles.inputBtnFormContainer}>

@@ -41,6 +41,16 @@ module.exports = StyleSheet.create({
     fontFamily: Platform.OS === "android" ? "sans-serif-thin" : "AppleSDGothicNeo-Thin",
     color: "cornflowerblue",
   },
+  pageSubTitleText: {
+    fontSize: 15,
+    fontWeight: "bold",
+    fontFamily: Platform.OS === "android" ? "sans-serif-thin" : "AppleSDGothicNeo-Thin",
+    color: "cornflowerblue",
+    borderColor: "cornflowerblue",
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingHorizontal: 15,
+  },
   // ########################################
 
   // standard buttons ########################################
