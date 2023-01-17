@@ -16,7 +16,7 @@ import {
 // import { useNavigation } from '@react-navigation/native';
 import { FontAwesome } from '@expo/vector-icons';
 import { db } from './firebase.config';
-import { doc, collection, query, getDoc, getDocs, setDoc, onSnapshot } from "firebase/firestore";
+import { doc, collection, query, getDoc, getDocs, setDoc, onSnapshot, orderBy } from "firebase/firestore";
 
 // use custom style sheet
 const styles = require('./Style.js');
@@ -24,7 +24,7 @@ const styles = require('./Style.js');
 export function TasksScreen({ route, navigation }) {
 
     const userRef = doc(db, "users", route.params.email);
-    const tasksRef = query(collection(db, "users", route.params.email, "tasks"));
+    const tasksRef = query(collection(db, "users", route.params.email, "tasks"), orderBy('createdAt'));
     const taskRef = db.collection("users/" + route.params.email + "/tasks");
 
     const [user, setUser] = useState('');
@@ -50,9 +50,10 @@ export function TasksScreen({ route, navigation }) {
 
     useEffect(() => {
         // get tasks from database
+        var unsubscribe;
         async function getTasks() {
             try {
-                const unsubscribe = onSnapshot(tasksRef, (querySnapshot) => {
+                unsubscribe = onSnapshot(tasksRef, (querySnapshot) => {
                     const retrievedTasks = [];
                     querySnapshot.forEach((doc) => {
                         const taskTitle = doc.id;
@@ -71,6 +72,10 @@ export function TasksScreen({ route, navigation }) {
             }
         }
         getTasks();
+        return function cleanup() {
+            console.log("unsubscribe!")
+            unsubscribe();
+          };
     }, [])
 
     // useEffect(() => {
@@ -231,7 +236,7 @@ export function TasksScreen({ route, navigation }) {
                             <TouchableOpacity
                                 style={styles.inputButton}
                                 onPress={() => {
-                                     Keyboard.dismiss();
+                                    Keyboard.dismiss();
                                     { addTask() }
                                 }}
                             >
