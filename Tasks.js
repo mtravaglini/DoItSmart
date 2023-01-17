@@ -6,7 +6,6 @@ import {
     KeyboardAvoidingView,
     Pressable,
     SafeAreaView,
-    ScrollView,
     Text,
     TextInput,
     TouchableOpacity,
@@ -16,23 +15,23 @@ import {
 // import { useNavigation } from '@react-navigation/native';
 import { FontAwesome } from '@expo/vector-icons';
 import { db } from './firebase.config';
-import { doc, collection, query, getDoc, getDocs, setDoc, onSnapshot, orderBy } from "firebase/firestore";
+import { doc, collection, query, getDoc, setDoc, onSnapshot, orderBy } from "firebase/firestore";
 
 // use custom style sheet
 const styles = require('./Style.js');
 
 export function TasksScreen({ route, navigation }) {
 
-    const userRef = doc(db, "users", route.params.email);
-    const tasksRef = query(collection(db, "users", route.params.email, "tasks"), orderBy('createdAt'));
-    const taskRef = db.collection("users/" + route.params.email + "/tasks");
-
     const [user, setUser] = useState('');
-    // const [uid, setUid] = useState(route.params.uid);
     const [email, setEmail] = useState(route.params.email);
     const [tasks, setTasks] = useState([]);
     const [newTask, setNewTask] = useState('');
     const [isLoading, setLoading] = useState(true);
+
+    const userRef = doc(db, "users", route.params.email);
+    const tasksRef = query(collection(db, "users", route.params.email, "tasks"), orderBy('createdAt'));
+    const taskRef = db.collection("users/" + route.params.email + "/tasks");
+    
 
     useEffect(() => {
         // get user from database
@@ -47,25 +46,35 @@ export function TasksScreen({ route, navigation }) {
         getUser();
     }, [])
 
-
     useEffect(() => {
         // get tasks from database
         var unsubscribe;
+        var taskObj;
         async function getTasks() {
             try {
                 unsubscribe = onSnapshot(tasksRef, (querySnapshot) => {
                     const retrievedTasks = [];
                     querySnapshot.forEach((doc) => {
-                        const taskTitle = doc.id;
-                        const taskDate = new Date(doc.data().createdAt);
-                        retrievedTasks.push({
-                            // id: doc.id,
-                            taskTitle: taskTitle,
-                            taskDate: taskDate
-                        })
+                        taskObj = doc.data();
+                        taskObj.taskTitle = doc.id;
+                        // const taskTitle = doc.id;
+                        // const createdAt = new Date(doc.data().createdAt);
+                        // const startDate = new Date(doc.data().startDate);
+                        // const endDate = new Date(doc.data().endDate);
+                        retrievedTasks.push(taskObj
+                        //     {
+                        //     // id: doc.id,
+                        //     assignee: doc.data().assignee,
+                        //     taskTitle: doc.id,
+                        //     createdAt: new Date(doc.data().createdAt),
+                        //     startDate: new Date(doc.data().startDate),
+                        //     endDate: new Date(doc.data().endDate)
+                        // }
+                        )
                     })
                     setTasks(retrievedTasks)
                     setLoading(false);
+                    console.log(taskObj);
                 })
             } catch (error) {
                 console.error(error);
@@ -73,7 +82,6 @@ export function TasksScreen({ route, navigation }) {
         }
         getTasks();
         return function cleanup() {
-            console.log("unsubscribe!")
             unsubscribe();
           };
     }, [])
@@ -131,11 +139,10 @@ export function TasksScreen({ route, navigation }) {
 
     // delete a task
 
-    const deleteTask = async (tasks) => {
-        // const deleteTask = (tasks) => {
+    const deleteTask = async (taskTitle) => {
         try {
             taskRef
-                .doc(tasks.taskTitle)
+                .doc(taskTitle)
                 .delete()
         } catch (error) {
             alert(error);
@@ -189,13 +196,16 @@ export function TasksScreen({ route, navigation }) {
 
 
 
-    const addTask = async (tasks) => {
+    const addTask = async () => {
         // const addTask = () => {
         // check we have one to add
         if (newTask && newTask.length > 0) {
             try {
                 const timestamp = Math.floor(Date.now()) //serverTimestamp();
                 const data = {
+                    assignee: email,
+                    startDate: timestamp,
+                    endDate: timestamp + (24 * 60 * 60 * 1000),
                     createdAt: timestamp
                 }
                 // setDoc(doc(taskRef, tasks.taskTitle), data)
@@ -258,18 +268,16 @@ export function TasksScreen({ route, navigation }) {
                                     <View>
                                         <Pressable
                                             style={styles.listContainer}
-                                            onPress={() => navigation.navigate('TaskDetail', { item })}
+                                            onPress={() => navigation.navigate('TaskDetail', {item})}
                                         >
                                             <FontAwesome
                                                 style={styles.listDelIcon}
                                                 name='trash-o'
                                                 color='red'
-                                                onPress={() => deleteTask(item)} />
+                                                onPress={() => deleteTask(item.taskTitle)} />
                                             {/* <View > */}
                                             <Text style={styles.listText} >
-                                                {/* {item.id}  */}
                                                 {item.taskTitle}
-                                                {/* {item.taskDate}  */}
                                             </Text>
                                             {/* </View> */}
                                         </Pressable>
