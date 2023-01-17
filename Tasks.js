@@ -227,7 +227,7 @@ export function TasksScreen({ route, navigation }) {
                         <View style={styles.inputBtnFormContainer}>
                             <TextInput
                                 style={styles.inputShort}
-                                placeholder="Enter new task here"
+                                placeholder="task quick add"
                                 onChangeText={(newTaskTitle) => setNewTask(newTaskTitle)}
                                 value={newTask}
                                 underlineColorAndroid='transparent'

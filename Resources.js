@@ -107,7 +107,6 @@ export function ResourcesScreen({ route, navigation }) {
                         <View style={styles.inputBtnFormContainer}>
                             <TextInput
                                 style={styles.inputShort}
-                                placeholder="Enter a new resource here"
                                 onChangeText={(resourceTitle2) => setNewData(resourceTitle2)}
                                 value={newData}
                                 underlineColorAndroid='transparent'

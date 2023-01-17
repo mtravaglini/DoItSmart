@@ -35,7 +35,6 @@ export function TaskDetailScreen({ route, navigation }) {
               <Text style={styles.inputLabel}>Title</Text>
               <TextInput
                 style={styles.input}
-                placeholder="Task title"
                 // onChangeText={(taskTitle) => setNewData(taskTitle)}
                 value={route.params.item.taskTitle}
                 underlineColorAndroid='transparent'
@@ -46,7 +45,6 @@ export function TaskDetailScreen({ route, navigation }) {
               <TextInput
                 editable={false} selectTextOnFocus={false}
                 style={styles.input}
-                placeholder="Date Created"
                 // onChangeText={(taskTitle) => setNewData(taskTitle)}
                 value={route.params.item.taskDate.toString().slice(0, 24)}
                 underlineColorAndroid='transparent'
@@ -56,7 +54,6 @@ export function TaskDetailScreen({ route, navigation }) {
               <Text style={styles.inputLabel}>Assigned To</Text>
               <TextInput
                 style={styles.input}
-                placeholder="Assigned to"
                 // onChangeText={(taskTitle) => setNewData(taskTitle)}
                 value={route.params.item.assignedTo}
                 underlineColorAndroid='transparent'
@@ -70,7 +67,6 @@ export function TaskDetailScreen({ route, navigation }) {
                   textAlignVertical: "top" // android fix for centering it at the top-left corner 
                 }]}
                 multiline={true} // ios fix for centering it at the top-left corner 
-                placeholder="Notes"
                 // onChangeText={(taskTitle) => setNewData(taskTitle)}
                 value={route.params.item.taskNotes}
                 underlineColorAndroid='transparent'
@@ -80,7 +76,6 @@ export function TaskDetailScreen({ route, navigation }) {
               <Text style={styles.inputLabel}>Start Date</Text>
               <TextInput
                 style={styles.input}
-                placeholder="Start Date"
                 // onChangeText={(taskTitle) => setNewData(taskTitle)}
                 value={route.params.item.startDate == undefined ?
                   new Date(Date.now()).toString().slice(0, 24)
@@ -93,7 +88,6 @@ export function TaskDetailScreen({ route, navigation }) {
               <Text style={styles.inputLabel}>End Before Date</Text>
               <TextInput
                 style={styles.input}
-                placeholder="End Before Date"
                 // onChangeText={(taskTitle) => setNewData(taskTitle)}
                 value={route.params.item.endDate == undefined ?
                   new Date(Date.now()).toString().slice(0, 24)
@@ -108,7 +102,6 @@ export function TaskDetailScreen({ route, navigation }) {
                   <Text style={styles.inputLabel}>Priority</Text>
                   <TextInput
                     style={[styles.input]}
-                    placeholder="Priority"
                     // onChangeText={(taskTitle) => setNewData(taskTitle)}
                     value={route.params.item.taskPriority}
                     underlineColorAndroid='transparent'
@@ -120,7 +113,6 @@ export function TaskDetailScreen({ route, navigation }) {
                   <Text style={styles.inputLabel}>Effort</Text>
                   <TextInput
                     style={[styles.input]}
-                    placeholder="Effort"
                     // onChangeText={(taskTitle) => setNewData(taskTitle)}
                     value={route.params.item.taskPriority}
                     underlineColorAndroid='transparent'
@@ -132,7 +124,6 @@ export function TaskDetailScreen({ route, navigation }) {
               <Text style={styles.inputLabel}>Group</Text>
               <TextInput
                 style={styles.input}
-                placeholder="Group"
                 // onChangeText={(taskTitle) => setNewData(taskTitle)}
                 value={route.params.item.taskGroup}
                 underlineColorAndroid='transparent'
@@ -142,7 +133,6 @@ export function TaskDetailScreen({ route, navigation }) {
               <Text style={styles.inputLabel}>Resources</Text>
               <TextInput
                 style={styles.input}
-                placeholder="Resources"
                 // onChangeText={(taskTitle) => setNewData(taskTitle)}
                 value={route.params.item.taskResources}
                 underlineColorAndroid='transparent'

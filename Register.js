@@ -111,7 +111,6 @@ export function RegisterScreen({ route, navigation }) {
                 // display icon in the textinput box
                 // left={<TextInput.Icon name="account" />}
                 style={styles.input}
-                placeholder="Name"
                 onChangeText={(newText) => setName(newText)}
                 // defaultValue={usernameText}
                 autoCapitalize="none"
@@ -122,7 +121,6 @@ export function RegisterScreen({ route, navigation }) {
                 // display icon in the textinput box
                 // left={<TextInput.Icon name="account" />}
                 style={styles.input}
-                placeholder="Email"
                 onChangeText={(newText) => setEmail(newText)}
                 // defaultValue={usernameText}
                 autoCapitalize="none"
@@ -133,7 +131,6 @@ export function RegisterScreen({ route, navigation }) {
                 // display icon in the textinput box
                 // left={<TextInput.Icon name="form-textbox-password" />}
                 style={styles.input}
-                placeholder="Password"
                 onChangeText={(newText) => setPassword(newText)}
                 // defaultValue={pwdText}
                 autoCapitalize="none"
@@ -145,7 +142,6 @@ export function RegisterScreen({ route, navigation }) {
                 // display icon in the textinput box
                 // left={<TextInput.Icon name="form-textbox-password" />}
                 style={styles.input}
-                placeholder="Confirm Password"
                 onChangeText={(newText) => setPasswordConf(newText)}
                 // defaultValue={pwdText}
                 autoCapitalize="none"

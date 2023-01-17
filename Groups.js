@@ -107,7 +107,6 @@ export function GroupsScreen({ route, navigation }) {
                         <View style={styles.inputBtnFormContainer}>
                             <TextInput
                                 style={styles.inputShort}
-                                placeholder="Enter a new group here"
                                 onChangeText={(groupTitle2) => setNewData(groupTitle2)}
                                 value={newData}
                                 underlineColorAndroid='transparent'

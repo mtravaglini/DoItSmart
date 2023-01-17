@@ -65,7 +65,6 @@ export function SigninScreen({ route, navigation }) {
                                 // display icon in the textinput box
                                 // left={<TextInput.Icon name="account" />}
                                 style={styles.input}
-                                placeholder="Email"
                                 onChangeText={(newText) => setEmail(newText)}
                                 // defaultValue={usernameText}
                                 autoCapitalize="none"
@@ -76,7 +75,6 @@ export function SigninScreen({ route, navigation }) {
                                 // display icon in the textinput box
                                 // left={<TextInput.Icon name="form-textbox-password" />}
                                 style={styles.input}
-                                placeholder="Password"
                                 onChangeText={(newText) => setPassword(newText)}
                                 // defaultValue={pwdText}
                                 autoCapitalize="none"
