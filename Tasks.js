@@ -15,19 +15,41 @@ import {
 } from 'react-native';
 // import { useNavigation } from '@react-navigation/native';
 import { FontAwesome } from '@expo/vector-icons';
-import { auth, db } from './firebase.config';
+import { db } from './firebase.config';
+import { doc, collection, getDoc, setDoc } from "firebase/firestore";
 
 // use custom style sheet
 const styles = require('./Style.js');
 
 export function TasksScreen({ route, navigation }) {
 
-    const tasksRef = db.collection("tasks");
+    const userRef = doc(db, "users", route.params.email);
+    // const tasksRef = collection(db, "users", route.params.email, "tasks");
+    const tasksRef = db.collection("users/" + route.params.email + "/tasks");
 
-    const [uid, setUid] = useState(route.params.uid);
-    const [tasks, setTodos] = useState([]);
-    const [newData, setNewData] = useState('');
+    const [user, setUser] = useState('');
+    // const [uid, setUid] = useState(route.params.uid);
+    const [email, setEmail] = useState(route.params.email);
+    const [tasks, setTasks] = useState([]);
+    const [newTask, setNewTask] = useState('');
     const [isLoading, setLoading] = useState(true);
+
+    useEffect(() => {
+        // get user from database
+        async function getUser() {
+            try {
+                const docSnap = await getDoc(userRef);
+                setUser(docSnap.data());
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        getUser();
+    }, [])
+
+
+
+
 
     useEffect(() => {
         tasksRef
@@ -36,15 +58,16 @@ export function TasksScreen({ route, navigation }) {
                 querySnapshot => {
                     const tasks = []
                     querySnapshot.forEach((doc) => {
-                        const taskTitle = doc.data().title;
+                        // const taskTitle = doc.data(); // check this
+                        const taskTitle = doc.id; // check this
                         const taskDate = new Date(doc.data().createdAt);
                         tasks.push({
-                            id: doc.id,
+                            // id: doc.id,
                             taskTitle: taskTitle,
                             taskDate: taskDate
                         })
                     })
-                    setTodos(tasks)
+                    setTasks(tasks)
                 }
             )
 
@@ -52,9 +75,9 @@ export function TasksScreen({ route, navigation }) {
 
     }, [])
 
-    // delete  a todo
+    // delete a task
 
-    const deleteTodo = (tasks) => {
+    const deleteTask = (tasks) => {
         tasksRef
             .doc(tasks.id)
             .delete()
@@ -67,21 +90,41 @@ export function TasksScreen({ route, navigation }) {
             })
     }
 
-    // add  a todo
+    // add a task
 
-    const addTodo = () => {
+    // const addTask = () => {
+    //     // check we have one to add
+    //     if (newTask && newTask.length > 0) {
+    //         const timestamp = Math.floor(Date.now()) //serverTimestamp();
+    //         const data = {
+    //             uid: uid,
+    //             title: newTask,
+    //             createdAt: timestamp
+    //         }
+    //         tasksRef
+    //             .add(data)
+    //             .then(() => {
+    //                 setNewTask('');
+    //                 Keyboard.dismiss();
+    //                 // success message
+    //                 // alert("Added!");
+    //             })
+    //             .catch(error => {
+    //                 alert(error);
+    //             })
+    //     }
+    // }
+
+    const addTask = () => {
         // check we have one to add
-        if (newData && newData.length > 0) {
+        if (newTask && newTask.length > 0) {
             const timestamp = Math.floor(Date.now()) //serverTimestamp();
             const data = {
-                uid: uid,
-                title: newData,
                 createdAt: timestamp
             }
-            tasksRef
-                .add(data)
+            setDoc(doc(db, "users", email, "tasks", newTask), data)
                 .then(() => {
-                    setNewData('');
+                    setNewTask('');
                     Keyboard.dismiss();
                     // success message
                     // alert("Added!");
@@ -90,9 +133,7 @@ export function TasksScreen({ route, navigation }) {
                     alert(error);
                 })
         }
-
     }
-
 
     return (
         <SafeAreaView style={styles.safeView}>
@@ -102,25 +143,25 @@ export function TasksScreen({ route, navigation }) {
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                     <View>
                         <View style={styles.pageTitleContainer}>
-                        <Text style={styles.pageTitleText}>
+                            <Text style={styles.pageTitleText}>
                                 Tasks
                             </Text>
                             <Text style={styles.pageSubTitleText}>
-                                {uid}
+                                {user.name}
                             </Text>
                         </View>
                         <View style={styles.inputBtnFormContainer}>
                             <TextInput
                                 style={styles.inputShort}
                                 placeholder="Enter new task here"
-                                onChangeText={(taskTitle2) => setNewData(taskTitle2)}
-                                value={newData}
+                                onChangeText={(newTaskTitle) => setNewTask(newTaskTitle)}
+                                value={newTask}
                                 underlineColorAndroid='transparent'
                                 autoCapitalize='none'
                             />
                             <TouchableOpacity
                                 style={styles.inputButton}
-                                onPress={addTodo}>
+                                onPress={addTask}>
                                 <Text
                                     style={styles.buttonText}
                                 >Add</Text>
@@ -137,12 +178,13 @@ export function TasksScreen({ route, navigation }) {
                                     <View>
                                         <Pressable
                                             style={styles.listContainer}
-                                            onPress={() => navigation.navigate('TaskDetail', { item })}>
+                                            onPress={() => navigation.navigate('TaskDetail', { item })}
+                                            >
                                             <FontAwesome
                                                 style={styles.listDelIcon}
                                                 name='trash-o'
                                                 color='red'
-                                                onPress={() => deleteTodo(item)} />
+                                                onPress={() => deleteTask(item)} />
                                             {/* <View > */}
                                             <Text style={styles.listText} >
                                                 {/* {item.id}  */}

@@ -36,9 +36,9 @@ export function WelcomeScreen({ route, navigation }) {
             return 1;
         }
 
-        console.log("Signed in successfully.");
-        console.log("currentuser=", auth.currentUser);
-        console.log("uid=", auth.currentUser.uid);
+        // console.log("Signed in successfully.");
+        // console.log("currentuser=", auth.currentUser);
+        // console.log("uid=", auth.currentUser.uid);
 
         setScreenMsg("");
         return 0;
@@ -92,7 +92,7 @@ export function WelcomeScreen({ route, navigation }) {
                                             (result) => {
                                                 // console.log("return code=", result)
                                                 if (result == 0) {
-                                                    navigation.navigate('Tasks', { uid: auth.currentUser.uid });
+                                                    navigation.navigate('Tasks', { email: email });
                                                     // navigation.navigate('Tasks');
                                                 }
                                             }
