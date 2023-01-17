@@ -25,7 +25,7 @@ export function TasksScreen({ route, navigation }) {
 
     const userRef = doc(db, "users", route.params.email);
     const tasksRef = query(collection(db, "users", route.params.email, "tasks"));
-    // const tasksRef = db.collection("users/" + route.params.email + "/tasks");
+    const taskRef = db.collection("users/" + route.params.email + "/tasks");
 
     const [user, setUser] = useState('');
     // const [uid, setUid] = useState(route.params.uid);
@@ -126,17 +126,15 @@ export function TasksScreen({ route, navigation }) {
 
     // delete a task
 
-    const deleteTask = (tasks) => {
-        tasksRef
-            .doc(tasks.id)
-            .delete()
-            .then(() => {
-                // success message
-                // alert("Deleted!");
-            })
-            .catch(error => {
-                alert(error);
-            })
+    const deleteTask = async (tasks) => {
+        // const deleteTask = (tasks) => {
+        try {
+            taskRef
+                .doc(tasks.taskTitle)
+                .delete()
+        } catch (error) {
+            alert(error);
+        }
     }
 
     // add a task
@@ -164,25 +162,47 @@ export function TasksScreen({ route, navigation }) {
     //     }
     // }
 
-    const addTask = () => {
+    // const addTask = () => {
+    //     // check we have one to add
+    //     if (newTask && newTask.length > 0) {
+    //         const timestamp = Math.floor(Date.now()) //serverTimestamp();
+    //         const data = {
+    //             createdAt: timestamp
+    //         }
+    //         setDoc(doc(db, "users", email, "tasks", newTask), data)
+    //             .then(() => {
+    //                 setNewTask('');
+    //                 Keyboard.dismiss();
+    //                 // success message
+    //                 // alert("Added!");
+    //             })
+    //             .catch(error => {
+    //                 alert(error);
+    //             })
+    //     }
+    // }
+
+
+
+    const addTask = async (tasks) => {
+        // const addTask = () => {
         // check we have one to add
         if (newTask && newTask.length > 0) {
-            const timestamp = Math.floor(Date.now()) //serverTimestamp();
-            const data = {
-                createdAt: timestamp
+            try {
+                const timestamp = Math.floor(Date.now()) //serverTimestamp();
+                const data = {
+                    createdAt: timestamp
+                }
+                // setDoc(doc(taskRef, tasks.taskTitle), data)
+                setDoc(doc(db, "users", email, "tasks", newTask), data)
+                setNewTask('');
+            } catch (error) {
+                alert(error);
             }
-            setDoc(doc(db, "users", email, "tasks", newTask), data)
-                .then(() => {
-                    setNewTask('');
-                    Keyboard.dismiss();
-                    // success message
-                    // alert("Added!");
-                })
-                .catch(error => {
-                    alert(error);
-                })
         }
     }
+
+
 
     return (
         <SafeAreaView style={styles.safeView}>
@@ -210,7 +230,11 @@ export function TasksScreen({ route, navigation }) {
                             />
                             <TouchableOpacity
                                 style={styles.inputButton}
-                                onPress={addTask}>
+                                onPress={() => {
+                                     Keyboard.dismiss();
+                                    { addTask() }
+                                }}
+                            >
                                 <Text
                                     style={styles.buttonText}
                                 >Add</Text>
