@@ -16,7 +16,7 @@ import { auth } from './firebase.config';
 // use custom style sheet
 const styles = require('./Style.js');
 
-export function WelcomeScreen({ route, navigation }) {
+export function SigninScreen({ route, navigation }) {
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');

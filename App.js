@@ -4,7 +4,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 
 // import custom functions/screens
-import { WelcomeScreen } from './Welcome.js';
+import { SigninScreen } from './Signin.js';
 import { RegisterScreen } from './Register.js';
 import { TasksScreen } from './Tasks.js';
 import { TaskDetailScreen } from './TaskDetail.js';
@@ -15,10 +15,10 @@ import { ResourcesScreen } from './Resources.js';
 const Stack = createStackNavigator();
 export default function App() {
   return (
-    // add all the screens to the Navigation stack, start with Welcome screen
+    // add all the screens to the Navigation stack, start with Signin screen
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Welcome" component={WelcomeScreen} />
+        <Stack.Screen name="Signin" component={SigninScreen} />
         <Stack.Screen name="Register" component={RegisterScreen} />
         <Stack.Screen name="Tasks" component={TasksScreen} />
         <Stack.Screen name="TaskDetail" component={TaskDetailScreen} />
