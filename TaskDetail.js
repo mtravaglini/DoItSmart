@@ -9,14 +9,19 @@ import {
   View,
 } from 'react-native';
 
-// import { SafeAreaView } from 'react-native-safe-area-context';
+import { db } from './firebase.config';
+import { doc, collection, query, getDoc, setDoc, onSnapshot, orderBy } from "firebase/firestore";
 
 // use custom style sheet
 const styles = require('./Style.js');
 
+
+
 export function TaskDetailScreen({ route, navigation }) {
-  console.log(route.params.item);
-  console.log(route.params.item.startDate);
+
+
+
+
   return (
     <SafeAreaView style={[styles.safeView]}>
       <KeyboardAvoidingView
@@ -46,7 +51,7 @@ export function TaskDetailScreen({ route, navigation }) {
                 editable={false} selectTextOnFocus={false}
                 style={styles.input}
                 // onChangeText={(taskTitle) => setNewData(taskTitle)}
-                value={route.params.item.taskDate.toString().slice(0, 24)}
+                value={new Date(route.params.item.createdAt).toString().slice(0, 24)}
                 underlineColorAndroid='transparent'
                 autoCapitalize='none'
               />
@@ -55,7 +60,7 @@ export function TaskDetailScreen({ route, navigation }) {
               <TextInput
                 style={styles.input}
                 // onChangeText={(taskTitle) => setNewData(taskTitle)}
-                value={route.params.item.assignedTo}
+                value={route.params.item.assignee}
                 underlineColorAndroid='transparent'
                 autoCapitalize='none'
               />
@@ -80,7 +85,7 @@ export function TaskDetailScreen({ route, navigation }) {
                 value={route.params.item.startDate == undefined ?
                   new Date(Date.now()).toString().slice(0, 24)
                   :
-                  route.params.item.startDate.toString().slice(0, 24)}
+                  new Date(route.params.item.startDate).toString().slice(0, 24)}
                 underlineColorAndroid='transparent'
                 autoCapitalize='none'
               />
@@ -92,7 +97,7 @@ export function TaskDetailScreen({ route, navigation }) {
                 value={route.params.item.endDate == undefined ?
                   new Date(Date.now()).toString().slice(0, 24)
                   :
-                  route.params.item.endDate.toString().slice(0, 24)}
+                  new Date(route.params.item.endDate).toString().slice(0, 24)}
                 underlineColorAndroid='transparent'
                 autoCapitalize='none'
               />
