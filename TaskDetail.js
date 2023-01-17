@@ -48,7 +48,7 @@ export function TaskDetailScreen({ route, navigation }) {
                 style={styles.input}
                 placeholder="Date Created"
                 // onChangeText={(taskTitle) => setNewData(taskTitle)}
-                value={route.params.item.taskDate.toISOString().slice(0, 19).replace(/-/g, "/").replace("T", " ")}
+                value={route.params.item.taskDate.toString().slice(0, 24)}
                 underlineColorAndroid='transparent'
                 autoCapitalize='none'
               />
@@ -83,9 +83,9 @@ export function TaskDetailScreen({ route, navigation }) {
                 placeholder="Start Date"
                 // onChangeText={(taskTitle) => setNewData(taskTitle)}
                 value={route.params.item.startDate == undefined ?
-                  new Date(Date.now()).toISOString().slice(0, 19).replace(/-/g, "/").replace("T", " ")
+                  new Date(Date.now()).toString().slice(0, 24)
                   :
-                  route.params.item.startDate.toISOString().slice(0, 19).replace(/-/g, "/").replace("T", " ")}
+                  route.params.item.startDate.toString().slice(0, 24)}
                 underlineColorAndroid='transparent'
                 autoCapitalize='none'
               />
@@ -96,9 +96,9 @@ export function TaskDetailScreen({ route, navigation }) {
                 placeholder="End Before Date"
                 // onChangeText={(taskTitle) => setNewData(taskTitle)}
                 value={route.params.item.endDate == undefined ?
-                  new Date(Date.now()).toISOString().slice(0, 19).replace(/-/g, "/").replace("T", " ")
+                  new Date(Date.now()).toString().slice(0, 24)
                   :
-                  route.params.item.endDate.toISOString().slice(0, 19).replace(/-/g, "/").replace("T", " ")}
+                  route.params.item.endDate.toString().slice(0, 24)}
                 underlineColorAndroid='transparent'
                 autoCapitalize='none'
               />
