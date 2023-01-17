@@ -16,7 +16,7 @@ import {
 // import { useNavigation } from '@react-navigation/native';
 import { FontAwesome } from '@expo/vector-icons';
 import { db } from './firebase.config';
-import { doc, collection, getDoc, setDoc } from "firebase/firestore";
+import { doc, collection, query, getDoc, getDocs, setDoc, onSnapshot } from "firebase/firestore";
 
 // use custom style sheet
 const styles = require('./Style.js');
@@ -24,8 +24,8 @@ const styles = require('./Style.js');
 export function TasksScreen({ route, navigation }) {
 
     const userRef = doc(db, "users", route.params.email);
-    // const tasksRef = collection(db, "users", route.params.email, "tasks");
-    const tasksRef = db.collection("users/" + route.params.email + "/tasks");
+    const tasksRef = query(collection(db, "users", route.params.email, "tasks"));
+    // const tasksRef = db.collection("users/" + route.params.email + "/tasks");
 
     const [user, setUser] = useState('');
     // const [uid, setUid] = useState(route.params.uid);
@@ -48,32 +48,81 @@ export function TasksScreen({ route, navigation }) {
     }, [])
 
 
-
-
-
     useEffect(() => {
-        tasksRef
-            .orderBy('createdAt', 'desc')
-            .onSnapshot(
-                querySnapshot => {
-                    const tasks = []
+        // get tasks from database
+        async function getTasks() {
+            try {
+                const unsubscribe = onSnapshot(tasksRef, (querySnapshot) => {
+                    const retrievedTasks = [];
                     querySnapshot.forEach((doc) => {
-                        // const taskTitle = doc.data(); // check this
-                        const taskTitle = doc.id; // check this
+                        const taskTitle = doc.id;
                         const taskDate = new Date(doc.data().createdAt);
-                        tasks.push({
+                        retrievedTasks.push({
                             // id: doc.id,
                             taskTitle: taskTitle,
                             taskDate: taskDate
                         })
                     })
-                    setTasks(tasks)
-                }
-            )
-
-        setLoading(false);
-
+                    setTasks(retrievedTasks)
+                    setLoading(false);
+                })
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        getTasks();
     }, [])
+
+    // useEffect(() => {
+    //     // get tasks from database
+    //     async function getTasks() {
+    //         try {
+    //             const tasksSnap = await getDocs(tasksRef);
+    //             const retrievedTasks = []
+
+    //             tasksSnap.forEach((doc) => {
+    //                 // doc.data() is never undefined for query doc snapshots
+    //                 const taskTitle = doc.id; // check this
+    //                 const taskDate = new Date(doc.data().createdAt);
+    //                 retrievedTasks.push({
+    //                     // id: doc.id,
+    //                     taskTitle: taskTitle,
+    //                     taskDate: taskDate
+    //                 })
+    //             });
+    //             setTasks(retrievedTasks)
+    //             setLoading(false);
+    //         } catch (error) {
+    //             console.error(error);
+    //         }
+    //     }
+    //     getTasks();
+    // }, [])
+
+
+    // useEffect(() => {
+    //     tasksRef
+    //         .orderBy('createdAt', 'desc')
+    //         .onSnapshot(
+    //             querySnapshot => {
+    //                 const tasks = []
+    //                 querySnapshot.forEach((doc) => {
+    //                     // const taskTitle = doc.data(); // check this
+    //                     const taskTitle = doc.id; // check this
+    //                     const taskDate = new Date(doc.data().createdAt);
+    //                     tasks.push({
+    //                         // id: doc.id,
+    //                         taskTitle: taskTitle,
+    //                         taskDate: taskDate
+    //                     })
+    //                 })
+    //                 setTasks(tasks)
+    //             }
+    //         )
+
+    //     setLoading(false);
+
+    // }, [])
 
     // delete a task
 
@@ -173,13 +222,15 @@ export function TasksScreen({ route, navigation }) {
                         ) : (
                             <FlatList style={{ height: "75%" }}
                                 data={tasks}
-                                ListEmptyComponent={<Text style={[styles.listText, { marginLeft: "20%" }]}>All done! Add more tasks!</Text>}
+                                ListEmptyComponent={<Text style={[styles.listText, { marginLeft: "20%" }]}>
+                                    All done! Add more tasks!
+                                </Text>}
                                 renderItem={({ item }) => (
                                     <View>
                                         <Pressable
                                             style={styles.listContainer}
                                             onPress={() => navigation.navigate('TaskDetail', { item })}
-                                            >
+                                        >
                                             <FontAwesome
                                                 style={styles.listDelIcon}
                                                 name='trash-o'
