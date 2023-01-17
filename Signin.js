@@ -88,7 +88,7 @@ export function SigninScreen({ route, navigation }) {
                                 { opacity: (!email || !password) ? 0.5 : 1.0 }
                                 ]}
                                     onPress={async () => {
-                                        Keyboard.dismiss
+                                        Keyboard.dismiss();
                                         await SigninUser().then(
                                             (result) => {
                                                 // console.log("return code=", result)
