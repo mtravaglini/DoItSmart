@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -9,7 +9,6 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import { useState } from 'react';
 // import { SafeAreaView } from 'react-native-safe-area-context';
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from './firebase.config';
