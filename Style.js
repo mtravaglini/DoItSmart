@@ -40,6 +40,7 @@ module.exports = StyleSheet.create({
     fontWeight: "bold",
     fontFamily: Platform.OS === "android" ? "sans-serif-thin" : "AppleSDGothicNeo-Thin",
     color: "cornflowerblue",
+    // marginBottom: 5
   },
   pageSubTitleText: {
     fontSize: 15,
@@ -50,6 +51,8 @@ module.exports = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 5,
     paddingHorizontal: 15,
+    marginBottom: 10
+
   },
   // ########################################
 
@@ -92,10 +95,11 @@ module.exports = StyleSheet.create({
   // input + button form ########################################
   inputBtnFormContainer: {
     flexDirection: 'row',
-    height: 80,
+    // height: 80,
     marginLeft: 10,
     marginRight: 10,
-    marginTop: 15,
+    // marginTop: 15,
+    marginBottom: 15
   },
   inputShort: {
     height: 48,
@@ -121,10 +125,12 @@ module.exports = StyleSheet.create({
   // input + title form ########################################
   inputFormContainer: {
     flexDirection: 'column',
-    height: 80,
+    // height: 80,
     marginLeft: 10,
     marginRight: 10,
-    marginTop: 15,
+    // marginTop: 15,
+    // marginBottom: 15,
+    
   },
   input: {
     height: 48,
@@ -134,6 +140,7 @@ module.exports = StyleSheet.create({
     paddingLeft: 10,
     // marginLeft: 0,
     marginRight: "2%",
+    marginBottom: 15,
     fontSize: 18,
     backgroundColor: "white"
   },

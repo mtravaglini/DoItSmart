@@ -57,13 +57,14 @@ export function TasksScreen({ route, navigation }) {
                             const retrievedTasks = [];
                             querySnapshot.forEach((doc) => {
                                 taskObj = doc.data();
-                                taskObj.taskTitle = doc.id;
+                                taskObj.title = doc.id;
+                                taskObj.email = email;
                                 retrievedTasks.push(taskObj
                                 )
                             })
                             setTasks(retrievedTasks)
                             setLoading(false);
-                            console.log(taskObj);
+                            // console.log(taskObj);
                         })
             } catch (error) {
                 console.error(error);
@@ -109,7 +110,7 @@ export function TasksScreen({ route, navigation }) {
         <SafeAreaView style={styles.safeView}>
             <KeyboardAvoidingView
                 style={{ flex: 1 }}
-                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+                behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                     <View>
                         <View style={styles.pageTitleContainer}>
@@ -133,7 +134,7 @@ export function TasksScreen({ route, navigation }) {
                                 style={styles.inputButton}
                                 onPress={() => {
                                     Keyboard.dismiss();
-                                    { addTask() }
+                                    addTask()
                                 }}
                             >
                                 <Text
@@ -163,7 +164,7 @@ export function TasksScreen({ route, navigation }) {
                                                 onPress={() => deleteTask(item.taskTitle)} />
                                             {/* <View > */}
                                             <Text style={styles.listText} >
-                                                {item.taskTitle}
+                                                {item.title}
                                             </Text>
                                             {/* </View> */}
                                         </Pressable>
