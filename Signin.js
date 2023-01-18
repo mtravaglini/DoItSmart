@@ -48,7 +48,7 @@ export function SigninScreen({ route, navigation }) {
         <SafeAreaView style={[styles.safeView]}>
             <KeyboardAvoidingView
                 style={{ flex: 1 }}
-                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+                behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                     <View>
 
