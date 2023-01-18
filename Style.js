@@ -75,20 +75,21 @@ module.exports = StyleSheet.create({
   },
   secondaryButton: {
     width: "75%",
-    height: 50,
+    height: 30,
     borderRadius: 15,
     marginTop: 10,
     marginBottom: 10,
     backgroundColor: "white",
     justifyContent: "center",
-    borderWidth: 1
+    borderWidth: 1,
+    borderColor: "cornflowerblue"
   },
   secondaryButtonText: {
     textAlign: "center",
     textAlignVertical: "center",
     color: "cornflowerblue",
-    fontWeight: "bold",
-    fontSize: 20
+    // fontWeight: "bold",
+    fontSize: 15
   },
   // ########################################
 
