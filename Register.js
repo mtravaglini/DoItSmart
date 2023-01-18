@@ -14,67 +14,50 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from './firebase.config';
 import { doc, getDoc, setDoc } from "firebase/firestore";
 
-
 // use custom style sheet
 const styles = require('./Style.js');
 
-
-
 export function RegisterScreen({ route, navigation }) {
 
-  const usersRef = db.collection("users");
-  
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConf, setPasswordConf] = useState('');
   const [screenMsg, setScreenMsg] = useState('');
-
+  
+  // function to register a new user
   const RegisterNewUser = async () => {
 
     if (password != passwordConf) {
-      // console.log("Passwords don't match");
       setScreenMsg("Passwords don't match.");
       return 1;
     }
 
+    // create user 
     try {
       await createUserWithEmailAndPassword(auth, email, password);
     } catch (error) {
       // const errorCode = error.code;
       const errorMessage = error.message;
-      // console.log("Sign in failed");
-      // console.log(errorCode);    // ..
-      // console.log(errorMessage);    // ..
       setScreenMsg(errorMessage);
       return 1;
     }
 
-
-
     const timestamp = Math.floor(Date.now()) //serverTimestamp();
     const data = {
       name: name,
+      email: email,
       createdAt: timestamp
     }
-    // usersRef
-    //   .add(data)
-    //   .then(() => {
-    //            Keyboard.dismiss();
-    //   })
-    //   .catch(error => {
-    //     alert(error);
-    //   })
 
-
-      setDoc(doc(db, "users", email), data)
+    setDoc(doc(db, "users", auth.currentUser.uid), data)
       .then(() => {
-          Keyboard.dismiss();
-          // success message
-          // alert("Added!");
+        Keyboard.dismiss();
+        // success message
+        // alert("Added!");
       })
       .catch(error => {
-          alert(error);
+        alert(error);
       })
 
 
@@ -157,7 +140,7 @@ export function RegisterScreen({ route, navigation }) {
                       (result) => {
                         // console.log("return code=", result)
                         if (result == 0) {
-                          navigation.navigate('Tasks', { email: email });
+                          navigation.navigate('Tasks', { uid: auth.currentUser.uid });
                           // navigation.navigate('Tasks');
                         }
                       }

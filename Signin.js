@@ -90,7 +90,7 @@ export function SigninScreen({ route, navigation }) {
                                             (result) => {
                                                 // console.log("return code=", result)
                                                 if (result == 0) {
-                                                    navigation.navigate('Tasks', { email: email });
+                                                    navigation.navigate('Tasks', { uid: auth.currentUser.uid });
                                                     // navigation.navigate('Tasks');
                                                 }
                                             }

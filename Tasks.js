@@ -22,9 +22,8 @@ const styles = require('./Style.js');
 
 export function TasksScreen({ route, navigation }) {
 
+    const uid = route.params.uid;
     const [user, setUser] = useState('');
-    // const [email, setEmail] = useState(route.params.email);
-    const email = route.params.email;
     const [tasks, setTasks] = useState([]);
     const [newTask, setNewTask] = useState('');
     const [isLoading, setLoading] = useState(true);
@@ -36,7 +35,7 @@ export function TasksScreen({ route, navigation }) {
     useEffect(() => {
         async function getUser() {
             try {
-                const docSnap = await getDoc(doc(db, "users", email));
+                const docSnap = await getDoc(doc(db, "users", uid));
                 setUser(docSnap.data());
             } catch (error) {
                 console.error(error);
@@ -53,12 +52,12 @@ export function TasksScreen({ route, navigation }) {
             try {
                 unsubscribe = onSnapshot(
                     query(
-                        collection(db, "users", route.params.email, "tasks"), orderBy('createdAt')), (querySnapshot) => {
+                        collection(db, "users", uid, "tasks"), orderBy('createdAt')), (querySnapshot) => {
                             const retrievedTasks = [];
                             querySnapshot.forEach((doc) => {
                                 taskObj = doc.data();
                                 taskObj.title = doc.id;
-                                taskObj.email = email;
+                                taskObj.uid = uid;
                                 retrievedTasks.push(taskObj
                                 )
                             })
@@ -84,12 +83,12 @@ export function TasksScreen({ route, navigation }) {
             try {
                 const timestamp = Math.floor(Date.now()) //serverTimestamp();
                 const data = {
-                    assignee: email,
+                    assignee: uid,
                     startDate: timestamp,
                     endDate: timestamp + (24 * 60 * 60 * 1000),
                     createdAt: timestamp
                 }
-                setDoc(doc(db, "users", email, "tasks", newTask), data)
+                setDoc(doc(db, "users", uid, "tasks", newTask), data)
                 setNewTask('');
             } catch (error) {
                 alert(error);
@@ -101,7 +100,7 @@ export function TasksScreen({ route, navigation }) {
     const deleteTask = async (taskTitle) => {
         // console.log("DELETING:", route.params.email, taskTitle)
         try {
-            await deleteDoc(doc(db, "users", route.params.email, "tasks", taskTitle));
+            await deleteDoc(doc(db, "users", uid, "tasks", taskTitle));
         } catch (error) {
             alert(error);
         }
