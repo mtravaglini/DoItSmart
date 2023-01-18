@@ -76,15 +76,6 @@ export function TasksScreen({ route, navigation }) {
         };
     }, [])
 
-    // delete a task
-    const deleteTask = async (taskTitle) => {
-        try {
-            await deleteDoc(doc(db, "users", route.params.email, "tasks", taskTitle));
-        } catch (error) {
-            alert(error);
-        }
-    }
-
     // add a task
     const addTask = async () => {
         // const addTask = () => {
@@ -103,6 +94,16 @@ export function TasksScreen({ route, navigation }) {
             } catch (error) {
                 alert(error);
             }
+        }
+    }
+
+    // delete a task
+    const deleteTask = async (taskTitle) => {
+        // console.log("DELETING:", route.params.email, taskTitle)
+        try {
+            await deleteDoc(doc(db, "users", route.params.email, "tasks", taskTitle));
+        } catch (error) {
+            alert(error);
         }
     }
 
@@ -161,7 +162,7 @@ export function TasksScreen({ route, navigation }) {
                                                 style={styles.listDelIcon}
                                                 name='trash-o'
                                                 color='red'
-                                                onPress={() => deleteTask(item.taskTitle)} />
+                                                onPress={() => deleteTask(item.title)} />
                                             {/* <View > */}
                                             <Text style={styles.listText} >
                                                 {item.title}
