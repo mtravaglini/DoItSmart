@@ -29,14 +29,14 @@ export function TasksScreen({ route, navigation }) {
     const [newTask, setNewTask] = useState('');
     const [isLoading, setLoading] = useState(true);
 
-    const userRef = doc(db, "users", route.params.email);
-    const tasksRef = query(collection(db, "users", route.params.email, "tasks"), orderBy('createdAt'));
+    // const userRef = doc(db, "users", route.params.email);
+    // const tasksRef = query(collection(db, "users", route.params.email, "tasks"), orderBy('createdAt'));
 
     // get user 
     useEffect(() => {
         async function getUser() {
             try {
-                const docSnap = await getDoc(userRef);
+                const docSnap = await getDoc(doc(db, "users", email));
                 setUser(docSnap.data());
             } catch (error) {
                 console.error(error);
@@ -51,18 +51,20 @@ export function TasksScreen({ route, navigation }) {
         var taskObj;
         async function getTasks() {
             try {
-                unsubscribe = onSnapshot(tasksRef, (querySnapshot) => {
-                    const retrievedTasks = [];
-                    querySnapshot.forEach((doc) => {
-                        taskObj = doc.data();
-                        taskObj.taskTitle = doc.id;
-                        retrievedTasks.push(taskObj
-                        )
-                    })
-                    setTasks(retrievedTasks)
-                    setLoading(false);
-                    console.log(taskObj);
-                })
+                unsubscribe = onSnapshot(
+                    query(
+                        collection(db, "users", route.params.email, "tasks"), orderBy('createdAt')), (querySnapshot) => {
+                            const retrievedTasks = [];
+                            querySnapshot.forEach((doc) => {
+                                taskObj = doc.data();
+                                taskObj.taskTitle = doc.id;
+                                retrievedTasks.push(taskObj
+                                )
+                            })
+                            setTasks(retrievedTasks)
+                            setLoading(false);
+                            console.log(taskObj);
+                        })
             } catch (error) {
                 console.error(error);
             }
