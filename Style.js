@@ -131,7 +131,10 @@ module.exports = StyleSheet.create({
     marginRight: 10,
     // marginTop: 15,
     // marginBottom: 15,
-    
+  },
+  inputLabel: {
+    paddingLeft: 10,
+    fontSize: 10,
   },
   input: {
     height: 48,
@@ -139,15 +142,13 @@ module.exports = StyleSheet.create({
     borderRadius: 15,
     overflow: 'hidden',
     paddingLeft: 10,
-    // marginLeft: 0,
-    marginRight: "2%",
+    marginLeft: 0,
+    // marginRight: "2%",
     marginBottom: 15,
     fontSize: 18,
-    backgroundColor: "white"
-  },
-  inputLabel: {
-    paddingLeft: 10,
-    fontSize: 10,
+    backgroundColor: "white",
+    alignContent: "center",
+    // justifyContent: "center"
   },
   // ########################################
 
@@ -174,6 +175,22 @@ module.exports = StyleSheet.create({
     marginRight: 22,
   },
   // ########################################
+
+  // Date 
+  dateText: {
+    height: 48,
+    lineHeight: 20,
+    fontSize: 18,
+    width: "95%",
+    backgroundColor: "white",
+    borderRadius: 15,
+    paddingHorizontal: 15,
+    marginBottom: 10,
+    paddingLeft: 10,
+    marginLeft: 0,
+    // marginRight: "2%",
+    marginBottom: 15,
+  },
 
   // MISC ########################################
   textDisplay: {

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   Keyboard,
   KeyboardAvoidingView,
+  Pressable,
   SafeAreaView,
   ScrollView,
   Text,
@@ -13,11 +14,10 @@ import {
 
 import { db } from './firebase.config';
 import { doc, collection, query, getDoc, setDoc, onSnapshot, orderBy } from "firebase/firestore";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 // use custom style sheet
 const styles = require('./Style.js');
-
-
 
 export function TaskDetailScreen({ route, navigation }) {
 
@@ -28,14 +28,31 @@ export function TaskDetailScreen({ route, navigation }) {
   const [origTask, setOrigTask] = useState({});
   const [task, setTask] = useState({});
 
-  const [taskTitle, setTaskTitle] = useState('');
-  const [taskAssignee, setTaskAssignee] = useState('');
-  const [taskNotes, setTaskNotes] = useState('');
-  const [taskPriority, setTaskPriority] = useState('');
-  const [taskEffort, setTaskEffort] = useState('');
+  // date picker variables
+  const [isStartDatePickerVisible, setStartDatePickerVisibility] = useState(false);
+  const [isEndDatePickerVisible, setEndDatePickerVisibility] = useState(false);
 
-  // const [email, setEmail] = ('');
-  // const [taskTitleSave, setTaskTitleSave] = ('');
+  const handleStartDatePickerConfirm = (date) => {
+    setTask((prevState) => ({ ...prevState, startDate: Date.parse(date) }));
+    setStartDatePickerVisibility(false);
+  }
+
+  const handleEndDatePickerConfirm = (date) => {
+    setTask((prevState) => ({ ...prevState, endDate: Date.parse(date) }));
+    setEndDatePickerVisibility(false);
+  }
+
+  const formatDate = (date) => {
+    var formattedDate = date;
+
+    if (date) {
+      formattedDate = new Date(date)
+    } else {
+      formattedDate = new Date(Date.now())
+    }
+
+    return formattedDate.toString().slice(0, 10) + "\n" + formattedDate.toString().slice(16, 21)
+  }
 
   // get user 
   useEffect(() => {
@@ -104,7 +121,7 @@ export function TaskDetailScreen({ route, navigation }) {
   }
   // console.log("task", task)
   // console.log("origTask", origTask)
-  // console.log("REFRESHED")
+  console.log("REFRESHED", Date())
 
 
   return (
@@ -135,11 +152,12 @@ export function TaskDetailScreen({ route, navigation }) {
                   autoCapitalize='none'
                 />
 
-                <Text style={styles.inputLabel}>Assigned To</Text>
+                <Text style={styles.inputLabel}>Created by</Text>
                 <TextInput
+                  readOnly={true}
                   style={styles.input}
-                  onChangeText={(newValue) => { setTask((prevState) => ({ ...prevState, assignee: newValue })) }}
-                  value={task.assignee}
+                  // onChangeText={(newValue) => { setTask((prevState) => ({ ...prevState, creator: newValue })) }}
+                  value={task.creator}
                   underlineColorAndroid='transparent'
                   autoCapitalize='none'
                 />
@@ -157,35 +175,59 @@ export function TaskDetailScreen({ route, navigation }) {
                   autoCapitalize='none'
                 />
 
-                <Text style={styles.inputLabel}>Start Date</Text>
-                <TextInput
-                  style={styles.input}
-                  onChangeText={(newValue) => { setTask((prevState) => ({ ...prevState, startDate: newValue })) }}
-                  value={task.startDate == undefined ?
-                    new Date(Date.now()).toString().slice(0, 24)
-                    :
-                    new Date(task.startDate).toString().slice(0, 24)}
-                  underlineColorAndroid='transparent'
-                  autoCapitalize='none'
-                />
+                <View style={{ flexDirection: "row" }}>
 
-                <Text style={styles.inputLabel}>End Before Date</Text>
-                <TextInput
-                  style={styles.input}
-                  onChangeText={(newValue) => { setTask((prevState) => ({ ...prevState, endDate: newValue })) }}
-                  value={task.endDate == undefined ?
-                    new Date(Date.now()).toString().slice(0, 24)
-                    :
-                    new Date(task.endDate).toString().slice(0, 24)}
-                  underlineColorAndroid='transparent'
-                  autoCapitalize='none'
-                />
+                  <View style={{ flexDirection: "column", flex: 1 }}>
+                    <Text style={styles.inputLabel}>Start After</Text>
+                    <Pressable
+                      onPress={() => setStartDatePickerVisibility(true)}>
+                      <Text style={styles.dateText}>
+                        {formatDate(task.startDate)}
+                      </Text>
+                    </Pressable>
+                  </View>
+
+                  <View>
+                    <TouchableOpacity title="Show Date Picker">
+                      <DateTimePickerModal
+                        isVisible={isStartDatePickerVisible}
+                        mode="datetime"
+                        date={new Date(task.startDate)}
+                        onConfirm={handleStartDatePickerConfirm}
+                        onCancel={() => setStartDatePickerVisibility(false)}
+                      />
+                    </TouchableOpacity>
+                  </View>
+
+                  <View style={{ flexDirection: "column", flex: 1 }}>
+                    <Text style={styles.inputLabel}>Finish by</Text>
+                    <Pressable
+                      onPress={() => setEndDatePickerVisibility(true)}>
+                      <Text style={styles.dateText}>
+                        {formatDate(task.endDate)}
+                      </Text>
+                    </Pressable>
+                  </View>
+
+                  <View>
+                    <TouchableOpacity title="Show Date Picker">
+                      <DateTimePickerModal
+                        isVisible={isEndDatePickerVisible}
+                        mode="datetime"
+                        date={new Date(task.endDate)}
+                        onConfirm={handleEndDatePickerConfirm}
+                        onCancel={() => setEndDatePickerVisibility(false)}
+                      />
+                    </TouchableOpacity>
+                  </View>
+
+                </View>
 
                 <View style={{ flexDirection: "row" }}>
-                  <View style={{ flexDirection: "column" }}>
+                  <View style={{ flexDirection: "column", flex: 1 }}>
                     <Text style={styles.inputLabel}>Priority</Text>
                     <TextInput
-                      style={[styles.input]}
+                      style={styles.input}
                       onChangeText={(newValue) => { setTask((prevState) => ({ ...prevState, priority: +newValue })) }}
                       value={task.priority?.toString()}
                       underlineColorAndroid='transparent'
@@ -194,7 +236,7 @@ export function TaskDetailScreen({ route, navigation }) {
                     />
                   </View>
 
-                  <View style={{ flexDirection: "column" }}>
+                  <View style={{ flexDirection: "column", flex: 1 }}>
                     <Text style={styles.inputLabel}>Effort</Text>
                     <TextInput
                       style={[styles.input]}
@@ -226,7 +268,7 @@ export function TaskDetailScreen({ route, navigation }) {
                 />
 
                 <View style={{ alignItems: "center" }}>
-                  <TouchableOpacity style={[styles.mainButton,{ opacity: (!taskChanged()) ? 0.5 : 1.0 }]}
+                  <TouchableOpacity style={[styles.mainButton, { opacity: (!taskChanged()) ? 0.5 : 1.0 }]}
                     disabled={!taskChanged()}
                     onPress={async () => {
                       await SaveTask().then(
