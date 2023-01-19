@@ -12,10 +12,9 @@ import {
     TouchableWithoutFeedback,
     View,
 } from 'react-native';
-// import { useNavigation } from '@react-navigation/native';
 import { FontAwesome } from '@expo/vector-icons';
 import { db } from './firebase.config';
-import { doc, collection, query, getDoc, setDoc, deleteDoc, onSnapshot, orderBy } from "firebase/firestore";
+import { doc, collection, query, getDoc, setDoc, addDoc, deleteDoc, onSnapshot, orderBy } from "firebase/firestore";
 
 // use custom style sheet
 const styles = require('./Style.js');
@@ -23,13 +22,11 @@ const styles = require('./Style.js');
 export function TasksScreen({ route, navigation }) {
 
     const uid = route.params.uid;
+
     const [user, setUser] = useState('');
     const [tasks, setTasks] = useState([]);
-    const [newTask, setNewTask] = useState('');
+    const [newTaskTitle, setNewTask] = useState('');
     const [isLoading, setLoading] = useState(true);
-
-    // const userRef = doc(db, "users", route.params.email);
-    // const tasksRef = query(collection(db, "users", route.params.email, "tasks"), orderBy('createdAt'));
 
     // get user 
     useEffect(() => {
@@ -56,14 +53,11 @@ export function TasksScreen({ route, navigation }) {
                             const retrievedTasks = [];
                             querySnapshot.forEach((doc) => {
                                 taskObj = doc.data();
-                                taskObj.title = doc.id;
-                                taskObj.uid = uid;
-                                retrievedTasks.push(taskObj
-                                )
+                                taskObj.id = doc.id;
+                                retrievedTasks.push(taskObj)
                             })
                             setTasks(retrievedTasks)
                             setLoading(false);
-                            // console.log(taskObj);
                         })
             } catch (error) {
                 console.error(error);
@@ -77,18 +71,21 @@ export function TasksScreen({ route, navigation }) {
 
     // add a task
     const addTask = async () => {
-        // const addTask = () => {
         // check we have one to add
-        if (newTask && newTask.length > 0) {
+        if (newTaskTitle && newTaskTitle.length > 0) {
             try {
                 const timestamp = Math.floor(Date.now()) //serverTimestamp();
                 const data = {
+                    title: newTaskTitle,
+                    creator: uid,
                     assignee: uid,
                     startDate: timestamp,
                     endDate: timestamp + (24 * 60 * 60 * 1000),
+                    priority: 1,
+                    effort: 30,
                     createdAt: timestamp
                 }
-                setDoc(doc(db, "users", uid, "tasks", newTask), data)
+                addDoc(collection(db, "users", uid, "tasks"), data)
                 setNewTask('');
             } catch (error) {
                 alert(error);
@@ -97,10 +94,9 @@ export function TasksScreen({ route, navigation }) {
     }
 
     // delete a task
-    const deleteTask = async (taskTitle) => {
-        // console.log("DELETING:", route.params.email, taskTitle)
+    const deleteTask = async (taskId) => {
         try {
-            await deleteDoc(doc(db, "users", uid, "tasks", taskTitle));
+            await deleteDoc(doc(db, "users", uid, "tasks", taskId));
         } catch (error) {
             alert(error);
         }
@@ -126,12 +122,13 @@ export function TasksScreen({ route, navigation }) {
                                 style={styles.inputShort}
                                 placeholder="task quick add"
                                 onChangeText={(newTaskTitle) => setNewTask(newTaskTitle)}
-                                value={newTask}
+                                value={newTaskTitle}
                                 underlineColorAndroid='transparent'
                                 autoCapitalize='none'
                             />
                             <TouchableOpacity
-                                style={styles.inputButton}
+                                style={[styles.inputButton,{ opacity: (!newTaskTitle ? 0.5 : 1.0 )}]}
+                                disabled={!newTaskTitle}
                                 onPress={() => {
                                     Keyboard.dismiss();
                                     addTask()
@@ -155,13 +152,13 @@ export function TasksScreen({ route, navigation }) {
                                     <View>
                                         <Pressable
                                             style={styles.listContainer}
-                                            onPress={() => navigation.navigate('TaskDetail', { item })}
+                                            onPress={() => navigation.navigate('TaskDetail', { uid: uid, taskId: item.id })}
                                         >
                                             <FontAwesome
                                                 style={styles.listDelIcon}
                                                 name='trash-o'
                                                 color='red'
-                                                onPress={() => deleteTask(item.title)} />
+                                                onPress={() => deleteTask(item.id)} />
                                             {/* <View > */}
                                             <Text style={styles.listText} >
                                                 {item.title}

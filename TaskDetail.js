@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -21,42 +21,91 @@ const styles = require('./Style.js');
 
 export function TaskDetailScreen({ route, navigation }) {
 
-  const [taskObj, setTaskObj] = useState(route.params.item);
-  const [taskTitle, setTaskTitle] = useState(route.params.item.title);
-  const [taskAssignee, setTaskAssignee] = useState(route.params.item.assignee);
-  const [taskNotes, setTaskNotes] = useState(route.params.item.notes);
-  const [taskPriority, setTaskPriority] = useState(route.params.item.priority);
-  const [taskEffort, setTaskEffort] = useState(route.params.item.effort);
+  const uid = route.params.uid;
+  const taskId = route.params.taskId;
 
-  const email = route.params.item.email;
-  const taskTitleSave = route.params.item.title;
+  const [user, setUser] = useState('');
+  const [origTask, setOrigTask] = useState({});
+  const [task, setTask] = useState({});
+
+  const [taskTitle, setTaskTitle] = useState('');
+  const [taskAssignee, setTaskAssignee] = useState('');
+  const [taskNotes, setTaskNotes] = useState('');
+  const [taskPriority, setTaskPriority] = useState('');
+  const [taskEffort, setTaskEffort] = useState('');
+
+  // const [email, setEmail] = ('');
+  // const [taskTitleSave, setTaskTitleSave] = ('');
+
+  // get user 
+  useEffect(() => {
+    // console.log("Getting user", uid)
+    async function getUser() {
+      try {
+        const docSnap = await getDoc(doc(db, "users", uid));
+        setUser(docSnap.data());
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    getUser();
+  }, [])
+
+  // get task
+  useEffect(() => {
+    // console.log("Getting task", uid, taskId);
+    async function getTask() {
+      try {
+        const docSnap = await getDoc(doc(db, "users", uid, "tasks", taskId));
+        setOrigTask(docSnap.data());
+        setTask(docSnap.data());
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    getTask();
+  }, [])
+
+  const taskChanged = () => {
+    const keys1 = Object.keys(task);
+    const keys2 = Object.keys(origTask);
+    if (keys1.length !== keys2.length) {
+      return true;
+    }
+    for (let key of keys1) {
+      if (task[key] !== origTask[key]) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+
 
   const SaveTask = async () => {
 
-    var newTaskObj = taskObj;
-    delete     newTaskObj.email;
-    delete     newTaskObj.title;
+    if (!taskChanged()) {
+      // console.log("!taskChanged()")
+      return 0
+    }
 
-    newTaskObj.assignee = taskAssignee
-    newTaskObj.notes = taskNotes
-    newTaskObj.priority = taskPriority
-    newTaskObj.effort = taskEffort
+    // console.log("Saving task", uid, taskId)
 
     try {
-      await setDoc(doc(db, "users", email, "tasks", taskTitleSave), newTaskObj)
+      await setDoc(doc(db, "users", uid, "tasks", taskId), task)
     } catch (error) {
       // const errorCode = error.code;
       const errorMessage = error.message;
-      // console.log("Sign in failed");
-      // console.log(errorCode);    // ..
-      // console.log(errorMessage);    // ..
-      // setScreenMsg(errorMessage);
       alert(errorMessage);
       return 1;
     }
 
     return 0;
   }
+  // console.log("task", task)
+  // console.log("origTask", origTask)
+  // console.log("REFRESHED")
+
 
   return (
     <SafeAreaView style={[styles.safeView]}>
@@ -71,14 +120,17 @@ export function TaskDetailScreen({ route, navigation }) {
                 <Text style={styles.pageTitleText}>
                   Task Detail
                 </Text>
+                <Text style={styles.pageSubTitleText}>
+                  {user.name}
+                </Text>
               </View>
 
               <View style={styles.inputFormContainer}>
-                <Text style={styles.inputLabel}>Title (created {new Date(taskObj.createdAt).toString().slice(0, 24)})</Text>
+                <Text style={styles.inputLabel}>Title (created on {new Date(task.createdAt).toString().slice(0, 24)})</Text>
                 <TextInput
                   style={styles.input}
-                  onChangeText={(newTaskTitle) => { setTaskTitle(newTaskTitle) }}
-                  value={taskTitle}
+                  onChangeText={(newValue) => { setTask((prevState) => ({ ...prevState, title: newValue })) }}
+                  value={task.title}
                   underlineColorAndroid='transparent'
                   autoCapitalize='none'
                 />
@@ -86,8 +138,8 @@ export function TaskDetailScreen({ route, navigation }) {
                 <Text style={styles.inputLabel}>Assigned To</Text>
                 <TextInput
                   style={styles.input}
-                  onChangeText={(newTaskAssignee) => { setTaskAssignee(newTaskAssignee) }}
-                  value={taskAssignee}
+                  onChangeText={(newValue) => { setTask((prevState) => ({ ...prevState, assignee: newValue })) }}
+                  value={task.assignee}
                   underlineColorAndroid='transparent'
                   autoCapitalize='none'
                 />
@@ -99,8 +151,8 @@ export function TaskDetailScreen({ route, navigation }) {
                     textAlignVertical: "top" // android fix for centering it at the top-left corner 
                   }]}
                   multiline={true} // ios fix for centering it at the top-left corner 
-                  onChangeText={(newTaskNotes) => { setTaskNotes(newTaskNotes) }}
-                  value={taskNotes}
+                  onChangeText={(newValue) => { setTask((prevState) => ({ ...prevState, notes: newValue })) }}
+                  value={task.notes}
                   underlineColorAndroid='transparent'
                   autoCapitalize='none'
                 />
@@ -108,11 +160,11 @@ export function TaskDetailScreen({ route, navigation }) {
                 <Text style={styles.inputLabel}>Start Date</Text>
                 <TextInput
                   style={styles.input}
-                  // onChangeText={(taskTitle) => setNewData(taskTitle)}
-                  value={taskObj.startDate == undefined ?
+                  onChangeText={(newValue) => { setTask((prevState) => ({ ...prevState, startDate: newValue })) }}
+                  value={task.startDate == undefined ?
                     new Date(Date.now()).toString().slice(0, 24)
                     :
-                    new Date(taskObj.startDate).toString().slice(0, 24)}
+                    new Date(task.startDate).toString().slice(0, 24)}
                   underlineColorAndroid='transparent'
                   autoCapitalize='none'
                 />
@@ -120,11 +172,11 @@ export function TaskDetailScreen({ route, navigation }) {
                 <Text style={styles.inputLabel}>End Before Date</Text>
                 <TextInput
                   style={styles.input}
-                  // onChangeText={(taskTitle) => setNewData(taskTitle)}
-                  value={taskObj.endDate == undefined ?
+                  onChangeText={(newValue) => { setTask((prevState) => ({ ...prevState, endDate: newValue })) }}
+                  value={task.endDate == undefined ?
                     new Date(Date.now()).toString().slice(0, 24)
                     :
-                    new Date(taskObj.endDate).toString().slice(0, 24)}
+                    new Date(task.endDate).toString().slice(0, 24)}
                   underlineColorAndroid='transparent'
                   autoCapitalize='none'
                 />
@@ -134,10 +186,11 @@ export function TaskDetailScreen({ route, navigation }) {
                     <Text style={styles.inputLabel}>Priority</Text>
                     <TextInput
                       style={[styles.input]}
-                      onChangeText={(taskPriority) => setTaskPriority(taskPriority)}
-                      value={taskPriority}
+                      onChangeText={(newValue) => { setTask((prevState) => ({ ...prevState, priority: +newValue })) }}
+                      value={task.priority?.toString()}
                       underlineColorAndroid='transparent'
                       autoCapitalize='none'
+                      keyboardType="numeric"
                     />
                   </View>
 
@@ -145,10 +198,11 @@ export function TaskDetailScreen({ route, navigation }) {
                     <Text style={styles.inputLabel}>Effort</Text>
                     <TextInput
                       style={[styles.input]}
-                      onChangeText={(taskEffort) => setTaskEffort(taskEffort)}
-                      value={taskEffort}
+                      onChangeText={(newValue) => { setTask((prevState) => ({ ...prevState, effort: +newValue })) }}
+                      value={task.effort?.toString()}
                       underlineColorAndroid='transparent'
                       autoCapitalize='none'
+                      keyboardType="numeric"
                     />
                   </View>
                 </View>
@@ -157,7 +211,7 @@ export function TaskDetailScreen({ route, navigation }) {
                 <TextInput
                   style={styles.input}
                   // onChangeText={(taskTitle) => setNewData(taskTitle)}
-                  value={taskObj.taskGroup}
+                  value={task.taskGroup}
                   underlineColorAndroid='transparent'
                   autoCapitalize='none'
                 />
@@ -166,28 +220,30 @@ export function TaskDetailScreen({ route, navigation }) {
                 <TextInput
                   style={styles.input}
                   // onChangeText={(taskTitle) => setNewData(taskTitle)}
-                  value={taskObj.taskResources}
+                  value={task.taskResources}
                   underlineColorAndroid='transparent'
                   autoCapitalize='none'
                 />
 
-                <TouchableOpacity style={styles.mainButton}
-                  onPress={async () => {
-                    await SaveTask().then(
-                      (result) => {
-                        if (result == 0) {
-                          navigation.goBack();
+                <View style={{ alignItems: "center" }}>
+                  <TouchableOpacity style={[styles.mainButton,{ opacity: (!taskChanged()) ? 0.5 : 1.0 }]}
+                    disabled={!taskChanged()}
+                    onPress={async () => {
+                      await SaveTask().then(
+                        (result) => {
+                          if (result == 0) {
+                            navigation.goBack();
+                          }
                         }
-                      }
-                    )
-                  }}
-                >
-                  <Text
-                    style={styles.buttonText}
-                  >Save
-                  </Text>
-                </TouchableOpacity>
-
+                      )
+                    }}
+                  >
+                    <Text
+                      style={styles.buttonText}
+                    >Save
+                    </Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
           </TouchableWithoutFeedback>
