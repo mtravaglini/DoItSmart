@@ -1,16 +1,28 @@
 import React, { useState } from 'react';
-import { Alert, View, Text, Modal, StyleSheet, Pressable } from 'react-native';
-import { FontAwesome } from '@expo/vector-icons';
+import { 
+  Modal, 
+  Pressable,
+  Text, 
+  TouchableOpacity,
+  View, 
+ } from 'react-native';
+
+ import { FontAwesome } from '@expo/vector-icons';
 
 // use custom style sheet
 const styles = require('./Style.js');
 
-export const HamburgerMenu = () => {
-  const [modalVisible, setModalVisible] = useState(false);
+// export const HamburgerMenu = () => {
+  export function HamburgerMenu(navigation, route) {
+    const [modalVisible, setModalVisible] = useState(false);
 
   return (
     <View style={styles.menuView}>
       <Modal
+        onBackdropPress={() => {
+          // Alert.alert('Modal has been closed.');
+          setModalVisible(false);
+        }}
         animationType="slide"
         transparent={true}
         visible={modalVisible}
@@ -20,35 +32,43 @@ export const HamburgerMenu = () => {
         }}>
         <View style={styles.menuView}>
 
-          <View style={styles.modalView}>
+          <View style={styles.modalMenuView}>
 
             <View style={{ flexDirection: "row", alignItems: "flex-start" }}>
               <Pressable style={{ flex: .2 }}
                 onPress={() => setModalVisible(false)}>
                 <FontAwesome
-                  style={[styles.hamburgerIcon,{marginLeft: 15}]}
+                  style={[styles.hamburgerIcon, { marginLeft: 15 }]}
                   color='cornflowerblue'
                   name='bars'
                 />
               </Pressable>
               <View style={[styles.pageTitleContainer, { flex: .4 }]}>
-                                <Text style={styles.pageTitleText}>
-                                    Do It. Smart.
-                                </Text>
-        
-                            </View>
+                <Text style={styles.pageTitleText}>
+                  Do It. Smart.
+                </Text>
+
+              </View>
               <View style={{ flex: .1 }}>
               </View>
             </View>
 
 
             <View style={styles.hamburgerItems}>
-              <Text style={styles.modalText}>Tasks</Text>
-              <Text style={styles.modalText}>Groups</Text>
-              <Text style={styles.modalText}>Resources</Text>
 
-              <Text style={styles.modalText}>Profile</Text>
-              <Text style={styles.modalText}>Signout</Text>
+              <TouchableOpacity 
+                onPress={() => { navigation.navigate('Tasks', {uid: uid}) }}
+              >
+                <Text style={styles.menuText}>Tasks</Text>
+              </TouchableOpacity>
+
+
+
+              <Text style={styles.menuText}>Groups</Text>
+              <Text style={styles.menuText}>Resources</Text>
+
+              <Text style={styles.menuText}>Profile</Text>
+              <Text style={styles.menuText}>Signout</Text>
 
 
             </View>

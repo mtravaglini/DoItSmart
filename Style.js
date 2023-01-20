@@ -206,20 +206,20 @@ module.exports = StyleSheet.create({
     alignItems: 'flex-start',
     // marginTop: 22,
   },
-  modalView: {
+  modalMenuView: {
     // margin: 20,
     backgroundColor: 'white',
     borderRadius: 5,
     paddingRigh: 20,
     alignItems: 'flex-start',
-    shadowColor: '#000',
+    shadowColor: 'cornflowerblue',
     shadowOffset: {
-      width: 0,
-      height: 2,
+      width: 3,
+      height: 5,
     },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
+    shadowOpacity: 1,
+    shadowRadius: 5,
+    elevation: 10,
   },
   hamburgerItems:{
     paddingRight: 10,
@@ -227,23 +227,7 @@ module.exports = StyleSheet.create({
     paddingVertical: 30,
 
   },
-  button: {
-    borderRadius: 20,
-    padding: 10,
-    elevation: 2,
-  },
-  buttonOpen: {
-    backgroundColor: '#F194FF',
-  },
-  buttonClose: {
-    backgroundColor: '#2196F3',
-  },
-  textStyle: {
-    color: 'white',
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  modalText: {
+  menuText: {
     marginBottom: 15,
     paddingLeft: 20,
     fontSize: 24,
