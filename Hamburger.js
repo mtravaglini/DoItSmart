@@ -9,31 +9,60 @@ export const HamburgerMenu = () => {
   const [modalVisible, setModalVisible] = useState(false);
 
   return (
-    <View style={styles.centeredView}>
+    <View style={styles.menuView}>
       <Modal
         animationType="slide"
         transparent={true}
         visible={modalVisible}
         onRequestClose={() => {
-          Alert.alert('Modal has been closed.');
+          // Alert.alert('Modal has been closed.');
           setModalVisible(!modalVisible);
         }}>
-        <View style={styles.centeredView}>
+        <View style={styles.menuView}>
+
           <View style={styles.modalView}>
-            <Text style={styles.modalText}>Hello World!</Text>
-            <Pressable
-              style={[styles.button, styles.buttonClose]}
-              onPress={() => setModalVisible(!modalVisible)}>
-              <Text style={styles.textStyle}>Hide Modal</Text>
-            </Pressable>
+
+            <View style={{ flexDirection: "row", alignItems: "flex-start" }}>
+              <Pressable style={{ flex: .2 }}
+                onPress={() => setModalVisible(false)}>
+                <FontAwesome
+                  style={[styles.hamburgerIcon,{marginLeft: 15}]}
+                  color='cornflowerblue'
+                  name='bars'
+                />
+              </Pressable>
+              <View style={[styles.pageTitleContainer, { flex: .4 }]}>
+                                <Text style={styles.pageTitleText}>
+                                    Do It. Smart.
+                                </Text>
+        
+                            </View>
+              <View style={{ flex: .1 }}>
+              </View>
+            </View>
+
+
+            <View style={styles.hamburgerItems}>
+              <Text style={styles.modalText}>Tasks</Text>
+              <Text style={styles.modalText}>Groups</Text>
+              <Text style={styles.modalText}>Resources</Text>
+
+              <Text style={styles.modalText}>Profile</Text>
+              <Text style={styles.modalText}>Signout</Text>
+
+
+            </View>
+
+
           </View>
         </View>
       </Modal>
-      <Pressable
+      <Pressable style={{ paddingLeft: 15 }}
         onPress={() => setModalVisible(true)}>
         <FontAwesome
           style={styles.hamburgerIcon}
           name='bars'
+          color='cornflowerblue'
         />
       </Pressable>
     </View>

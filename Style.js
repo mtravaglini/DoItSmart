@@ -36,7 +36,7 @@ module.exports = StyleSheet.create({
     alignItems: 'center',
   },
   pageTitleText: {
-    width: 'auto',
+    // width: 'auto',
     fontSize: 25,
     fontWeight: "bold",
     fontFamily: Platform.OS === "android" ? "sans-serif-thin" : "AppleSDGothicNeo-Thin",
@@ -197,10 +197,10 @@ module.exports = StyleSheet.create({
   hamburgerIcon: {
     fontSize: 35,
     height: 50,
-    marginLeft: "5%",
+    marginLeft: 0,
     // marginTop: "5%",
   },
-  centeredView: {
+  menuView: {
     flex: 1,
     justifyContent: 'flex-start',
     alignItems: 'flex-start',
@@ -209,8 +209,8 @@ module.exports = StyleSheet.create({
   modalView: {
     // margin: 20,
     backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 35,
+    borderRadius: 5,
+    paddingRigh: 20,
     alignItems: 'flex-start',
     shadowColor: '#000',
     shadowOffset: {
@@ -220,6 +220,12 @@ module.exports = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
+  },
+  hamburgerItems:{
+    paddingRight: 10,
+    paddingLeft: 10,
+    paddingVertical: 30,
+
   },
   button: {
     borderRadius: 20,
@@ -239,7 +245,9 @@ module.exports = StyleSheet.create({
   },
   modalText: {
     marginBottom: 15,
-    textAlign: 'center',
+    paddingLeft: 20,
+    fontSize: 24,
+    // textAlign: 'center',
   },
 
   // MISC ########################################

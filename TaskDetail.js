@@ -15,6 +15,7 @@ import {
 import { db } from './firebase.config';
 import { doc, collection, query, getDoc, setDoc, onSnapshot, orderBy } from "firebase/firestore";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import { HamburgerMenu } from './Hamburger.js';
 
 // use custom style sheet
 const styles = require('./Style.js');
@@ -133,14 +134,19 @@ export function TaskDetailScreen({ route, navigation }) {
           <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <View>
 
-              <View style={styles.pageTitleContainer}>
-                <Text style={styles.pageTitleText}>
-                  Task Detail
-                </Text>
-                <Text style={styles.pageSubTitleText}>
-                  {user.name}
-                </Text>
-              </View>
+            <View style={{ flexDirection: "row", alignItems: "flex-start" }}>
+                            <HamburgerMenu style={{ flex: 1}}></HamburgerMenu>
+                            <View style={[styles.pageTitleContainer, { flex: 5 }]}>
+                                <Text style={styles.pageTitleText}>
+                                    Task Detail
+                                </Text>
+                                <Text style={styles.pageSubTitleText}>
+                                    {user.name}
+                                </Text>
+                            </View>
+                            <View style={{ flex: 1 }}>
+                            </View>
+                        </View>
 
               <View style={styles.inputFormContainer}>
                 <Text style={styles.inputLabel}>Title (created on {new Date(task.createdAt).toString().slice(0, 24)})</Text>

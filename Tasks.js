@@ -113,7 +113,7 @@ export function TasksScreen({ route, navigation }) {
                     <View>
 
                         <View style={{ flexDirection: "row", alignItems: "flex-start" }}>
-                            <HamburgerMenu style={{ flex: 1 }}></HamburgerMenu>
+                            <HamburgerMenu style={{ flex: 1}}></HamburgerMenu>
                             <View style={[styles.pageTitleContainer, { flex: 5 }]}>
                                 <Text style={styles.pageTitleText}>
                                     Tasks
