@@ -16,6 +16,8 @@ import { FontAwesome } from '@expo/vector-icons';
 import { db } from './firebase.config';
 import { doc, collection, query, getDoc, setDoc, addDoc, deleteDoc, onSnapshot, orderBy } from "firebase/firestore";
 
+import { HamburgerMenu } from './Hamburger.js';
+
 // use custom style sheet
 const styles = require('./Style.js');
 
@@ -109,14 +111,21 @@ export function TasksScreen({ route, navigation }) {
                 behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                     <View>
-                        <View style={styles.pageTitleContainer}>
-                            <Text style={styles.pageTitleText}>
-                                Tasks
-                            </Text>
-                            <Text style={styles.pageSubTitleText}>
-                                {user.name}
-                            </Text>
+
+                        <View style={{ flexDirection: "row", alignItems: "flex-start" }}>
+                            <HamburgerMenu style={{ flex: 1 }}></HamburgerMenu>
+                            <View style={[styles.pageTitleContainer, { flex: 5 }]}>
+                                <Text style={styles.pageTitleText}>
+                                    Tasks
+                                </Text>
+                                <Text style={styles.pageSubTitleText}>
+                                    {user.name}
+                                </Text>
+                            </View>
+                            <View style={{ flex: 1 }}>
+                            </View>
                         </View>
+
                         <View style={styles.inputBtnFormContainer}>
                             <TextInput
                                 style={styles.inputShort}
@@ -127,7 +136,7 @@ export function TasksScreen({ route, navigation }) {
                                 autoCapitalize='none'
                             />
                             <TouchableOpacity
-                                style={[styles.inputButton,{ opacity: (!newTaskTitle ? 0.5 : 1.0 )}]}
+                                style={[styles.inputButton, { opacity: (!newTaskTitle ? 0.5 : 1.0) }]}
                                 disabled={!newTaskTitle}
                                 onPress={() => {
                                     Keyboard.dismiss();

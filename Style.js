@@ -36,6 +36,7 @@ module.exports = StyleSheet.create({
     alignItems: 'center',
   },
   pageTitleText: {
+    width: 'auto',
     fontSize: 25,
     fontWeight: "bold",
     fontFamily: Platform.OS === "android" ? "sans-serif-thin" : "AppleSDGothicNeo-Thin",
@@ -166,13 +167,13 @@ module.exports = StyleSheet.create({
   },
   listDelIcon: {
     fontSize: 30,
-    marginLeft: "5%",
+    marginLeft: "3%",
     marginRight: "5%",
   },
   listText: {
     fontWeight: "bold",
     fontSize: 18,
-    marginRight: 22,
+    // marginRight: 22,
   },
   // ########################################
 
@@ -190,6 +191,55 @@ module.exports = StyleSheet.create({
     marginLeft: 0,
     // marginRight: "2%",
     marginBottom: 15,
+  },
+
+  // Hamburger Menu
+  hamburgerIcon: {
+    fontSize: 35,
+    height: 50,
+    marginLeft: "5%",
+    // marginTop: "5%",
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
+    // marginTop: 22,
+  },
+  modalView: {
+    // margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'flex-start',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  button: {
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
+  },
+  buttonOpen: {
+    backgroundColor: '#F194FF',
+  },
+  buttonClose: {
+    backgroundColor: '#2196F3',
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
   },
 
   // MISC ########################################
