@@ -16,8 +16,6 @@ import { FontAwesome } from '@expo/vector-icons';
 import { db } from './firebase.config';
 import { doc, collection, query, getDoc, setDoc, addDoc, deleteDoc, onSnapshot, orderBy } from "firebase/firestore";
 
-import { HamburgerMenu } from './Hamburger.js';
-
 // use custom style sheet
 const styles = require('./Style.js');
 
@@ -111,19 +109,13 @@ export function TasksScreen({ route, navigation }) {
                 behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                     <View>
-
-                        <View style={{ flexDirection: "row", alignItems: "flex-start" }}>
-                            <HamburgerMenu style={{ flex: 1}}></HamburgerMenu>
-                            <View style={[styles.pageTitleContainer, { flex: 5 }]}>
-                                <Text style={styles.pageTitleText}>
-                                    Tasks
-                                </Text>
-                                <Text style={styles.pageSubTitleText}>
-                                    {user.name}
-                                </Text>
-                            </View>
-                            <View style={{ flex: 1 }}>
-                            </View>
+                        <View style={styles.pageTitleContainer}>
+                            <Text style={styles.pageTitleText}>
+                                Tasks
+                            </Text>
+                            <Text style={styles.pageSubTitleText}>
+                                {user.name}
+                            </Text>
                         </View>
 
                         <View style={styles.inputBtnFormContainer}>
@@ -178,6 +170,60 @@ export function TasksScreen({ route, navigation }) {
                                 )}
                             />
                         )}
+                        <View style={styles.footer}>
+
+                            <Pressable
+                                onPress={() => { navigation.navigate('Tasks', { uid: uid }) }}
+                            >
+                                <FontAwesome
+                                    style={styles.footerIcon}
+                                    name='tasks'
+                                    color='black'
+                                />
+                            </Pressable>
+
+                            <Pressable
+                                onPress={() => { navigation.navigate('Groups', { uid: uid }) }}
+                            >
+                                <FontAwesome
+                                    style={styles.footerIcon}
+                                    name='group'
+                                    color='black'
+                                />
+                            </Pressable>
+
+                            <Pressable
+                                onPress={() => { navigation.navigate('Resources', { uid: uid }) }}
+                            >
+                                <FontAwesome
+                                    style={styles.footerIcon}
+                                    name='car'
+                                    color='black'
+                                />
+                            </Pressable>
+
+                            <Pressable
+                                onPress={() => { navigation.navigate('Profile', { uid: uid }) }}
+                            >
+                                <FontAwesome
+                                    style={styles.footerIcon}
+                                    name='user'
+                                    color='black'
+                                />
+                            </Pressable>
+
+                            <Pressable
+                                onPress={() => { navigation.navigate('Signout', { uid: uid }) }}
+                            >
+                                <FontAwesome
+                                    style={styles.footerIcon}
+                                    name='sign-out'
+                                    color='black'
+                                />
+                            </Pressable>
+
+                        </View>
+
                     </View>
                 </TouchableWithoutFeedback>
             </KeyboardAvoidingView>

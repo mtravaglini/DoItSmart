@@ -193,45 +193,15 @@ module.exports = StyleSheet.create({
     marginBottom: 15,
   },
 
-  // Hamburger Menu
-  hamburgerIcon: {
-    fontSize: 35,
-    height: 50,
-    marginLeft: 0,
-    // marginTop: "5%",
+  // footer
+  footer: {
+    flexDirection: "row",
+    justifyContent: 'space-evenly'
   },
-  menuView: {
-    flex: 1,
-    justifyContent: 'flex-start',
-    alignItems: 'flex-start',
-    // marginTop: 22,
-  },
-  modalMenuView: {
-    // margin: 20,
-    backgroundColor: 'white',
-    borderRadius: 5,
-    paddingRigh: 20,
-    alignItems: 'flex-start',
-    shadowColor: 'cornflowerblue',
-    shadowOffset: {
-      width: 3,
-      height: 5,
-    },
-    shadowOpacity: 1,
-    shadowRadius: 5,
-    elevation: 10,
-  },
-  hamburgerItems:{
-    paddingRight: 10,
-    paddingLeft: 10,
-    paddingVertical: 30,
-
-  },
-  menuText: {
-    marginBottom: 15,
-    paddingLeft: 20,
-    fontSize: 24,
-    // textAlign: 'center',
+  footerIcon: {
+    fontSize: 30,
+    // marginLeft: "10%",
+    // marginRight: "10%",
   },
 
   // MISC ########################################
