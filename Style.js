@@ -180,17 +180,17 @@ module.exports = StyleSheet.create({
   // Date 
   dateText: {
     height: 48,
-    lineHeight: 20,
-    fontSize: 18,
     width: "95%",
-    backgroundColor: "white",
     borderRadius: 15,
-    paddingHorizontal: 15,
-    marginBottom: 10,
+    overflow: 'hidden',
     paddingLeft: 10,
     marginLeft: 0,
     // marginRight: "2%",
     marginBottom: 15,
+    fontSize: 18,
+    backgroundColor: "white",
+    alignContent: "center",
+    // justifyContent: "center"
   },
 
   // footer

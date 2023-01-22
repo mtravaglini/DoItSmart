@@ -25,6 +25,7 @@ export function TaskDetailScreen({ route, navigation }) {
   const taskId = route.params.taskId;
 
   const [user, setUser] = useState('');
+  const [createdByUser, setCreatedByUser] = useState('');
   const [origTask, setOrigTask] = useState({});
   const [task, setTask] = useState({});
 
@@ -51,7 +52,7 @@ export function TaskDetailScreen({ route, navigation }) {
       formattedDate = new Date(Date.now())
     }
 
-    return formattedDate.toString().slice(0, 10) + "\n" + formattedDate.toString().slice(16, 21)
+    return formattedDate.toString().slice(0, 10) + " " + formattedDate.toString().slice(16, 21)
   }
 
   // get user 
@@ -68,14 +69,18 @@ export function TaskDetailScreen({ route, navigation }) {
     getUser();
   }, [])
 
-  // get task
+  // get task and related info
   useEffect(() => {
     // console.log("Getting task", uid, taskId);
     async function getTask() {
       try {
-        const docSnap = await getDoc(doc(db, "users", uid, "tasks", taskId));
+        var docSnap = await getDoc(doc(db, "users", uid, "tasks", taskId));
         setOrigTask(docSnap.data());
         setTask(docSnap.data());
+        // get user info for the user that created this task
+        docSnap = await getDoc(doc(db, "users", docSnap.data().creator));
+        setCreatedByUser(docSnap.data().name + " (" + docSnap.data().email + ")")
+
       } catch (error) {
         console.error(error);
       }
@@ -133,17 +138,19 @@ export function TaskDetailScreen({ route, navigation }) {
           <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <View>
 
-                            <View style={styles.pageTitleContainer}>
-                                <Text style={styles.pageTitleText}>
-                                    Task Detail
-                                </Text>
-                                <Text style={styles.pageSubTitleText}>
-                                    {user.name}
-                                </Text>
-                            </View>
+              <View style={styles.pageTitleContainer}>
+                <Text style={styles.pageTitleText}>
+                  Task Detail
+                </Text>
+                <Text style={styles.pageSubTitleText}>
+                  {user.name}
+                </Text>
+              </View>
 
               <View style={styles.inputFormContainer}>
-                <Text style={styles.inputLabel}>Title (created on {new Date(task.createdAt).toString().slice(0, 24)})</Text>
+                <Text style={styles.inputLabel}>Created by {createdByUser}</Text>
+                <Text style={styles.inputLabel}>Created on {new Date(task.createdAt).toString().slice(0, 24)}</Text>
+                <Text style={[styles.inputLabel, { paddingTop: 15 }]}>Title</Text>
                 <TextInput
                   style={styles.input}
                   onChangeText={(newValue) => { setTask((prevState) => ({ ...prevState, title: newValue })) }}
@@ -152,15 +159,15 @@ export function TaskDetailScreen({ route, navigation }) {
                   autoCapitalize='none'
                 />
 
-                <Text style={styles.inputLabel}>Created by</Text>
-                <TextInput
+                {/* <TextInput
                   readOnly={true}
                   style={styles.input}
                   // onChangeText={(newValue) => { setTask((prevState) => ({ ...prevState, creator: newValue })) }}
-                  value={task.creator}
+                  // value={task.creator}
+                  value={createdByUser}
                   underlineColorAndroid='transparent'
                   autoCapitalize='none'
-                />
+                /> */}
 
                 <Text style={styles.inputLabel}>Notes</Text>
                 <TextInput
