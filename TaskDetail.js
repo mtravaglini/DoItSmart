@@ -15,6 +15,7 @@ import {
 import { db } from './firebase.config';
 import { doc, collection, query, getDoc, setDoc, onSnapshot, orderBy } from "firebase/firestore";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import InputSpinner from "react-native-input-spinner";
 
 // use custom style sheet
 const styles = require('./Style.js');
@@ -150,6 +151,7 @@ export function TaskDetailScreen({ route, navigation }) {
               <View style={styles.inputFormContainer}>
                 <Text style={styles.inputLabel}>Created by {createdByUser}</Text>
                 <Text style={styles.inputLabel}>Created on {new Date(task.createdAt).toString().slice(0, 24)}</Text>
+
                 <Text style={[styles.inputLabel, { paddingTop: 15 }]}>Title</Text>
                 <TextInput
                   style={styles.input}
@@ -233,26 +235,63 @@ export function TaskDetailScreen({ route, navigation }) {
                 <View style={{ flexDirection: "row" }}>
                   <View style={{ flexDirection: "column", flex: 1 }}>
                     <Text style={styles.inputLabel}>Priority</Text>
-                    <TextInput
+                    <InputSpinner
+                      skin={"clean"}
+                      height={48}
+                      width={150}
+                      style={[styles.input, {
+                        borderRadius: 15,
+                        shadowColor: "#e5e5e5"
+                      }]}
+                      shadow={false}
+                      max={10}
+                      min={0}
+                      step={1}
+                      // colorMax={"#f04048"}
+                      // colorMin={"#40c5f4"}
+                      value={task.priority?.toString()}
+                      onChange={(newValue) => { setTask((prevState) => ({ ...prevState, priority: +newValue })) }}
+                    />
+                    {/* <TextInput
                       style={styles.input}
                       onChangeText={(newValue) => { setTask((prevState) => ({ ...prevState, priority: +newValue })) }}
                       value={task.priority?.toString()}
                       underlineColorAndroid='transparent'
                       autoCapitalize='none'
                       keyboardType="numeric"
-                    />
+                    /> */}
                   </View>
 
                   <View style={{ flexDirection: "column", flex: 1 }}>
                     <Text style={styles.inputLabel}>Effort</Text>
-                    <TextInput
+                    <InputSpinner
+                      skin={"clean"}
+                      height={48}
+                      width={150}
+                      style={[styles.input, {
+                        borderRadius: 15,
+                        shadowColor: "#e5e5e5"
+                      }]}
+                      shadow={false}
+                      max={10080}
+                      min={10}
+                      step={5}
+                      longStep={30}
+                      speed={4}
+                      // colorMax={"#f04048"}
+                      // colorMin={"#40c5f4"}
+                      value={task.effort?.toString()}
+                      // value={formatEffort(task.effort)}
+                      onChange={(newValue) => { setTask((prevState) => ({ ...prevState, effort: +newValue })) }}
+                    />
+                    {/* <TextInput
                       style={[styles.input]}
                       onChangeText={(newValue) => { setTask((prevState) => ({ ...prevState, effort: +newValue })) }}
                       value={task.effort?.toString()}
                       underlineColorAndroid='transparent'
                       autoCapitalize='none'
                       keyboardType="numeric"
-                    />
+                    /> */}
                   </View>
                 </View>
 
