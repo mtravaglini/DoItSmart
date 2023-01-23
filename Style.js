@@ -5,6 +5,7 @@ module.exports = StyleSheet.create({
   safeView: {
     flex: 1,
     paddingTop: Platform.OS === "android" ? 50 : 0,
+    backgroundColor: "#e5e5e5"
   },
   container: {
     alignItems: 'center',
@@ -139,7 +140,7 @@ module.exports = StyleSheet.create({
   },
   input: {
     height: 48,
-    width: "95%",
+    // width: "95%",
     borderRadius: 15,
     overflow: 'hidden',
     paddingLeft: 10,
@@ -155,7 +156,8 @@ module.exports = StyleSheet.create({
 
   // task list  ########################################
   listContainer: {
-    backgroundColor: "#e5e5e5",
+    // backgroundColor: "red",
+    backgroundColor: "white",
     // padding: 15,
     borderRadius: 15,
     margin: "1%",
