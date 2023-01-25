@@ -16,17 +16,33 @@ import {
 // import { useNavigation } from '@react-navigation/native';
 import { FontAwesome } from '@expo/vector-icons';
 import { app, db } from './firebase.config';
+import { doc, collection, query, getDoc, setDoc, addDoc, deleteDoc, onSnapshot, orderBy } from "firebase/firestore";
 
 // use custom style sheet
 const styles = require('./Style.js');
 
 export function GroupsScreen({ route, navigation }) {
 
+    const uid = route.params.uid;
     const groupsRef = db.collection("groups");
 
+    const [user, setUser] = useState('');
     const [groups, setGroups] = useState([]);
     const [newData, setNewData] = useState('');
     const [isLoading, setLoading] = useState(true);
+
+    // get user 
+    useEffect(() => {
+        async function getUser() {
+            try {
+                const docSnap = await getDoc(doc(db, "users", uid));
+                setUser(docSnap.data());
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        getUser();
+    }, [])
 
     useEffect(() => {
         groupsRef
@@ -103,6 +119,9 @@ export function GroupsScreen({ route, navigation }) {
                             <Text style={styles.pageTitleText}>
                                 Groups
                             </Text>
+                            <Text style={styles.pageSubTitleText}>
+                                {user.name}
+                            </Text>
                         </View>
                         <View style={styles.inputBtnFormContainer}>
                             <TextInput
@@ -124,7 +143,7 @@ export function GroupsScreen({ route, navigation }) {
                         {isLoading ? (
                             <ActivityIndicator size="large" color="cornflowerblue" />
                         ) : (
-                            <FlatList style={{ height: "75%" }}
+                            <FlatList style={{ height: "76%" }}
                                 data={groups}
                                 ListEmptyComponent={<Text style={[styles.listText, { marginLeft: "20%" }]}>No groups! Add some!</Text>}
                                 renderItem={({ item }) => (
@@ -149,6 +168,68 @@ export function GroupsScreen({ route, navigation }) {
                                 )}
                             />
                         )}
+                        <View style={styles.footer}>
+
+                            <Pressable
+                                onPress={() => { navigation.navigate('Tasks', { uid: uid }) }}
+                            >
+                                <FontAwesome
+                                    style={styles.footerIcon}
+                                    name='tasks'
+                                    color='black'
+                                />
+                            </Pressable>
+
+                            <Pressable
+                                onPress={() => { navigation.navigate('Groups', { uid: uid }) }}
+                            >
+                                <FontAwesome
+                                    style={styles.footerIcon}
+                                    name='group'
+                                    color='black'
+                                />
+                            </Pressable>
+
+                            <Pressable
+                                onPress={() => { navigation.navigate('Resources', { uid: uid }) }}
+                            >
+                                <FontAwesome
+                                    style={styles.footerIcon}
+                                    name='car'
+                                    color='black'
+                                />
+                            </Pressable>
+
+                            <Pressable
+                                onPress={() => { navigation.navigate('Profile', { uid: uid }) }}
+                            >
+                                <FontAwesome
+                                    style={styles.footerIcon}
+                                    name='user'
+                                    color='black'
+                                />
+                            </Pressable>
+
+                            <Pressable
+                                onPress={() => {
+                                    signOut(auth).then(() => {
+                                        // Sign-out successful.
+                                        //   alert("SIGNED OUT")
+                                        navigation.navigate('Signin')
+                                    }).catch((error) => {
+                                        alert(error.message)
+                                    });
+                                }}
+                            >
+                                <FontAwesome
+                                    style={styles.footerIcon}
+                                    name='sign-out'
+                                    color='black'
+                                />
+                            </Pressable>
+
+                        </View>
+
                     </View>
                 </TouchableWithoutFeedback>
             </KeyboardAvoidingView>
