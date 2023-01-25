@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Keyboard,
     KeyboardAvoidingView,
@@ -20,6 +20,12 @@ export function SigninScreen({ route, navigation }) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [screenMsg, setScreenMsg] = useState('');
+
+    // clear password on screen load 
+    useEffect(() => {
+        // console.log("page load")
+        setPassword("")
+    }, [])
 
     const SigninUser = async () => {
 
@@ -105,7 +111,7 @@ export function SigninScreen({ route, navigation }) {
                                 </TouchableOpacity>
 
                                 <TouchableOpacity style={styles.secondaryButton}
-                                    onPress={() => {navigation.navigate('Register')}}
+                                    onPress={() => { navigation.navigate('Register') }}
                                 >
                                     <Text
                                         style={styles.secondaryButtonText}
