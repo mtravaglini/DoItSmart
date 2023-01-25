@@ -12,9 +12,8 @@ import {
   View,
 } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
-
-
-import { db } from './firebase.config';
+import { db, auth } from './firebase.config';
+import { signOut } from "firebase/auth";
 import { doc, collection, query, getDoc, setDoc, onSnapshot, orderBy } from "firebase/firestore";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import InputSpinner from "react-native-input-spinner";
@@ -382,8 +381,17 @@ export function TaskDetailScreen({ route, navigation }) {
               </Pressable>
 
               <Pressable
-                onPress={() => { navigation.navigate('Signout', { uid: uid }) }}
+                onPress={() => {
+                  signOut(auth).then(() => {
+                    // Sign-out successful.
+                    //   alert("SIGNED OUT")
+                    navigation.navigate('Signin')
+                  }).catch((error) => {
+                    alert(error.message)
+                  });
+                }}
               >
+
                 <FontAwesome
                   style={styles.footerIcon}
                   name='sign-out'

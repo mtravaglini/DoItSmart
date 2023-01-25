@@ -14,7 +14,8 @@ import {
     View,
 } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
-import { db } from './firebase.config';
+import { db, auth } from './firebase.config';
+import { signOut } from "firebase/auth";
 import { doc, collection, query, getDoc, setDoc, addDoc, deleteDoc, onSnapshot, orderBy } from "firebase/firestore";
 
 
@@ -110,8 +111,17 @@ export function ProfileScreen({ route, navigation }) {
                             </Pressable>
 
                             <Pressable
-                                onPress={() => { navigation.navigate('Signout', { uid: uid }) }}
+                                onPress={() => {
+                                    signOut(auth).then(() => {
+                                        // Sign-out successful.
+                                        //   alert("SIGNED OUT")
+                                        navigation.navigate('Signin')
+                                    }).catch((error) => {
+                                        alert(error.message)
+                                    });
+                                }}
                             >
+
                                 <FontAwesome
                                     style={styles.footerIcon}
                                     name='sign-out'

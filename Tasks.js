@@ -13,7 +13,8 @@ import {
     View,
 } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
-import { db } from './firebase.config';
+import { db, auth } from './firebase.config';
+import { signOut } from "firebase/auth";
 import { doc, collection, query, getDoc, setDoc, addDoc, deleteDoc, onSnapshot, orderBy } from "firebase/firestore";
 
 // use custom style sheet
@@ -144,7 +145,7 @@ export function TasksScreen({ route, navigation }) {
                         {isLoading ? (
                             <ActivityIndicator size="large" color="cornflowerblue" />
                         ) : (
-                            <FlatList style={{ height: "76%" , marginBottom: 15}}
+                            <FlatList style={{ height: "76%", marginBottom: 15 }}
                                 data={tasks}
                                 ListEmptyComponent={<Text style={[styles.listText, { marginLeft: "20%" }]}>
                                     All done! Add more tasks!
@@ -213,7 +214,15 @@ export function TasksScreen({ route, navigation }) {
                             </Pressable>
 
                             <Pressable
-                                onPress={() => { navigation.navigate('Signout', { uid: uid }) }}
+                                onPress={() => {
+                                    signOut(auth).then(() => {
+                                        // Sign-out successful.
+                                        //   alert("SIGNED OUT")
+                                        navigation.navigate('Signin')
+                                    }).catch((error) => {
+                                        alert(error.message)
+                                    });
+                                }}
                             >
                                 <FontAwesome
                                     style={styles.footerIcon}
