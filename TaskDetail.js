@@ -11,6 +11,8 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
+import { FontAwesome } from '@expo/vector-icons';
+
 
 import { db } from './firebase.config';
 import { doc, collection, query, getDoc, setDoc, onSnapshot, orderBy } from "firebase/firestore";
@@ -132,21 +134,21 @@ export function TaskDetailScreen({ route, navigation }) {
 
   return (
     <SafeAreaView style={[styles.safeView]}>
-      <ScrollView style={{ height: '100%' }}>
-        <KeyboardAvoidingView
-          style={{ flex: 1 }}
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-            <View>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <View>
 
-              <View style={styles.pageTitleContainer}>
-                <Text style={styles.pageTitleText}>
-                  Task Detail
-                </Text>
-                <Text style={styles.pageSubTitleText}>
-                  {user.name}
-                </Text>
-              </View>
+            <View style={styles.pageTitleContainer}>
+              <Text style={styles.pageTitleText}>
+                Task Detail
+              </Text>
+              <Text style={styles.pageSubTitleText}>
+                {user.name}
+              </Text>
+            </View>
+            <ScrollView style={{ height: "84%", marginBottom: 15 }}>
 
               <View style={styles.inputFormContainer}>
                 <Text style={styles.inputLabel}>Created by {createdByUser}</Text>
@@ -174,7 +176,7 @@ export function TaskDetailScreen({ route, navigation }) {
                 <Text style={styles.inputLabel}>Notes</Text>
                 <TextInput
                   style={[styles.input, {
-                    height: 150,
+                    height: 120,
                     textAlignVertical: "top" // android fix for centering it at the top-left corner 
                   }]}
                   multiline={true} // ios fix for centering it at the top-left corner 
@@ -335,10 +337,66 @@ export function TaskDetailScreen({ route, navigation }) {
                   </TouchableOpacity>
                 </View>
               </View>
+            </ScrollView>
+
+            <View style={styles.footer}>
+
+              <Pressable
+                onPress={() => { navigation.navigate('Tasks', { uid: uid }) }}
+              >
+                <FontAwesome
+                  style={styles.footerIcon}
+                  name='tasks'
+                  color='black'
+                />
+              </Pressable>
+
+              <Pressable
+                onPress={() => { navigation.navigate('Groups', { uid: uid }) }}
+              >
+                <FontAwesome
+                  style={styles.footerIcon}
+                  name='group'
+                  color='black'
+                />
+              </Pressable>
+
+              <Pressable
+                onPress={() => { navigation.navigate('Resources', { uid: uid }) }}
+              >
+                <FontAwesome
+                  style={styles.footerIcon}
+                  name='car'
+                  color='black'
+                />
+              </Pressable>
+
+              <Pressable
+                onPress={() => { navigation.navigate('Profile', { uid: uid }) }}
+              >
+                <FontAwesome
+                  style={styles.footerIcon}
+                  name='user'
+                  color='black'
+                />
+              </Pressable>
+
+              <Pressable
+                onPress={() => { navigation.navigate('Signout', { uid: uid }) }}
+              >
+                <FontAwesome
+                  style={styles.footerIcon}
+                  name='sign-out'
+                  color='black'
+                />
+              </Pressable>
+
             </View>
-          </TouchableWithoutFeedback>
-        </KeyboardAvoidingView>
-      </ScrollView>
+
+
+          </View>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
