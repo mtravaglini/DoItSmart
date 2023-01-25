@@ -204,15 +204,15 @@ module.exports = StyleSheet.create({
 
   // OTHER ########################################
   textDisplay: {
-    borderBottomWidth: 3,
-    borderColor: "cornflowerblue",
     color: "cornflowerblue",
-    width: "75%",
-    height: 25,
-    marginBottom: 5,
+    width: "90%",
+    height: 48,
+    lineHeight: 48,
+    marginBottom: 15,
     paddingLeft: "5%",
     fontSize: 18,
-    backgroundColor: "lightgrey"
+    backgroundColor: "white",
+    borderRadius: 15,
   },
   closeBox: {
     position: 'absolute',

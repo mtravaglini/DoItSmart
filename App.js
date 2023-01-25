@@ -10,6 +10,7 @@ import { TasksScreen } from './Tasks.js';
 import { TaskDetailScreen } from './TaskDetail.js';
 import { GroupsScreen } from './Groups.js';
 import { ResourcesScreen } from './Resources.js';
+import { ProfileScreen } from './Profile.js';
 
 // create the Navigation stack
 const Stack = createStackNavigator();
@@ -24,6 +25,7 @@ export default function App() {
         <Stack.Screen name="TaskDetail" component={TaskDetailScreen} />
         <Stack.Screen name="Groups" component={GroupsScreen} />
         <Stack.Screen name="Resources" component={ResourcesScreen} />
+        <Stack.Screen name="Profile" component={ProfileScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
