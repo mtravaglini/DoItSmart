@@ -182,17 +182,13 @@ module.exports = StyleSheet.create({
   // Date 
   dateText: {
     height: 48,
+    lineHeight: 48,
     width: "95%",
     borderRadius: 15,
-    overflow: 'hidden',
     paddingLeft: 10,
-    marginLeft: 0,
-    // marginRight: "2%",
     marginBottom: 15,
     fontSize: 18,
     backgroundColor: "white",
-    alignContent: "center",
-    // justifyContent: "center"
   },
 
   // footer
@@ -206,7 +202,7 @@ module.exports = StyleSheet.create({
     // marginRight: "10%",
   },
 
-  // MISC ########################################
+  // OTHER ########################################
   textDisplay: {
     borderBottomWidth: 3,
     borderColor: "cornflowerblue",

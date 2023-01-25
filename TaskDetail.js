@@ -202,6 +202,7 @@ export function TaskDetailScreen({ route, navigation }) {
                         isVisible={isStartDatePickerVisible}
                         mode="datetime"
                         date={new Date(task.startDate)}
+                        maximumDate={new Date(task.endDate)}
                         onConfirm={handleStartDatePickerConfirm}
                         onCancel={() => setStartDatePickerVisibility(false)}
                       />
@@ -224,6 +225,7 @@ export function TaskDetailScreen({ route, navigation }) {
                         isVisible={isEndDatePickerVisible}
                         mode="datetime"
                         date={new Date(task.endDate)}
+                        minimumDate={new Date(task.startDate)}
                         onConfirm={handleEndDatePickerConfirm}
                         onCancel={() => setEndDatePickerVisibility(false)}
                       />
