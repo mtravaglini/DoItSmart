@@ -6,16 +6,15 @@ import {
     KeyboardAvoidingView,
     Pressable,
     SafeAreaView,
-    ScrollView,
     Text,
     TextInput,
     TouchableOpacity,
     TouchableWithoutFeedback,
     View,
 } from 'react-native';
-// import { useNavigation } from '@react-navigation/native';
 import { FontAwesome } from '@expo/vector-icons';
-import { app, db } from './firebase.config';
+import { db, auth } from './firebase.config';
+import { signOut } from "firebase/auth";
 import { doc, collection, query, getDoc, setDoc, addDoc, deleteDoc, onSnapshot, orderBy } from "firebase/firestore";
 
 // use custom style sheet
@@ -24,11 +23,11 @@ const styles = require('./Style.js');
 export function ResourcesScreen({ route, navigation }) {
 
     const uid = route.params.uid;
-    const resourcesRef = db.collection("resources");
+    // const resourcesRef = db.collection("resources");
 
     const [user, setUser] = useState('');
     const [resources, setResources] = useState([]);
-    const [newData, setNewData] = useState('');
+    const [newResourceName, setNewResource] = useState('');
     const [isLoading, setLoading] = useState(true);
 
     // get user 
@@ -44,69 +43,124 @@ export function ResourcesScreen({ route, navigation }) {
         getUser();
     }, [])
 
+    // get resources
     useEffect(() => {
-        resourcesRef
-            .orderBy('createdAt', 'desc')
-            .onSnapshot(
-                querySnapshot => {
-                    const resources = []
-                    querySnapshot.forEach((doc) => {
-                        const resourceTitle = doc.data().title;
-                        const resourceDate = new Date(doc.data().createdAt);
-                        resources.push({
-                            id: doc.id,
-                            resourceTitle: resourceTitle,
-                            resourceDate: resourceDate
+        var unsubscribe;
+        var resourceObj;
+        async function getResources() {
+            try {
+                unsubscribe = onSnapshot(
+                    query(
+                        collection(db, "resources"), orderBy('name')), (querySnapshot) => {
+                            const retrievedResources = [];
+                            querySnapshot.forEach((doc) => {
+                                resourceObj = doc.data();
+                                resourceObj.id = doc.id;
+                                retrievedResources.push(resourceObj)
+                            })
+                            setResources(retrievedResources)
+                            setLoading(false);
                         })
-                    })
-                    setResources(resources)
-                }
-            )
-
-        setLoading(false);
-
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        getResources();
+        return function cleanup() {
+            unsubscribe();
+        };
     }, [])
 
-    // delete  a resource
+    // useEffect(() => {
+    //     resourcesRef
+    //         .orderBy('createdAt', 'desc')
+    //         .onSnapshot(
+    //             querySnapshot => {
+    //                 const resources = []
+    //                 querySnapshot.forEach((doc) => {
+    //                     const resourceTitle = doc.data().title;
+    //                     const resourceDate = new Date(doc.data().createdAt);
+    //                     resources.push({
+    //                         id: doc.id,
+    //                         resourceTitle: resourceTitle,
+    //                         resourceDate: resourceDate
+    //                     })
+    //                 })
+    //                 setResources(resources)
+    //             }
+    //         )
 
-    const deleteResource = (resources) => {
-        resourcesRef
-            .doc(resources.id)
-            .delete()
-            .then(() => {
-                // success message
-                // alert("Deleted!");
-            })
-            .catch(error => {
-                alert(error);
-            })
-    }
+    //     setLoading(false);
 
-    // add  a resource
+    // }, [])
 
-    const addResource = () => {
+    // // delete  a resource
+
+    // const deleteResource = (resources) => {
+    //     resourcesRef
+    //         .doc(resources.id)
+    //         .delete()
+    //         .then(() => {
+    //             // success message
+    //             // alert("Deleted!");
+    //         })
+    //         .catch(error => {
+    //             alert(error);
+    //         })
+    // }
+
+    // // add  a resource
+
+    // const addResource = () => {
+    //     // check we have one to add
+    //     if (newData && newData.length > 0) {
+    //         const timestamp = Math.floor(Date.now()) //serverTimestamp();
+    //         const data = {
+    //             title: newData,
+    //             createdAt: timestamp
+    //         }
+    //         resourcesRef
+    //             .add(data)
+    //             .then(() => {
+    //                 setNewResource('');
+    //                 Keyboard.dismiss();
+    //                 // success message
+    //                 // alert("Added!");
+    //             })
+    //             .catch(error => {
+    //                 alert(error);
+    //             })
+    //     }
+
+    // }
+
+    // add a resource
+    const addResource = async () => {
         // check we have one to add
-        if (newData && newData.length > 0) {
-            const timestamp = Math.floor(Date.now()) //serverTimestamp();
-            const data = {
-                title: newData,
-                createdAt: timestamp
+        if (newResourceName && newResourceName.length > 0) {
+            try {
+                const timestamp = Math.floor(Date.now()) //serverTimestamp();
+                const data = {
+                    name: newResourceName,
+                    creator: uid,
+                    createdAt: timestamp
+                }
+                addDoc(collection(db, "resources"), data)
+                setNewResource('');
+            } catch (error) {
+                alert(error);
             }
-            resourcesRef
-                .add(data)
-                .then(() => {
-                    setNewData('');
-                    Keyboard.dismiss();
-                    // success message
-                    // alert("Added!");
-                })
-                .catch(error => {
-                    alert(error);
-                })
         }
-
     }
 
+    // delete a resource
+    const deleteResource = async (resourceId) => {
+        try {
+            await deleteDoc(doc(db, "resources", resourceId));
+        } catch (error) {
+            alert(error);
+        }
+    }
 
     return (
         <SafeAreaView style={styles.safeView}>
@@ -123,17 +177,24 @@ export function ResourcesScreen({ route, navigation }) {
                                 {user.name}
                             </Text>
                         </View>
+
                         <View style={styles.inputBtnFormContainer}>
                             <TextInput
                                 style={styles.inputShort}
-                                onChangeText={(resourceTitle2) => setNewData(resourceTitle2)}
-                                value={newData}
+                                placeholder="resource quick add"
+                                onChangeText={(newResourceName) => setNewResource(newResourceName)}
+                                value={newResourceName}
                                 underlineColorAndroid='transparent'
                                 autoCapitalize='none'
                             />
                             <TouchableOpacity
-                                style={styles.inputButton}
-                                onPress={addResource}>
+                                style={[styles.inputButton, { opacity: (!newResourceName ? 0.5 : 1.0) }]}
+                                disabled={!newResourceName}
+                                onPress={() => {
+                                    Keyboard.dismiss();
+                                    addResource()
+                                }}
+                            >
                                 <Text
                                     style={styles.buttonText}
                                 >Add</Text>
@@ -143,24 +204,25 @@ export function ResourcesScreen({ route, navigation }) {
                         {isLoading ? (
                             <ActivityIndicator size="large" color="cornflowerblue" />
                         ) : (
-                            <FlatList style={{ height: "76%" }}
+                            <FlatList style={{ height: "76%", marginBottom: 15 }}
                                 data={resources}
-                                ListEmptyComponent={<Text style={[styles.listText, { marginLeft: "20%" }]}>No resources! Add some!</Text>}
+                                ListEmptyComponent={<Text style={[styles.listText, { marginLeft: "20%" }]}>
+                                    No resources! Add some!
+                                </Text>}
                                 renderItem={({ item }) => (
                                     <View>
                                         <Pressable
                                             style={styles.listContainer}
-                                            onPress={() => navigation.navigate('ResourceDetail', { item })}>
+                                            onPress={() => navigation.navigate('ResourceDetail', { uid: uid, resourceId: item.id })}
+                                        >
                                             <FontAwesome
                                                 style={styles.listDelIcon}
                                                 name='trash-o'
                                                 color='red'
-                                                onPress={() => deleteResource(item)} />
+                                                onPress={() => deleteResource(item.id)} />
                                             {/* <View > */}
                                             <Text style={styles.listText} >
-                                                {/* {item.id}  */}
-                                                {item.resourceTitle}
-                                                {/* {item.resourceDate}  */}
+                                                {item.name}
                                             </Text>
                                             {/* </View> */}
                                         </Pressable>
@@ -181,7 +243,7 @@ export function ResourcesScreen({ route, navigation }) {
                             </Pressable>
 
                             <Pressable
-                                onPress={() => { navigation.navigate('Groups', { uid: uid }) }}
+                                onPress={() => { navigation.navigate('Resources', { uid: uid }) }}
                             >
                                 <FontAwesome
                                     style={styles.footerIcon}

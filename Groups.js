@@ -6,16 +6,15 @@ import {
     KeyboardAvoidingView,
     Pressable,
     SafeAreaView,
-    ScrollView,
     Text,
     TextInput,
     TouchableOpacity,
     TouchableWithoutFeedback,
     View,
 } from 'react-native';
-// import { useNavigation } from '@react-navigation/native';
 import { FontAwesome } from '@expo/vector-icons';
-import { app, db } from './firebase.config';
+import { db, auth } from './firebase.config';
+import { signOut } from "firebase/auth";
 import { doc, collection, query, getDoc, setDoc, addDoc, deleteDoc, onSnapshot, orderBy } from "firebase/firestore";
 
 // use custom style sheet
@@ -24,11 +23,11 @@ const styles = require('./Style.js');
 export function GroupsScreen({ route, navigation }) {
 
     const uid = route.params.uid;
-    const groupsRef = db.collection("groups");
+    // const groupsRef = db.collection("groups");
 
     const [user, setUser] = useState('');
     const [groups, setGroups] = useState([]);
-    const [newData, setNewData] = useState('');
+    const [newGroupName, setNewGroup] = useState('');
     const [isLoading, setLoading] = useState(true);
 
     // get user 
@@ -44,69 +43,124 @@ export function GroupsScreen({ route, navigation }) {
         getUser();
     }, [])
 
+    // get groups
     useEffect(() => {
-        groupsRef
-            .orderBy('createdAt', 'desc')
-            .onSnapshot(
-                querySnapshot => {
-                    const groups = []
-                    querySnapshot.forEach((doc) => {
-                        const groupTitle = doc.data().title;
-                        const groupDate = new Date(doc.data().createdAt);
-                        groups.push({
-                            id: doc.id,
-                            groupTitle: groupTitle,
-                            groupDate: groupDate
+        var unsubscribe;
+        var groupObj;
+        async function getGroups() {
+            try {
+                unsubscribe = onSnapshot(
+                    query(
+                        collection(db, "groups"), orderBy('name')), (querySnapshot) => {
+                            const retrievedGroups = [];
+                            querySnapshot.forEach((doc) => {
+                                groupObj = doc.data();
+                                groupObj.id = doc.id;
+                                retrievedGroups.push(groupObj)
+                            })
+                            setGroups(retrievedGroups)
+                            setLoading(false);
                         })
-                    })
-                    setGroups(groups)
-                }
-            )
-
-        setLoading(false);
-
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        getGroups();
+        return function cleanup() {
+            unsubscribe();
+        };
     }, [])
 
-    // delete  a group
+    // useEffect(() => {
+    //     groupsRef
+    //         .orderBy('createdAt', 'desc')
+    //         .onSnapshot(
+    //             querySnapshot => {
+    //                 const groups = []
+    //                 querySnapshot.forEach((doc) => {
+    //                     const groupTitle = doc.data().title;
+    //                     const groupDate = new Date(doc.data().createdAt);
+    //                     groups.push({
+    //                         id: doc.id,
+    //                         groupTitle: groupTitle,
+    //                         groupDate: groupDate
+    //                     })
+    //                 })
+    //                 setGroups(groups)
+    //             }
+    //         )
 
-    const deleteGroup = (groups) => {
-        groupsRef
-            .doc(groups.id)
-            .delete()
-            .then(() => {
-                // success message
-                // alert("Deleted!");
-            })
-            .catch(error => {
-                alert(error);
-            })
-    }
+    //     setLoading(false);
 
-    // add  a group
+    // }, [])
 
-    const addGroup = () => {
+    // // delete  a group
+
+    // const deleteGroup = (groups) => {
+    //     groupsRef
+    //         .doc(groups.id)
+    //         .delete()
+    //         .then(() => {
+    //             // success message
+    //             // alert("Deleted!");
+    //         })
+    //         .catch(error => {
+    //             alert(error);
+    //         })
+    // }
+
+    // // add  a group
+
+    // const addGroup = () => {
+    //     // check we have one to add
+    //     if (newData && newData.length > 0) {
+    //         const timestamp = Math.floor(Date.now()) //serverTimestamp();
+    //         const data = {
+    //             title: newData,
+    //             createdAt: timestamp
+    //         }
+    //         groupsRef
+    //             .add(data)
+    //             .then(() => {
+    //                 setNewGroup('');
+    //                 Keyboard.dismiss();
+    //                 // success message
+    //                 // alert("Added!");
+    //             })
+    //             .catch(error => {
+    //                 alert(error);
+    //             })
+    //     }
+
+    // }
+
+    // add a group
+    const addGroup = async () => {
         // check we have one to add
-        if (newData && newData.length > 0) {
-            const timestamp = Math.floor(Date.now()) //serverTimestamp();
-            const data = {
-                title: newData,
-                createdAt: timestamp
+        if (newGroupName && newGroupName.length > 0) {
+            try {
+                const timestamp = Math.floor(Date.now()) //serverTimestamp();
+                const data = {
+                    name: newGroupName,
+                    creator: uid,
+                    createdAt: timestamp
+                }
+                addDoc(collection(db, "groups"), data)
+                setNewGroup('');
+            } catch (error) {
+                alert(error);
             }
-            groupsRef
-                .add(data)
-                .then(() => {
-                    setNewData('');
-                    Keyboard.dismiss();
-                    // success message
-                    // alert("Added!");
-                })
-                .catch(error => {
-                    alert(error);
-                })
         }
-
     }
 
+    // delete a group
+    const deleteGroup = async (groupId) => {
+        try {
+            await deleteDoc(doc(db, "groups", groupId));
+        } catch (error) {
+            alert(error);
+        }
+    }
 
     return (
         <SafeAreaView style={styles.safeView}>
@@ -123,17 +177,24 @@ export function GroupsScreen({ route, navigation }) {
                                 {user.name}
                             </Text>
                         </View>
+
                         <View style={styles.inputBtnFormContainer}>
                             <TextInput
                                 style={styles.inputShort}
-                                onChangeText={(groupTitle2) => setNewData(groupTitle2)}
-                                value={newData}
+                                placeholder="group quick add"
+                                onChangeText={(newGroupName) => setNewGroup(newGroupName)}
+                                value={newGroupName}
                                 underlineColorAndroid='transparent'
                                 autoCapitalize='none'
                             />
                             <TouchableOpacity
-                                style={styles.inputButton}
-                                onPress={addGroup}>
+                                style={[styles.inputButton, { opacity: (!newGroupName ? 0.5 : 1.0) }]}
+                                disabled={!newGroupName}
+                                onPress={() => {
+                                    Keyboard.dismiss();
+                                    addGroup()
+                                }}
+                            >
                                 <Text
                                     style={styles.buttonText}
                                 >Add</Text>
@@ -143,24 +204,25 @@ export function GroupsScreen({ route, navigation }) {
                         {isLoading ? (
                             <ActivityIndicator size="large" color="cornflowerblue" />
                         ) : (
-                            <FlatList style={{ height: "76%" }}
+                            <FlatList style={{ height: "76%", marginBottom: 15 }}
                                 data={groups}
-                                ListEmptyComponent={<Text style={[styles.listText, { marginLeft: "20%" }]}>No groups! Add some!</Text>}
+                                ListEmptyComponent={<Text style={[styles.listText, { marginLeft: "20%" }]}>
+                                    No groups! Add some!
+                                </Text>}
                                 renderItem={({ item }) => (
                                     <View>
                                         <Pressable
                                             style={styles.listContainer}
-                                            onPress={() => navigation.navigate('GroupDetail', { item })}>
+                                            onPress={() => navigation.navigate('GroupDetail', { uid: uid, groupId: item.id })}
+                                        >
                                             <FontAwesome
                                                 style={styles.listDelIcon}
                                                 name='trash-o'
                                                 color='red'
-                                                onPress={() => deleteGroup(item)} />
+                                                onPress={() => deleteGroup(item.id)} />
                                             {/* <View > */}
                                             <Text style={styles.listText} >
-                                                {/* {item.id}  */}
-                                                {item.groupTitle}
-                                                {/* {item.groupDate}  */}
+                                                {item.name}
                                             </Text>
                                             {/* </View> */}
                                         </Pressable>
