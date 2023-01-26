@@ -50,7 +50,7 @@ export function TasksScreen({ route, navigation }) {
             try {
                 unsubscribe = onSnapshot(
                     query(
-                        collection(db, "users", uid, "tasks"), orderBy('createdAt')), (querySnapshot) => {
+                        collection(db, "users", uid, "tasks"), orderBy('startDate', 'priority')), (querySnapshot) => {
                             const retrievedTasks = [];
                             querySnapshot.forEach((doc) => {
                                 taskObj = doc.data();
