@@ -180,7 +180,7 @@ export function ResourcesScreen({ route, navigation }) {
                             </Pressable>
 
                             <Pressable
-                                onPress={() => { navigation.navigate('Resources', { uid: uid }) }}
+                                onPress={() => { navigation.navigate('Groups', { uid: uid }) }}
                             >
                                 <FontAwesome
                                     style={styles.footerIcon}
