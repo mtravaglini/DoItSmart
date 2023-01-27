@@ -62,7 +62,7 @@ export function TaskDetailScreen({ route, navigation }) {
     // console.log("Getting user", uid)
     async function getUser() {
       try {
-        const docSnap = await getDoc(doc(db, "users", uid));
+        const docSnap = await getDoc(doc(db, "Users", uid));
         setUser(docSnap.data());
       } catch (error) {
         console.error(error);
@@ -76,11 +76,11 @@ export function TaskDetailScreen({ route, navigation }) {
     // console.log("Getting task", uid, taskId);
     async function getTask() {
       try {
-        var docSnap = await getDoc(doc(db, "users", uid, "tasks", taskId));
+        var docSnap = await getDoc(doc(db, "Users", uid, "Tasks", taskId));
         setOrigTask(docSnap.data());
         setTask(docSnap.data());
         // get user info for the user that created this task
-        docSnap = await getDoc(doc(db, "users", docSnap.data().creator));
+        docSnap = await getDoc(doc(db, "Users", docSnap.data().creator));
         setCreatedByUser(docSnap.data().name + " (" + docSnap.data().email + ")")
 
       } catch (error) {
@@ -116,7 +116,7 @@ export function TaskDetailScreen({ route, navigation }) {
     // console.log("Saving task", uid, taskId)
 
     try {
-      await setDoc(doc(db, "users", uid, "tasks", taskId), task)
+      await setDoc(doc(db, "Users", uid, "Tasks", taskId), task)
     } catch (error) {
       // const errorCode = error.code;
       const errorMessage = error.message;

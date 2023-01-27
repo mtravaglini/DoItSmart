@@ -33,7 +33,7 @@ export function ProfileScreen({ route, navigation }) {
     useEffect(() => {
         async function getUser() {
             try {
-                const docSnap = await getDoc(doc(db, "users", uid));
+                const docSnap = await getDoc(doc(db, "Users", uid));
                 setUser(docSnap.data());
                 setLoading(false);
             } catch (error) {

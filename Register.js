@@ -50,7 +50,7 @@ export function RegisterScreen({ route, navigation }) {
       createdDate: timestamp
     }
 
-    setDoc(doc(db, "users", auth.currentUser.uid), data)
+    setDoc(doc(db, "Users", auth.currentUser.uid), data)
       .then(() => {
         Keyboard.dismiss();
         // success message

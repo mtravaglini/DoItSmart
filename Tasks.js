@@ -33,7 +33,7 @@ export function TasksScreen({ route, navigation }) {
     useEffect(() => {
         async function getUser() {
             try {
-                const docSnap = await getDoc(doc(db, "users", uid));
+                const docSnap = await getDoc(doc(db, "Users", uid));
                 setUser(docSnap.data());
             } catch (error) {
                 console.error(error);
@@ -50,7 +50,7 @@ export function TasksScreen({ route, navigation }) {
             try {
                 unsubscribe = onSnapshot(
                     query(
-                        collection(db, "users", uid, "tasks"), orderBy('startDate'), orderBy('priority')), (querySnapshot) => {
+                        collection(db, "Users", uid, "Tasks"), orderBy('startDate'), orderBy('priority')), (querySnapshot) => {
                             const retrievedTasks = [];
                             querySnapshot.forEach((doc) => {
                                 taskObj = doc.data();
@@ -86,7 +86,7 @@ export function TasksScreen({ route, navigation }) {
                     effort: 30,
                     createdDate: timestamp
                 }
-                addDoc(collection(db, "users", uid, "tasks"), data)
+                addDoc(collection(db, "Users", uid, "Tasks"), data)
                 setNewTaskName('');
             } catch (error) {
                 alert(error);
@@ -97,7 +97,7 @@ export function TasksScreen({ route, navigation }) {
     // delete a task
     const deleteTask = async (taskId) => {
         try {
-            await deleteDoc(doc(db, "users", uid, "tasks", taskId));
+            await deleteDoc(doc(db, "Users", uid, "Tasks", taskId));
         } catch (error) {
             alert(error);
         }

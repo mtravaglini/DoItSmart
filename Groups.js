@@ -34,7 +34,7 @@ export function GroupsScreen({ route, navigation }) {
     useEffect(() => {
         async function getUser() {
             try {
-                const docSnap = await getDoc(doc(db, "users", uid));
+                const docSnap = await getDoc(doc(db, "Users", uid));
                 setUser(docSnap.data());
             } catch (error) {
                 console.error(error);
@@ -51,7 +51,7 @@ export function GroupsScreen({ route, navigation }) {
             try {
                 unsubscribe = onSnapshot(
                     query(
-                        collection(db, "groups"), orderBy('name')), (querySnapshot) => {
+                        collection(db, "Groups"), orderBy('name')), (querySnapshot) => {
                             const retrievedGroups = [];
                             querySnapshot.forEach((doc) => {
                                 groupObj = doc.data();
@@ -84,7 +84,7 @@ export function GroupsScreen({ route, navigation }) {
                     creator: uid,
                     createdDate: timestamp
                 }
-                var groupRef = addDoc(collection(db, "groups"), data)
+                var groupRef = addDoc(collection(db, "Groups"), data)
                 setNewGroupName('');
                 // add current user to group
                 data = {
@@ -92,7 +92,7 @@ export function GroupsScreen({ route, navigation }) {
                     userId: uid,
                     createdDate: timestamp
                 }
-                addDoc(collection(db, "groupUser"), data)
+                addDoc(collection(db, "UserGroup"), data)
             } catch (error) {
                 alert(error);
             }
@@ -102,7 +102,7 @@ export function GroupsScreen({ route, navigation }) {
     // delete a group
     const deleteGroup = async (groupId) => {
         try {
-            await deleteDoc(doc(db, "groups", groupId));
+            await deleteDoc(doc(db, "Groups", groupId));
         } catch (error) {
             alert(error);
         }

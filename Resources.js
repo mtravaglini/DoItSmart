@@ -34,7 +34,7 @@ export function ResourcesScreen({ route, navigation }) {
     useEffect(() => {
         async function getUser() {
             try {
-                const docSnap = await getDoc(doc(db, "users", uid));
+                const docSnap = await getDoc(doc(db, "Users", uid));
                 setUser(docSnap.data());
             } catch (error) {
                 console.error(error);
@@ -51,7 +51,7 @@ export function ResourcesScreen({ route, navigation }) {
             try {
                 unsubscribe = onSnapshot(
                     query(
-                        collection(db, "resources"), orderBy('name')), (querySnapshot) => {
+                        collection(db, "Resources"), orderBy('name')), (querySnapshot) => {
                             const retrievedResources = [];
                             querySnapshot.forEach((doc) => {
                                 resourceObj = doc.data();
@@ -82,7 +82,7 @@ export function ResourcesScreen({ route, navigation }) {
                     creator: uid,
                     createdDate: timestamp
                 }
-                addDoc(collection(db, "resources"), data)
+                addDoc(collection(db, "Resources"), data)
                 setNewResourceName('');
             } catch (error) {
                 alert(error);
@@ -93,7 +93,7 @@ export function ResourcesScreen({ route, navigation }) {
     // delete a resource
     const deleteResource = async (resourceId) => {
         try {
-            await deleteDoc(doc(db, "resources", resourceId));
+            await deleteDoc(doc(db, "Resources", resourceId));
         } catch (error) {
             alert(error);
         }
