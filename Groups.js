@@ -15,7 +15,7 @@ import {
 import { FontAwesome } from '@expo/vector-icons';
 import { db, auth } from './firebase.config';
 import { signOut } from "firebase/auth";
-import { doc, collection, query, getDoc, setDoc, addDoc, deleteDoc, onSnapshot, orderBy } from "firebase/firestore";
+import { doc, collection, query, getDoc, setDoc, addDoc, deleteDoc, onSnapshot, where, orderBy } from "firebase/firestore";
 
 // use custom style sheet
 const styles = require('./Style.js');
@@ -51,7 +51,7 @@ export function GroupsScreen({ route, navigation }) {
             try {
                 unsubscribe = onSnapshot(
                     query(
-                        collection(db, "Groups"), orderBy('name')), (querySnapshot) => {
+                        collection(db, "Groups"), orderBy('name'), where("creator", "==", uid)), (querySnapshot) => {
                             const retrievedGroups = [];
                             querySnapshot.forEach((doc) => {
                                 groupObj = doc.data();
@@ -88,11 +88,10 @@ export function GroupsScreen({ route, navigation }) {
                 setNewGroupName('');
                 // add current user to group
                 data = {
-                    groupId: (await groupRef).id,
                     userId: uid,
                     createdDate: timestamp
                 }
-                addDoc(collection(db, "UserGroup"), data)
+                addDoc(collection(db, "Groups", (await groupRef).id, "GroupUsers"), data)
             } catch (error) {
                 alert(error);
             }
