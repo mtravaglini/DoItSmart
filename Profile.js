@@ -16,7 +16,7 @@ import {
 import { FontAwesome } from '@expo/vector-icons';
 import { db, auth } from './firebase.config';
 import { signOut } from "firebase/auth";
-import { doc, collection, query, getDoc, setDoc, addDoc, deleteDoc, onSnapshot, orderBy } from "firebase/firestore";
+import { doc, collection, collectionGroup, query, getDoc, getDocs, getParent, getRef, setDoc, addDoc, deleteDoc, onSnapshot, where, orderBy } from "firebase/firestore";
 
 
 // use custom style sheet
@@ -42,6 +42,48 @@ export function ProfileScreen({ route, navigation }) {
         }
         getUser();
     }, [])
+
+    // get user's groups
+    useEffect(() => {
+        // var unsubscribe;
+        async function getGroups() {
+            try {
+                const querySnapshot = await getDocs(query(collectionGroup(db, 'GroupUsers'), where('userId', '==', uid)));
+                const parentsPromises = [];
+
+                querySnapshot.forEach((doc) => {
+                    console.log(doc.id, '-> ', doc.data())
+
+
+                    const docRef = doc.ref;
+                    const parentCollectionRef = docRef.parent;   // CollectionReference
+                    const immediateParentDocumentRef = parentCollectionRef.parent; // DocumentReference
+
+
+                    parentsPromises.push(getDoc(immediateParentDocumentRef));
+                    // const immediateParentDocumentRef = parentCollectionRef.parent; // DocumentReference
+                    // const grandParentDocumentRef = immediateParentDocumentRef.parent.parent; // DocumentReference
+                    // console.log("docRef-> ", docRef.id)
+                    // console.log("parentCollectionRef-> ", parentCollectionRef.id)
+                    // console.log("immediateParentDocumentRef-> ", immediateParentDocumentRef.id)
+                    // console.log("grandParentDocumentRef-> ", immediateParentDocumentRef)
+                });
+                const arrayOfParentsDocumentSnapshots = await Promise.all(parentsPromises);
+                // console.log(arrayOfParentsDocumentSnapshots[0].data())
+                for (var group of arrayOfParentsDocumentSnapshots) {
+                    console.log(group.data().name)
+                }
+
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        getGroups();
+        // return function cleanup() {
+        //     unsubscribe();
+        // };
+    }, [])
+
 
 
     return (
