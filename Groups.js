@@ -27,7 +27,7 @@ export function GroupsScreen({ route, navigation }) {
 
     const [user, setUser] = useState('');
     const [groups, setGroups] = useState([]);
-    const [newGroupName, setNewGroup] = useState('');
+    const [newGroupName, setNewGroupName] = useState('');
     const [isLoading, setLoading] = useState(true);
 
     // get user 
@@ -85,7 +85,7 @@ export function GroupsScreen({ route, navigation }) {
                     createdAt: timestamp
                 }
                 var groupRef = addDoc(collection(db, "groups"), data)
-                setNewGroup('');
+                setNewGroupName('');
                 // add current user to group
                 data = {
                     groupId: (await groupRef).id,
@@ -128,7 +128,7 @@ export function GroupsScreen({ route, navigation }) {
                             <TextInput
                                 style={styles.inputShort}
                                 placeholder="group quick add"
-                                onChangeText={(newGroupName) => setNewGroup(newGroupName)}
+                                onChangeText={(newGroupName) => setNewGroupName(newGroupName)}
                                 value={newGroupName}
                                 underlineColorAndroid='transparent'
                                 autoCapitalize='none'

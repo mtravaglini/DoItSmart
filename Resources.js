@@ -27,7 +27,7 @@ export function ResourcesScreen({ route, navigation }) {
 
     const [user, setUser] = useState('');
     const [resources, setResources] = useState([]);
-    const [newResourceName, setNewResource] = useState('');
+    const [newResourceName, setNewResourceName] = useState('');
     const [isLoading, setLoading] = useState(true);
 
     // get user 
@@ -83,7 +83,7 @@ export function ResourcesScreen({ route, navigation }) {
                     createdAt: timestamp
                 }
                 addDoc(collection(db, "resources"), data)
-                setNewResource('');
+                setNewResourceName('');
             } catch (error) {
                 alert(error);
             }
@@ -119,7 +119,7 @@ export function ResourcesScreen({ route, navigation }) {
                             <TextInput
                                 style={styles.inputShort}
                                 placeholder="resource quick add"
-                                onChangeText={(newResourceName) => setNewResource(newResourceName)}
+                                onChangeText={(newResourceName) => setNewResourceName(newResourceName)}
                                 value={newResourceName}
                                 underlineColorAndroid='transparent'
                                 autoCapitalize='none'
