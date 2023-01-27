@@ -14,7 +14,7 @@ import {
 import { FontAwesome } from '@expo/vector-icons';
 import { db, auth } from './firebase.config';
 import { signOut } from "firebase/auth";
-import { doc, collection, query, getDoc, setDoc, onSnapshot, orderBy } from "firebase/firestore";
+import { doc, collection, query, getDoc, setDoc, onSnapshot, where, orderBy } from "firebase/firestore";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import InputSpinner from "react-native-input-spinner";
 
@@ -76,7 +76,7 @@ export function TaskDetailScreen({ route, navigation }) {
     // console.log("Getting task", uid, taskId);
     async function getTask() {
       try {
-        var docSnap = await getDoc(doc(db, "Users", uid, "Tasks", taskId));
+        var docSnap = await getDoc(doc(db, "Tasks", taskId), where("assignee", "==", uid));
         setOrigTask(docSnap.data());
         setTask(docSnap.data());
         // get user info for the user that created this task
@@ -116,7 +116,7 @@ export function TaskDetailScreen({ route, navigation }) {
     // console.log("Saving task", uid, taskId)
 
     try {
-      await setDoc(doc(db, "Users", uid, "Tasks", taskId), task)
+      await setDoc(doc(db, "Tasks", taskId), task)
     } catch (error) {
       // const errorCode = error.code;
       const errorMessage = error.message;
