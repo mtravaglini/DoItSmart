@@ -151,7 +151,7 @@ export function TaskDetailScreen({ route, navigation }) {
 
               <View style={styles.inputFormContainer}>
                 <Text style={styles.inputLabel}>Created by {createdByUser}</Text>
-                <Text style={styles.inputLabel}>Created on {new Date(task.createdAt).toString().slice(0, 24)}</Text>
+                <Text style={styles.inputLabel}>Created on {new Date(task.createdDate).toString().slice(0, 24)}</Text>
 
                 <Text style={[styles.inputLabel, { paddingTop: 15 }]}>Name</Text>
                 <TextInput

@@ -82,7 +82,7 @@ export function GroupsScreen({ route, navigation }) {
                 data = {
                     name: newGroupName,
                     creator: uid,
-                    createdAt: timestamp
+                    createdDate: timestamp
                 }
                 var groupRef = addDoc(collection(db, "groups"), data)
                 setNewGroupName('');
@@ -90,7 +90,7 @@ export function GroupsScreen({ route, navigation }) {
                 data = {
                     groupId: (await groupRef).id,
                     userId: uid,
-                    createdAt: timestamp
+                    createdDate: timestamp
                 }
                 addDoc(collection(db, "groupUser"), data)
             } catch (error) {

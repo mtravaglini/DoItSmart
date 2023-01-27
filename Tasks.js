@@ -84,7 +84,7 @@ export function TasksScreen({ route, navigation }) {
                     endDate: timestamp + (24 * 60 * 60 * 1000),
                     priority: 1,
                     effort: 30,
-                    createdAt: timestamp
+                    createdDate: timestamp
                 }
                 addDoc(collection(db, "users", uid, "tasks"), data)
                 setNewTaskName('');

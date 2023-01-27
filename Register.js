@@ -47,7 +47,7 @@ export function RegisterScreen({ route, navigation }) {
     const data = {
       name: name,
       email: email,
-      createdAt: timestamp
+      createdDate: timestamp
     }
 
     setDoc(doc(db, "users", auth.currentUser.uid), data)

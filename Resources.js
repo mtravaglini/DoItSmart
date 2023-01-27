@@ -80,7 +80,7 @@ export function ResourcesScreen({ route, navigation }) {
                 const data = {
                     name: newResourceName,
                     creator: uid,
-                    createdAt: timestamp
+                    createdDate: timestamp
                 }
                 addDoc(collection(db, "resources"), data)
                 setNewResourceName('');
