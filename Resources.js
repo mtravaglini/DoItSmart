@@ -71,69 +71,6 @@ export function ResourcesScreen({ route, navigation }) {
         };
     }, [])
 
-    // useEffect(() => {
-    //     resourcesRef
-    //         .orderBy('createdAt', 'desc')
-    //         .onSnapshot(
-    //             querySnapshot => {
-    //                 const resources = []
-    //                 querySnapshot.forEach((doc) => {
-    //                     const resourceTitle = doc.data().title;
-    //                     const resourceDate = new Date(doc.data().createdAt);
-    //                     resources.push({
-    //                         id: doc.id,
-    //                         resourceTitle: resourceTitle,
-    //                         resourceDate: resourceDate
-    //                     })
-    //                 })
-    //                 setResources(resources)
-    //             }
-    //         )
-
-    //     setLoading(false);
-
-    // }, [])
-
-    // // delete  a resource
-
-    // const deleteResource = (resources) => {
-    //     resourcesRef
-    //         .doc(resources.id)
-    //         .delete()
-    //         .then(() => {
-    //             // success message
-    //             // alert("Deleted!");
-    //         })
-    //         .catch(error => {
-    //             alert(error);
-    //         })
-    // }
-
-    // // add  a resource
-
-    // const addResource = () => {
-    //     // check we have one to add
-    //     if (newData && newData.length > 0) {
-    //         const timestamp = Math.floor(Date.now()) //serverTimestamp();
-    //         const data = {
-    //             title: newData,
-    //             createdAt: timestamp
-    //         }
-    //         resourcesRef
-    //             .add(data)
-    //             .then(() => {
-    //                 setNewResource('');
-    //                 Keyboard.dismiss();
-    //                 // success message
-    //                 // alert("Added!");
-    //             })
-    //             .catch(error => {
-    //                 alert(error);
-    //             })
-    //     }
-
-    // }
-
     // add a resource
     const addResource = async () => {
         // check we have one to add

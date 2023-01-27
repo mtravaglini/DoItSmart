@@ -71,69 +71,6 @@ export function GroupsScreen({ route, navigation }) {
         };
     }, [])
 
-    // useEffect(() => {
-    //     groupsRef
-    //         .orderBy('createdAt', 'desc')
-    //         .onSnapshot(
-    //             querySnapshot => {
-    //                 const groups = []
-    //                 querySnapshot.forEach((doc) => {
-    //                     const groupTitle = doc.data().title;
-    //                     const groupDate = new Date(doc.data().createdAt);
-    //                     groups.push({
-    //                         id: doc.id,
-    //                         groupTitle: groupTitle,
-    //                         groupDate: groupDate
-    //                     })
-    //                 })
-    //                 setGroups(groups)
-    //             }
-    //         )
-
-    //     setLoading(false);
-
-    // }, [])
-
-    // // delete  a group
-
-    // const deleteGroup = (groups) => {
-    //     groupsRef
-    //         .doc(groups.id)
-    //         .delete()
-    //         .then(() => {
-    //             // success message
-    //             // alert("Deleted!");
-    //         })
-    //         .catch(error => {
-    //             alert(error);
-    //         })
-    // }
-
-    // // add  a group
-
-    // const addGroup = () => {
-    //     // check we have one to add
-    //     if (newData && newData.length > 0) {
-    //         const timestamp = Math.floor(Date.now()) //serverTimestamp();
-    //         const data = {
-    //             title: newData,
-    //             createdAt: timestamp
-    //         }
-    //         groupsRef
-    //             .add(data)
-    //             .then(() => {
-    //                 setNewGroup('');
-    //                 Keyboard.dismiss();
-    //                 // success message
-    //                 // alert("Added!");
-    //             })
-    //             .catch(error => {
-    //                 alert(error);
-    //             })
-    //     }
-
-    // }
-
     // add a group
     const addGroup = async () => {
         // check we have one to add
