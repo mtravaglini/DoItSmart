@@ -153,11 +153,11 @@ export function TaskDetailScreen({ route, navigation }) {
                 <Text style={styles.inputLabel}>Created by {createdByUser}</Text>
                 <Text style={styles.inputLabel}>Created on {new Date(task.createdAt).toString().slice(0, 24)}</Text>
 
-                <Text style={[styles.inputLabel, { paddingTop: 15 }]}>Title</Text>
+                <Text style={[styles.inputLabel, { paddingTop: 15 }]}>Name</Text>
                 <TextInput
                   style={styles.input}
-                  onChangeText={(newValue) => { setTask((prevState) => ({ ...prevState, title: newValue })) }}
-                  value={task.title}
+                  onChangeText={(newValue) => { setTask((prevState) => ({ ...prevState, name: newValue })) }}
+                  value={task.name}
                   underlineColorAndroid='transparent'
                   autoCapitalize='none'
                 />
@@ -301,7 +301,6 @@ export function TaskDetailScreen({ route, navigation }) {
                 <Text style={styles.inputLabel}>Group</Text>
                 <TextInput
                   style={styles.input}
-                  // onChangeText={(taskTitle) => setNewData(taskTitle)}
                   value={task.taskGroup}
                   underlineColorAndroid='transparent'
                   autoCapitalize='none'
@@ -310,7 +309,6 @@ export function TaskDetailScreen({ route, navigation }) {
                 <Text style={styles.inputLabel}>Resources</Text>
                 <TextInput
                   style={styles.input}
-                  // onChangeText={(taskTitle) => setNewData(taskTitle)}
                   value={task.taskResources}
                   underlineColorAndroid='transparent'
                   autoCapitalize='none'

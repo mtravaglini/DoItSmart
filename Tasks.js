@@ -26,7 +26,7 @@ export function TasksScreen({ route, navigation }) {
 
     const [user, setUser] = useState('');
     const [tasks, setTasks] = useState([]);
-    const [newTaskTitle, setNewTask] = useState('');
+    const [newTaskName, setNewTaskName] = useState('');
     const [isLoading, setLoading] = useState(true);
 
     // get user 
@@ -73,11 +73,11 @@ export function TasksScreen({ route, navigation }) {
     // add a task
     const addTask = async () => {
         // check we have one to add
-        if (newTaskTitle && newTaskTitle.length > 0) {
+        if (newTaskName && newTaskName.length > 0) {
             try {
                 const timestamp = Math.floor(Date.now()) //serverTimestamp();
                 const data = {
-                    title: newTaskTitle,
+                    name: newTaskName,
                     creator: uid,
                     assignee: uid,
                     startDate: timestamp,
@@ -87,7 +87,7 @@ export function TasksScreen({ route, navigation }) {
                     createdAt: timestamp
                 }
                 addDoc(collection(db, "users", uid, "tasks"), data)
-                setNewTask('');
+                setNewTaskName('');
             } catch (error) {
                 alert(error);
             }
@@ -123,14 +123,14 @@ export function TasksScreen({ route, navigation }) {
                             <TextInput
                                 style={styles.inputShort}
                                 placeholder="task quick add"
-                                onChangeText={(newTaskTitle) => setNewTask(newTaskTitle)}
-                                value={newTaskTitle}
+                                onChangeText={(newTaskName) => setNewTaskName(newTaskName)}
+                                value={newTaskName}
                                 underlineColorAndroid='transparent'
                                 autoCapitalize='none'
                             />
                             <TouchableOpacity
-                                style={[styles.inputButton, { opacity: (!newTaskTitle ? 0.5 : 1.0) }]}
-                                disabled={!newTaskTitle}
+                                style={[styles.inputButton, { opacity: (!newTaskName ? 0.5 : 1.0) }]}
+                                disabled={!newTaskName}
                                 onPress={() => {
                                     Keyboard.dismiss();
                                     addTask()
@@ -163,7 +163,7 @@ export function TasksScreen({ route, navigation }) {
                                                 onPress={() => deleteTask(item.id)} />
                                             {/* <View > */}
                                             <Text style={styles.listText} >
-                                                {item.title}
+                                                {item.name}
                                             </Text>
                                             {/* </View> */}
                                         </Pressable>
