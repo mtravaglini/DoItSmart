@@ -139,14 +139,23 @@ export function GroupsScreen({ route, navigation }) {
         // check we have one to add
         if (newGroupName && newGroupName.length > 0) {
             try {
+                var data = {};
                 const timestamp = Math.floor(Date.now()) //serverTimestamp();
-                const data = {
+                // add the group
+                data = {
                     name: newGroupName,
                     creator: uid,
                     createdAt: timestamp
                 }
-                addDoc(collection(db, "groups"), data)
+                var groupRef = addDoc(collection(db, "groups"), data)
                 setNewGroup('');
+                // add current user to group
+                data = {
+                    groupId: (await groupRef).id,
+                    userId: uid,
+                    createdAt: timestamp
+                }
+                addDoc(collection(db, "groupUser"), data)
             } catch (error) {
                 alert(error);
             }
