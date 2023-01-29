@@ -9,6 +9,7 @@ import { RegisterScreen } from './Register.js';
 import { TasksScreen } from './Tasks.js';
 import { TaskDetailScreen } from './TaskDetail.js';
 import { GroupsScreen } from './Groups.js';
+import { GroupDetailScreen } from './GroupDetail.js';
 import { ResourcesScreen } from './Resources.js';
 import { ProfileScreen } from './Profile.js';
 
@@ -24,6 +25,7 @@ export default function App() {
         <Stack.Screen name="Tasks" component={TasksScreen} />
         <Stack.Screen name="TaskDetail" component={TaskDetailScreen} />
         <Stack.Screen name="Groups" component={GroupsScreen} />
+        <Stack.Screen name="GroupDetail" component={GroupDetailScreen} />
         <Stack.Screen name="Resources" component={ResourcesScreen} />
         <Stack.Screen name="Profile" component={ProfileScreen} />
       </Stack.Navigator>
