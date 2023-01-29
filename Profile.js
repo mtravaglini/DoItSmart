@@ -47,7 +47,7 @@ export function ProfileScreen({ route, navigation }) {
 
     // get user's groups
     useEffect(() => {
-        // var unsubscribe;
+        var unsubscribe;
         async function getGroups() {
             try {
                 const querySnapshot = await getDocs(query(collectionGroup(db, 'GroupUsers'), where('userId', '==', uid)));
@@ -88,16 +88,19 @@ export function ProfileScreen({ route, navigation }) {
 
         // delete a group
         const deleteGroupMembership = async (groupId) => {
-            console.log("deleting the group membership", groupId, uid)
+            // console.log("deleting the group membership", groupId, uid)
             try {
-                const querySnapshot = await getDocs(query(collectionGroup(db, "Groups", groupId, "GroupUsers"), where('userId', '==', uid)));
-                await deleteDoc(querySnapshot.id);
+                const querySnapshot = await getDocs(query(collection(db, "Groups", groupId, "GroupUsers"), where('userId', '==', uid)));
+                console.log(typeof querySnapshot)
+                querySnapshot.forEach((doc) => {
+                    // console.log("deleting docref", doc.ref)
+                    deleteDoc(doc.ref)
+                })
             } catch (error) {
                 console.error(error);
             }
         }
     
-
     return (
         <SafeAreaView style={styles.safeView}>
             <KeyboardAvoidingView
