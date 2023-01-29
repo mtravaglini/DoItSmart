@@ -143,7 +143,7 @@ export function ResourcesScreen({ route, navigation }) {
                         ) : (
                             <FlatList style={{ height: "76%", marginBottom: 15 }}
                                 data={resources}
-                                ListEmptyComponent={<Text style={[styles.listText, { marginLeft: "20%" }]}>
+                                ListEmptyComponent={<Text style={[styles.listText, { alignSelf: "center" }]}>
                                     No resources! Add some!
                                 </Text>}
                                 renderItem={({ item }) => (

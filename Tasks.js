@@ -147,7 +147,7 @@ export function TasksScreen({ route, navigation }) {
                         ) : (
                             <FlatList style={{ height: "76%", marginBottom: 15 }}
                                 data={tasks}
-                                ListEmptyComponent={<Text style={[styles.listText, { marginLeft: "20%" }]}>
+                                ListEmptyComponent={<Text style={[styles.listText, { alignSelf: "center" }]}>
                                     All done! Add more tasks!
                                 </Text>}
                                 renderItem={({ item }) => (

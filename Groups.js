@@ -151,7 +151,7 @@ export function GroupsScreen({ route, navigation }) {
                         ) : (
                             <FlatList style={{ height: "76%", marginBottom: 15 }}
                                 data={groups}
-                                ListEmptyComponent={<Text style={[styles.listText, { marginLeft: "20%" }]}>
+                                ListEmptyComponent={<Text style={[styles.listText, { alignSelf: "center" }]}>
                                     No groups! Add some!
                                 </Text>}
                                 renderItem={({ item }) => (
