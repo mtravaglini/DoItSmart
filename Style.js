@@ -179,7 +179,7 @@ module.exports = StyleSheet.create({
   },
   // ########################################
 
-  // Date 
+  // Date ###################################
   dateText: {
     height: 48,
     lineHeight: 48,
@@ -190,6 +190,36 @@ module.exports = StyleSheet.create({
     fontSize: 18,
     backgroundColor: "white",
   },
+
+// Groups on secondary screens
+groupContainer: {
+  color: "cornflowerblue",
+  borderColor: "cornflowerblue",
+  borderRadius: 15,
+  margin: "1%",
+  // height: 48,
+  marginHorizontal: "5%",
+  flexDirection: 'row',
+  alignItems: 'center',
+  // paddingTop: 300,
+},
+groupButton:{
+  width: "19%",
+  marginRight: "1%",
+},
+groupText: {
+  fontSize: 15,
+  // fontWeight: "bold",
+  // fontFamily: Platform.OS === "android" ? "sans-serif-thin" : "AppleSDGothicNeo-Thin",
+  color: "white",
+  backgroundColor: "cornflowerblue",
+  borderColor: "white",
+  borderWidth: 1,
+  borderRadius: 5,
+  paddingHorizontal: 15,
+  // marginBottom: 10
+
+},
 
   // footer
   footer: {
