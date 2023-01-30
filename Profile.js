@@ -58,7 +58,7 @@ export function ProfileScreen({ route, navigation }) {
             const immediateParentDocumentRef = parentCollectionRef.parent; // DocumentReference
             const parentDoc = await getDoc(immediateParentDocumentRef)
 
-            
+
             return {
                 "id": parentDoc?.id,
                 "name": parentDoc?.data().name,
@@ -202,7 +202,8 @@ export function ProfileScreen({ route, navigation }) {
                                 {user.name}
                             </Text>
                         </View>
-                        {/* <ScrollView style={{ height: "84%", marginBottom: 15 }}> */}
+                        <ScrollView style={{ height: "84%", marginBottom: 15 }}>
+                        <View style={styles.inputFormContainer}>
 
                         {/* show acivity indicator when waiting to return to groups screen */}
                         {isLoading ? (
@@ -222,7 +223,70 @@ export function ProfileScreen({ route, navigation }) {
                                 />
 
 
-                                <View style={{ alignItems: "center" }}>
+                                {/* <View style={{ alignItems: "center" }}>
+                                    <TouchableOpacity style={[styles.mainButton, { opacity: (!userChanged()) ? 0.5 : 1.0 }]}
+                                        disabled={!userChanged()}
+                                        onPress={async () => {
+                                            await SaveUser().then(
+                                                (result) => {
+                                                    if (result == 0) {
+                                                        navigation.goBack();
+                                                    }
+                                                }
+                                            )
+                                        }}
+                                    >
+                                        <Text
+                                            style={styles.buttonText}
+                                        >Save
+                                        </Text>
+                                    </TouchableOpacity>
+                                </View> */}
+
+
+                                <Text style={styles.inputLabel}>Your groups</Text>
+                                {/* <FlatList style={{ height: "63%", marginBottom: 15, marginLeft: "1%" }}
+                                    data={groupNames}
+                                    ListEmptyComponent={<Text style={[styles.listText, { alignSelf: "center" }]}>
+                                        You're not a member of any groups.
+                                    </Text>}
+                                    numColumns={5}
+                                    renderItem={({ item }) => (
+                                        <Pressable style={styles.groupButton}
+                                            onPress={() => navigation.navigate('GroupDetail', { uid: uid, groupId: item.id })}
+                                            onLongPress={() => confirmDelete(item.id, item.name)}
+                                        >
+                                            <Text style={styles.groupText}>
+                                                {item.name}
+                                            </Text>
+                                        </Pressable>
+                                    )}
+                                /> */}
+
+                                <View style={{ marginBottom: 15, alignItems: "flex-start", flexWrap: "wrap", flexDirection: "row" }}>
+                                    {
+                                        groupNames.map((item) =>
+                                            <Pressable key={item.id}
+                                                onPress={() => navigation.navigate('GroupDetail', { uid: uid, groupId: item.id })}
+                                                onLongPress={() => confirmDelete(item.id, item.name)}
+                                            >
+                                                <Text style={styles.groupText}>
+                                                    {item.name}
+                                                </Text>
+                                            </Pressable>
+                                        )
+                                    }
+                                </View>
+
+
+                            </View>
+
+
+
+
+                        )}
+
+<View style={{ alignItems: "center" }}>
                                     <TouchableOpacity style={[styles.mainButton, { opacity: (!userChanged()) ? 0.5 : 1.0 }]}
                                         disabled={!userChanged()}
                                         onPress={async () => {
@@ -241,36 +305,8 @@ export function ProfileScreen({ route, navigation }) {
                                         </Text>
                                     </TouchableOpacity>
                                 </View>
-
-
-                                <Text style={styles.inputLabel}>Your groups</Text>
-                                <FlatList style={{ height: "63%", marginBottom: 15, marginLeft: "1%" }}
-                                    data={groupNames}
-                                    ListEmptyComponent={<Text style={[styles.listText, { alignSelf: "center" }]}>
-                                        You're not a member of any groups.
-                                    </Text>}
-                                    numColumns={5}
-                                    renderItem={({ item }) => (
-                                        <Pressable style={styles.groupButton}
-                                            onPress={() => navigation.navigate('GroupDetail', { uid: uid, groupId: item.id })}
-                                            onLongPress={() => confirmDelete(item.id, item.name)}
-                                        >
-                                            <Text style={styles.groupText}>
-                                                {item.name}
-                                            </Text>
-                                        </Pressable>
-                                    )}
-                                />
-
-
-
-                            </View>
-
-
-
-
-                        )}
-                        {/* </ScrollView> */}
+</View>
+                        </ScrollView>
                         <View style={styles.footer}>
 
                             <Pressable
