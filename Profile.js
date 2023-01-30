@@ -58,9 +58,10 @@ export function ProfileScreen({ route, navigation }) {
             const immediateParentDocumentRef = parentCollectionRef.parent; // DocumentReference
             const parentDoc = await getDoc(immediateParentDocumentRef)
 
+            
             return {
-                "id": parentDoc.id,
-                "name": parentDoc.data().name,
+                "id": parentDoc?.id,
+                "name": parentDoc?.data().name,
             }
         }))
         // setGroupNames(retrievedGroupNames)

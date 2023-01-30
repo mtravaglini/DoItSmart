@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
+  FlatList,
   Keyboard,
   KeyboardAvoidingView,
   Pressable,
@@ -14,7 +15,7 @@ import {
 import { FontAwesome } from '@expo/vector-icons';
 import { db, auth } from './firebase.config';
 import { signOut } from "firebase/auth";
-import { doc, collection, query, getDoc, setDoc, onSnapshot, where, orderBy } from "firebase/firestore";
+import { doc, collection, collectionGroup, query, getDoc, setDoc, onSnapshot, where, orderBy } from "firebase/firestore";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import InputSpinner from "react-native-input-spinner";
 
@@ -30,6 +31,8 @@ export function TaskDetailScreen({ route, navigation }) {
   const [createdByUser, setCreatedByUser] = useState('');
   const [origTask, setOrigTask] = useState({});
   const [task, setTask] = useState({});
+  const [userGroupNames, setUserGroupNames] = useState([]);
+  const [taskGroupNames, setTaskGroupNames] = useState([]);
 
   // date picker variables
   const [isStartDatePickerVisible, setStartDatePickerVisibility] = useState(false);
@@ -71,24 +74,115 @@ export function TaskDetailScreen({ route, navigation }) {
     getUser();
   }, [])
 
+
+
+
+
+
+
+
+
+
   // get task and related info
   useEffect(() => {
+    var unsubscribe;
     // console.log("Getting task", uid, taskId);
     async function getTask() {
       try {
         var docSnap = await getDoc(doc(db, "Tasks", taskId), where("assignee", "==", uid));
         setOrigTask(docSnap.data());
         setTask(docSnap.data());
+
         // get user info for the user that created this task
         docSnap = await getDoc(doc(db, "Users", docSnap.data().creator));
         setCreatedByUser(docSnap.data().name + " (" + docSnap.data().email + ")")
+
+        //////////////////////////////////////////////////////////
+        function getTaskGroup(taskGroupSnaps) {
+          return Promise.all(taskGroupSnaps.map(async (taskGroup) => {
+
+            const groupId = taskGroup.data().groupId;
+            const parentDoc = await getDoc(doc(db, "Groups", groupId))
+
+
+            return {
+              "id": parentDoc?.id,
+              "name": parentDoc?.data().name,
+            }
+          }))
+          // setUserGroupNames(retrievedGroupNames)
+        }
+
+        // get task groups
+        unsubscribe = onSnapshot(
+          collection(db, "Tasks", taskId, "TaskGroups"), (querySnapshot) => {
+
+
+
+            getTaskGroup(querySnapshot.docs)
+              .then((retrievedGroupNames) => {
+                setTaskGroupNames(retrievedGroupNames)
+              })
+              .catch((error) => {
+                console.log(error)
+              })
+
+
+          });
+        //////////////////////////////////////////////////////////
+
+
 
       } catch (error) {
         console.error(error);
       }
     }
     getTask();
+    return function cleanup() {
+      unsubscribe();
+    };
   }, [])
+
+  // get user's groups
+  function getGroupUsersParents(groupUsersSnaps) {
+    return Promise.all(groupUsersSnaps.map(async (groupUser) => {
+      const docRef = groupUser.ref;
+      const parentCollectionRef = docRef.parent; // CollectionReference
+      const immediateParentDocumentRef = parentCollectionRef.parent; // DocumentReference
+      const parentDoc = await getDoc(immediateParentDocumentRef)
+      return {
+        "id": parentDoc?.id,
+        "name": parentDoc?.data().name,
+      }
+    }))
+  }
+
+  useEffect(() => {
+    var unsubscribe;
+    async function getGroupUsers() {
+      try {
+        unsubscribe = onSnapshot(
+          query(
+            collectionGroup(db, 'GroupUsers'), where('userId', '==', uid)), (querySnapshot) => {
+              getGroupUsersParents(querySnapshot.docs)
+                .then((retrievedGroupNames) => {
+                  setUserGroupNames(retrievedGroupNames)
+                })
+                .catch((error) => {
+                  console.log(error)
+                })
+
+            });
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    getGroupUsers();
+    return function cleanup() {
+      unsubscribe();
+    };
+  }, [])
+
 
   const taskChanged = () => {
     const keys1 = Object.keys(task);
@@ -128,8 +222,9 @@ export function TaskDetailScreen({ route, navigation }) {
   }
   // console.log("task", task)
   // console.log("origTask", origTask)
-  console.log("REFRESHED", Date())
-
+  // console.log("REFRESHED", Date())
+  // console.log("userGroupNames", userGroupNames)
+  console.log("taskGroupNames", taskGroupNames)
 
   return (
     <SafeAreaView style={[styles.safeView]}>
@@ -298,13 +393,52 @@ export function TaskDetailScreen({ route, navigation }) {
                   </View>
                 </View>
 
-                <Text style={styles.inputLabel}>Group</Text>
+                {/* <Text style={styles.inputLabel}>Group</Text>
                 <TextInput
                   style={styles.input}
                   value={task.taskGroup}
                   underlineColorAndroid='transparent'
                   autoCapitalize='none'
-                />
+                /> */}
+
+                <Text style={styles.inputLabel}>Groups</Text>
+                {/* <FlatList style={{ height: "5%", marginBottom: 15, marginLeft: "1%" }}
+                  data={taskGroupNames}
+                  ListEmptyComponent={<Text style={[styles.listText, { alignSelf: "center" }]}>
+                    Task has no groups.
+                  </Text>}
+                  numColumns={5}
+                  renderItem={({ item }) => (
+                    <Pressable style={styles.groupButton}
+                      onPress={() => navigation.navigate('GroupDetail', { uid: uid, groupId: item.id })}
+                      onLongPress={() => confirmDelete(item.id, item.name)}
+                    >
+                      <Text style={styles.groupText}>
+                        {item.name}
+                      </Text>
+                    </Pressable>
+                  )}
+                /> */}
+
+
+                <View style={{  marginBottom: 15, alignItems: "flex-start", flexWrap: "wrap", flexDirection: "row" }}>
+                  {
+                    taskGroupNames.map((item) => 
+                    
+                    // <Text style={styles.groupText}>{item.name}</Text>
+                    <Pressable key={item.id}
+                    onPress={() => navigation.navigate('GroupDetail', { uid: uid, groupId: item.id })}
+                    onLongPress={() => confirmDelete(item.id, item.name)}
+                  >
+                    <Text style={styles.groupText}>
+                      {item.name}
+                    </Text>
+                  </Pressable>
+
+
+                    )
+                  }
+                </View>
 
                 <Text style={styles.inputLabel}>Resources</Text>
                 <TextInput
