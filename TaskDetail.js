@@ -421,21 +421,17 @@ export function TaskDetailScreen({ route, navigation }) {
                 /> */}
 
 
-                <View style={{  marginBottom: 15, alignItems: "flex-start", flexWrap: "wrap", flexDirection: "row" }}>
+                <View style={{ marginBottom: 15, alignItems: "flex-start", flexWrap: "wrap", flexDirection: "row" }}>
                   {
-                    taskGroupNames.map((item) => 
-                    
-                    // <Text style={styles.groupText}>{item.name}</Text>
-                    <Pressable key={item.id}
-                    onPress={() => navigation.navigate('GroupDetail', { uid: uid, groupId: item.id })}
-                    onLongPress={() => confirmDelete(item.id, item.name)}
-                  >
-                    <Text style={styles.groupText}>
-                      {item.name}
-                    </Text>
-                  </Pressable>
-
-
+                    taskGroupNames.map((item) =>
+                      <Pressable key={item.id}
+                        onPress={() => navigation.navigate('GroupDetail', { uid: uid, groupId: item.id })}
+                        onLongPress={() => confirmDelete(item.id, item.name)}
+                      >
+                        <Text style={styles.groupText}>
+                          {item.name}
+                        </Text>
+                      </Pressable>
                     )
                   }
                 </View>
