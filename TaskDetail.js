@@ -21,6 +21,8 @@ import InputSpinner from "react-native-input-spinner";
 
 // use custom style sheet
 const styles = require('./Style.js');
+// use custom components
+import { Title, Footer } from './Components.js'
 
 export function TaskDetailScreen({ route, navigation }) {
 
@@ -234,14 +236,11 @@ export function TaskDetailScreen({ route, navigation }) {
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View>
 
-            <View style={styles.pageTitleContainer}>
-              <Text style={styles.pageTitleText}>
-                Task Detail
-              </Text>
-              <Text style={styles.pageSubTitleText}>
-                {user.name}
-              </Text>
-            </View>
+            <Title
+              title="Task Details"
+              name={user.name}
+              navigation={navigation} />
+
             <ScrollView style={{ height: "84%", marginBottom: 15 }}>
 
               <View style={styles.inputFormContainer}>
@@ -433,14 +432,14 @@ export function TaskDetailScreen({ route, navigation }) {
                         </Text>
                       </Pressable>
                     )
-                  }                      
-                  <Pressable 
-                  onPress={() => alert("add group membership")}
-                >
-                  <Text style={styles.groupText}>
-                    +
-                  </Text>
-                </Pressable>
+                  }
+                  <Pressable
+                    onPress={() => alert("add group membership")}
+                  >
+                    <Text style={styles.groupText}>
+                      +
+                    </Text>
+                  </Pressable>
 
 
                 </View>
@@ -475,69 +474,9 @@ export function TaskDetailScreen({ route, navigation }) {
               </View>
             </ScrollView>
 
-            <View style={styles.footer}>
-
-              <Pressable
-                onPress={() => { navigation.navigate('Tasks', { uid: uid }) }}
-              >
-                <FontAwesome
-                  style={styles.footerIcon}
-                  name='tasks'
-                  color='black'
-                />
-              </Pressable>
-
-              <Pressable
-                onPress={() => { navigation.navigate('Groups', { uid: uid }) }}
-              >
-                <FontAwesome
-                  style={styles.footerIcon}
-                  name='group'
-                  color='black'
-                />
-              </Pressable>
-
-              <Pressable
-                onPress={() => { navigation.navigate('Resources', { uid: uid }) }}
-              >
-                <FontAwesome
-                  style={styles.footerIcon}
-                  name='car'
-                  color='black'
-                />
-              </Pressable>
-
-              <Pressable
-                onPress={() => { navigation.navigate('Profile', { uid: uid }) }}
-              >
-                <FontAwesome
-                  style={styles.footerIcon}
-                  name='user'
-                  color='black'
-                />
-              </Pressable>
-
-              <Pressable
-                onPress={() => {
-                  signOut(auth).then(() => {
-                    // Sign-out successful.
-                    //   alert("SIGNED OUT")
-                    navigation.navigate('Signin')
-                  }).catch((error) => {
-                    alert(error.message)
-                  });
-                }}
-              >
-
-                <FontAwesome
-                  style={styles.footerIcon}
-                  name='sign-out'
-                  color='black'
-                />
-              </Pressable>
-
-            </View>
-
+            <Footer auth={auth}
+              navigation={navigation}
+              uid={uid} />
 
           </View>
         </TouchableWithoutFeedback>

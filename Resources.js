@@ -19,6 +19,8 @@ import { doc, collection, query, getDoc, setDoc, addDoc, deleteDoc, onSnapshot, 
 
 // use custom style sheet
 const styles = require('./Style.js');
+// use custom components
+import { Title, Footer } from './Components.js'
 
 export function ResourcesScreen({ route, navigation }) {
 
@@ -106,14 +108,11 @@ export function ResourcesScreen({ route, navigation }) {
                 behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                     <View>
-                        <View style={styles.pageTitleContainer}>
-                            <Text style={styles.pageTitleText}>
-                                Resources
-                            </Text>
-                            <Text style={styles.pageSubTitleText}>
-                                {user.name}
-                            </Text>
-                        </View>
+
+                        <Title
+                            title="Resources"
+                            name={user.name}
+                            navigation={navigation} />
 
                         <View style={styles.inputBtnFormContainer}>
                             <TextInput
@@ -167,67 +166,10 @@ export function ResourcesScreen({ route, navigation }) {
                                 )}
                             />
                         )}
-                        <View style={styles.footer}>
 
-                            <Pressable
-                                onPress={() => { navigation.navigate('Tasks', { uid: uid }) }}
-                            >
-                                <FontAwesome
-                                    style={styles.footerIcon}
-                                    name='tasks'
-                                    color='black'
-                                />
-                            </Pressable>
-
-                            <Pressable
-                                onPress={() => { navigation.navigate('Groups', { uid: uid }) }}
-                            >
-                                <FontAwesome
-                                    style={styles.footerIcon}
-                                    name='group'
-                                    color='black'
-                                />
-                            </Pressable>
-
-                            <Pressable
-                                onPress={() => { navigation.navigate('Resources', { uid: uid }) }}
-                            >
-                                <FontAwesome
-                                    style={styles.footerIcon}
-                                    name='car'
-                                    color='black'
-                                />
-                            </Pressable>
-
-                            <Pressable
-                                onPress={() => { navigation.navigate('Profile', { uid: uid }) }}
-                            >
-                                <FontAwesome
-                                    style={styles.footerIcon}
-                                    name='user'
-                                    color='black'
-                                />
-                            </Pressable>
-
-                            <Pressable
-                                onPress={() => {
-                                    signOut(auth).then(() => {
-                                        // Sign-out successful.
-                                        //   alert("SIGNED OUT")
-                                        navigation.navigate('Signin')
-                                    }).catch((error) => {
-                                        alert(error.message)
-                                    });
-                                }}
-                            >
-                                <FontAwesome
-                                    style={styles.footerIcon}
-                                    name='sign-out'
-                                    color='black'
-                                />
-                            </Pressable>
-
-                        </View>
+                        <Footer auth={auth}
+                            navigation={navigation}
+                            uid={uid} />
 
                     </View>
                 </TouchableWithoutFeedback>

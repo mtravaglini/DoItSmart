@@ -41,7 +41,7 @@ module.exports = StyleSheet.create({
     fontSize: 25,
     fontWeight: "bold",
     fontFamily: Platform.OS === "android" ? "sans-serif-thin" : "AppleSDGothicNeo-Thin",
-    color: "cornflowerblue",
+    color: "cornflowerblue"
     // marginBottom: 5
   },
   pageSubTitleText: {
@@ -53,8 +53,8 @@ module.exports = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 5,
     paddingHorizontal: 15,
-    marginBottom: 10
-
+    marginBottom: 10,
+    alignSelf: "center"
   },
   // ########################################
 

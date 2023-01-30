@@ -22,6 +22,8 @@ import { doc, collection, collectionGroup, query, getDoc, getDocs, getParent, ge
 
 // use custom style sheet
 const styles = require('./Style.js');
+// use custom components
+import { Title , Footer} from './Components.js'
 
 export function ProfileScreen({ route, navigation }) {
 
@@ -194,36 +196,34 @@ export function ProfileScreen({ route, navigation }) {
                 behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                     <View>
-                        <View style={styles.pageTitleContainer}>
-                            <Text style={styles.pageTitleText}>
-                                Profile
-                            </Text>
-                            <Text style={styles.pageSubTitleText}>
-                                {user.name}
-                            </Text>
-                        </View>
+
+                    <Title 
+                        title="Profile" 
+                        name={user.name} 
+                        navigation={navigation}/>
+
                         <ScrollView style={{ height: "84%", marginBottom: 15 }}>
-                        <View style={styles.inputFormContainer}>
+                            <View style={styles.inputFormContainer}>
 
-                        {/* show acivity indicator when waiting to return to groups screen */}
-                        {isLoading ? (
-                            <ActivityIndicator size="large" color="cornflowerblue" />
-                        ) : (
+                                {/* show acivity indicator when waiting to return to groups screen */}
+                                {isLoading ? (
+                                    <ActivityIndicator size="large" color="cornflowerblue" />
+                                ) : (
 
-                            <View>
-
-
-                                <Text style={styles.inputLabel}>Email</Text>
-                                <TextInput
-                                    style={styles.input}
-                                    onChangeText={(newValue) => { setUser((prevState) => ({ ...prevState, email: newValue })) }}
-                                    value={user.email}
-                                    underlineColorAndroid='transparent'
-                                    autoCapitalize='none'
-                                />
+                                    <View>
 
 
-                                {/* <View style={{ alignItems: "center" }}>
+                                        <Text style={styles.inputLabel}>Email</Text>
+                                        <TextInput
+                                            style={styles.input}
+                                            onChangeText={(newValue) => { setUser((prevState) => ({ ...prevState, email: newValue })) }}
+                                            value={user.email}
+                                            underlineColorAndroid='transparent'
+                                            autoCapitalize='none'
+                                        />
+
+
+                                        {/* <View style={{ alignItems: "center" }}>
                                     <TouchableOpacity style={[styles.mainButton, { opacity: (!userChanged()) ? 0.5 : 1.0 }]}
                                         disabled={!userChanged()}
                                         onPress={async () => {
@@ -244,8 +244,8 @@ export function ProfileScreen({ route, navigation }) {
                                 </View> */}
 
 
-                                <Text style={styles.inputLabel}>Your groups</Text>
-                                {/* <FlatList style={{ height: "63%", marginBottom: 15, marginLeft: "1%" }}
+                                        <Text style={styles.inputLabel}>Your groups</Text>
+                                        {/* <FlatList style={{ height: "63%", marginBottom: 15, marginLeft: "1%" }}
                                     data={groupNames}
                                     ListEmptyComponent={<Text style={[styles.listText, { alignSelf: "center" }]}>
                                         You're not a member of any groups.
@@ -263,30 +263,30 @@ export function ProfileScreen({ route, navigation }) {
                                     )}
                                 /> */}
 
-                                <View style={{ marginBottom: 15, alignItems: "flex-start", flexWrap: "wrap", flexDirection: "row" }}>
-                                    {
-                                        groupNames.map((item) =>
-                                            <Pressable key={item.id}
-                                                onPress={() => navigation.navigate('GroupDetail', { uid: uid, groupId: item.id })}
-                                                onLongPress={() => confirmDelete(item.id, item.name)}
-                                            >
-                                                <Text style={styles.groupText}>
-                                                    {item.name}
-                                                </Text>
-                                            </Pressable>
-                                        )
-                                    }
-                                </View>
+                                        <View style={{ marginBottom: 15, alignItems: "flex-start", flexWrap: "wrap", flexDirection: "row" }}>
+                                            {
+                                                groupNames.map((item) =>
+                                                    <Pressable key={item.id}
+                                                        onPress={() => navigation.navigate('GroupDetail', { uid: uid, groupId: item.id })}
+                                                        onLongPress={() => confirmDelete(item.id, item.name)}
+                                                    >
+                                                        <Text style={styles.groupText}>
+                                                            {item.name}
+                                                        </Text>
+                                                    </Pressable>
+                                                )
+                                            }
+                                        </View>
 
 
-                            </View>
+                                    </View>
 
 
 
 
-                        )}
+                                )}
 
-<View style={{ alignItems: "center" }}>
+                                <View style={{ alignItems: "center" }}>
                                     <TouchableOpacity style={[styles.mainButton, { opacity: (!userChanged()) ? 0.5 : 1.0 }]}
                                         disabled={!userChanged()}
                                         onPress={async () => {
@@ -305,70 +305,12 @@ export function ProfileScreen({ route, navigation }) {
                                         </Text>
                                     </TouchableOpacity>
                                 </View>
-</View>
+                            </View>
                         </ScrollView>
-                        <View style={styles.footer}>
 
-                            <Pressable
-                                onPress={() => { navigation.navigate('Tasks', { uid: uid }) }}
-                            >
-                                <FontAwesome
-                                    style={styles.footerIcon}
-                                    name='tasks'
-                                    color='black'
-                                />
-                            </Pressable>
-
-                            <Pressable
-                                onPress={() => { navigation.navigate('Groups', { uid: uid }) }}
-                            >
-                                <FontAwesome
-                                    style={styles.footerIcon}
-                                    name='group'
-                                    color='black'
-                                />
-                            </Pressable>
-
-                            <Pressable
-                                onPress={() => { navigation.navigate('Resources', { uid: uid }) }}
-                            >
-                                <FontAwesome
-                                    style={styles.footerIcon}
-                                    name='car'
-                                    color='black'
-                                />
-                            </Pressable>
-
-                            <Pressable
-                                onPress={() => { navigation.navigate('Profile', { uid: uid }) }}
-                            >
-                                <FontAwesome
-                                    style={styles.footerIcon}
-                                    name='user'
-                                    color='black'
-                                />
-                            </Pressable>
-
-                            <Pressable
-                                onPress={() => {
-                                    signOut(auth).then(() => {
-                                        // Sign-out successful.
-                                        //   alert("SIGNED OUT")
-                                        navigation.navigate('Signin')
-                                    }).catch((error) => {
-                                        alert(error.message)
-                                    });
-                                }}
-                            >
-
-                                <FontAwesome
-                                    style={styles.footerIcon}
-                                    name='sign-out'
-                                    color='black'
-                                />
-                            </Pressable>
-
-                        </View>
+                        <Footer auth={auth}
+                            navigation={navigation}
+                            uid={uid} />
 
                     </View>
                 </TouchableWithoutFeedback>

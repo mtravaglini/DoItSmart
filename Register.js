@@ -16,6 +16,8 @@ import { doc, getDoc, setDoc } from "firebase/firestore";
 
 // use custom style sheet
 const styles = require('./Style.js');
+// use custom components
+import { Title, Footer } from './Components.js'
 
 export function RegisterScreen({ route, navigation }) {
 
@@ -24,7 +26,7 @@ export function RegisterScreen({ route, navigation }) {
   const [password, setPassword] = useState('');
   const [passwordConf, setPasswordConf] = useState('');
   const [screenMsg, setScreenMsg] = useState('');
-  
+
   // function to register a new user
   const RegisterNewUser = async () => {
 
@@ -81,11 +83,10 @@ export function RegisterScreen({ route, navigation }) {
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View>
 
-            <View style={styles.pageTitleContainer}>
-              <Text style={styles.pageTitleText}>
-                Register
-              </Text>
-            </View>
+            <Title
+              title="Register"
+              name="Welcome to Do It. Smart."
+              navigation={navigation} />
 
             <View style={styles.inputFormContainer}>
               <Text style={styles.inputLabel}>Name</Text>
