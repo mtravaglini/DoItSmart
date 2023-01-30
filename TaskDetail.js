@@ -433,7 +433,16 @@ export function TaskDetailScreen({ route, navigation }) {
                         </Text>
                       </Pressable>
                     )
-                  }
+                  }                      
+                  <Pressable 
+                  onPress={() => alert("add group membership")}
+                >
+                  <Text style={styles.groupText}>
+                    +
+                  </Text>
+                </Pressable>
+
+
                 </View>
 
                 <Text style={styles.inputLabel}>Resources</Text>
