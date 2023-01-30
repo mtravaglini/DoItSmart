@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {
     ActivityIndicator,
+    Alert,
     FlatList,
     Keyboard,
     KeyboardAvoidingView,
@@ -46,61 +47,101 @@ export function ProfileScreen({ route, navigation }) {
     }, [])
 
     // get user's groups
+
+    function getGroupUsersParents(groupUsersSnaps) {
+        return Promise.all(groupUsersSnaps.map(async (groupUser) => {
+
+            const docRef = groupUser.ref;
+            const parentCollectionRef = docRef.parent; // CollectionReference
+            const immediateParentDocumentRef = parentCollectionRef.parent; // DocumentReference
+            const parentDoc = await getDoc(immediateParentDocumentRef)
+
+            return {
+                "id": parentDoc.id,
+                "name": parentDoc.data().name,
+            }
+        }))
+        // setGroupNames(retrievedGroupNames)
+    }
+
     useEffect(() => {
         var unsubscribe;
-        async function getGroups() {
+        const parentsPromises = [];
+        const retrievedGroupNames = [];
+        async function getGroupUsers() {
             try {
-                const querySnapshot = await getDocs(query(collectionGroup(db, 'GroupUsers'), where('userId', '==', uid)));
-                const parentsPromises = [];
+                // const querySnapshot = await getDocs(query(collectionGroup(db, 'GroupUsers'), where('userId', '==', uid)));
+                unsubscribe = onSnapshot(
+                    query(
+                        collectionGroup(db, 'GroupUsers'), where('userId', '==', uid)), (querySnapshot) => {
+                            // const parentsPromises = [];
+                            // querySnapshot.forEach((doc) => {
+                            //     // console.log(doc.id, '-> ', doc.data())
+                            //     console.log("doc.id", doc.id)
+                            //     const docRef = doc.ref;
+                            //     const parentCollectionRef = docRef.parent; // CollectionReference
+                            //     const immediateParentDocumentRef = parentCollectionRef.parent; // DocumentReference
+                            // parentsPromises.push(getDoc(immediateParentDocumentRef));
+                            getGroupUsersParents(querySnapshot.docs)
+                                .then((retrievedGroupNames) => {
+                                    setGroupNames(retrievedGroupNames)
+                                })
+                                .catch((error) => {
+                                    console.log(error)
+                                })
 
-                querySnapshot.forEach((doc) => {
-                    // console.log(doc.id, '-> ', doc.data())
-                    console.log("doc.id",doc.id)
+                        });
+                // setGroupNames(retrievedGroupNames)
 
-                    const docRef = doc.ref;
-                    const parentCollectionRef = docRef.parent; // CollectionReference
-                    const immediateParentDocumentRef = parentCollectionRef.parent; // DocumentReference
+                console.log("parentsPromises 1", parentsPromises)
 
-                    parentsPromises.push(getDoc(immediateParentDocumentRef));
-                });
-                const arrayOfParentsDocumentSnapshots = await Promise.all(parentsPromises);
-                const retrievedGroupNames = [];
-                for (var group of arrayOfParentsDocumentSnapshots) {
-                    console.log(group.id)
-                    retrievedGroupNames.push({
-                        "id": group.id,
-                        "name": group.data().name
-                    })
-                }
-                // console.log(retrievedGroupNames)
-                setGroupNames(retrievedGroupNames)
 
             } catch (error) {
                 console.error(error);
             }
         }
-        getGroups();
-        // return function cleanup() {
-        //     unsubscribe();
-        // };
+
+        getGroupUsers();
+
+
+
+        return function cleanup() {
+            unsubscribe();
+        };
     }, [])
 
+    const confirmDelete = (groupId, groupName) => {
+        Alert.alert("Leave group " + groupName,
+            "Are you sure?",
+            [{
+                text: "Leave",
+                onPress: () => deleteGroupMembership(groupId),
 
-        // delete a group
-        const deleteGroupMembership = async (groupId) => {
-            // console.log("deleting the group membership", groupId, uid)
-            try {
-                const querySnapshot = await getDocs(query(collection(db, "Groups", groupId, "GroupUsers"), where('userId', '==', uid)));
-                console.log(typeof querySnapshot)
-                querySnapshot.forEach((doc) => {
-                    // console.log("deleting docref", doc.ref)
-                    deleteDoc(doc.ref)
-                })
-            } catch (error) {
-                console.error(error);
-            }
+            },   
+            {
+                text: "Cancel"
+            }]
+        )
+        return
+    }
+
+    // delete a group membership
+    const deleteGroupMembership = async (groupId) => {
+        // console.log("deleting the group membership", groupId, uid)
+
+
+        try {
+            const querySnapshot = await getDocs(query(collection(db, "Groups", groupId, "GroupUsers"), where('userId', '==', uid)));
+            console.log(typeof querySnapshot)
+            querySnapshot.forEach((doc) => {
+                // console.log("deleting docref", doc.ref)
+                deleteDoc(doc.ref)
+            })
+        } catch (error) {
+            console.error(error);
         }
-    
+    }
+
     return (
         <SafeAreaView style={styles.safeView}>
             <KeyboardAvoidingView
@@ -126,21 +167,21 @@ export function ProfileScreen({ route, navigation }) {
                             <View>
                                 <Text style={styles.textDisplay}>{user.email}</Text>
                                 <Text style={styles.inputLabel}>Your groups</Text>
-                                <FlatList style={{ height: "74%", marginBottom: 15 , marginLeft: "1%"}}
+                                <FlatList style={{ height: "74%", marginBottom: 15, marginLeft: "1%" }}
                                     data={groupNames}
                                     ListEmptyComponent={<Text style={[styles.listText, { alignSelf: "center" }]}>
                                         You're not a member of any groups.
                                     </Text>}
                                     numColumns={5}
                                     renderItem={({ item }) => (
-                                        <Pressable style={styles.groupButton} 
-                                        onPress={() =>  navigation.navigate('GroupDetail', { uid: uid, groupId: item.id })}
-                                        onLongPress={() => deleteGroupMembership(item.id)}
+                                        <Pressable style={styles.groupButton}
+                                            onPress={() => navigation.navigate('GroupDetail', { uid: uid, groupId: item.id })}
+                                            onLongPress={() => confirmDelete(item.id, item.name)}
                                         >
                                             <Text style={styles.groupText}>
                                                 {item.name}
                                             </Text>
-                                            </Pressable>
+                                        </Pressable>
                                     )}
                                 />
 
