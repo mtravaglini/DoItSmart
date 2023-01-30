@@ -16,7 +16,7 @@ import {
 } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { db, auth } from './firebase.config';
-import { signOut } from "firebase/auth";
+import { signOut, updateEmail } from "firebase/auth";
 import { doc, collection, collectionGroup, query, getDoc, getDocs, getParent, getRef, setDoc, addDoc, deleteDoc, onSnapshot, where, orderBy } from "firebase/firestore";
 
 
@@ -29,6 +29,7 @@ export function ProfileScreen({ route, navigation }) {
 
     const [groupNames, setGroupNames] = useState([]);
     const [user, setUser] = useState('');
+    const [origUser, setOrigUser] = useState({});
     const [isLoading, setLoading] = useState(true);
 
 
@@ -37,6 +38,7 @@ export function ProfileScreen({ route, navigation }) {
         async function getUser() {
             try {
                 const docSnap = await getDoc(doc(db, "Users", uid));
+                setOrigUser(docSnap.data());
                 setUser(docSnap.data());
                 setLoading(false);
             } catch (error) {
@@ -93,7 +95,7 @@ export function ProfileScreen({ route, navigation }) {
                         });
                 // setGroupNames(retrievedGroupNames)
 
-                console.log("parentsPromises 1", parentsPromises)
+                // console.log("parentsPromises 1", parentsPromises)
 
 
             } catch (error) {
@@ -117,7 +119,7 @@ export function ProfileScreen({ route, navigation }) {
                 text: "Leave",
                 onPress: () => deleteGroupMembership(groupId),
 
-            },   
+            },
             {
                 text: "Cancel"
             }]
@@ -132,7 +134,7 @@ export function ProfileScreen({ route, navigation }) {
 
         try {
             const querySnapshot = await getDocs(query(collection(db, "Groups", groupId, "GroupUsers"), where('userId', '==', uid)));
-            console.log(typeof querySnapshot)
+            // console.log(typeof querySnapshot)
             querySnapshot.forEach((doc) => {
                 // console.log("deleting docref", doc.ref)
                 deleteDoc(doc.ref)
@@ -141,6 +143,48 @@ export function ProfileScreen({ route, navigation }) {
             console.error(error);
         }
     }
+
+
+
+
+    const userChanged = () => {
+        const keys1 = Object.keys(user);
+        const keys2 = Object.keys(origUser);
+        if (keys1.length !== keys2.length) {
+            return true;
+        }
+        for (let key of keys1) {
+            if (user[key] !== origUser[key]) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+
+    const SaveUser = async () => {
+
+        if (!userChanged()) {
+            return 0
+        }
+
+        try {
+            await setDoc(doc(db, "Users", uid), user)
+            console.log(auth.currentUser, user.email)
+            updateEmail(auth.currentUser, user.email)
+        } catch (error) {
+            // const errorCode = error.code;
+            const errorMessage = error.message;
+            alert(errorMessage);
+            return 1;
+        }
+
+        return 0;
+    }
+
+
+
 
     return (
         <SafeAreaView style={styles.safeView}>
@@ -165,9 +209,41 @@ export function ProfileScreen({ route, navigation }) {
                         ) : (
 
                             <View>
-                                <Text style={styles.textDisplay}>{user.email}</Text>
+
+
+                                <Text style={styles.inputLabel}>Email</Text>
+                                <TextInput
+                                    style={styles.input}
+                                    onChangeText={(newValue) => { setUser((prevState) => ({ ...prevState, email: newValue })) }}
+                                    value={user.email}
+                                    underlineColorAndroid='transparent'
+                                    autoCapitalize='none'
+                                />
+
+
+                                <View style={{ alignItems: "center" }}>
+                                    <TouchableOpacity style={[styles.mainButton, { opacity: (!userChanged()) ? 0.5 : 1.0 }]}
+                                        disabled={!userChanged()}
+                                        onPress={async () => {
+                                            await SaveUser().then(
+                                                (result) => {
+                                                    if (result == 0) {
+                                                        navigation.goBack();
+                                                    }
+                                                }
+                                            )
+                                        }}
+                                    >
+                                        <Text
+                                            style={styles.buttonText}
+                                        >Save
+                                        </Text>
+                                    </TouchableOpacity>
+                                </View>
+
+
                                 <Text style={styles.inputLabel}>Your groups</Text>
-                                <FlatList style={{ height: "74%", marginBottom: 15, marginLeft: "1%" }}
+                                <FlatList style={{ height: "63%", marginBottom: 15, marginLeft: "1%" }}
                                     data={groupNames}
                                     ListEmptyComponent={<Text style={[styles.listText, { alignSelf: "center" }]}>
                                         You're not a member of any groups.
