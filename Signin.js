@@ -21,11 +21,11 @@ export function SigninScreen({ route, navigation }) {
     const [password, setPassword] = useState('');
     const [screenMsg, setScreenMsg] = useState('');
 
-    // clear password on screen load 
-    useEffect(() => {
-        // console.log("page load")
-        setPassword("")
-    }, [])
+    // // clear password on screen load 
+    // useEffect(() => {
+    //     // console.log("page load")
+    //     setPassword("")
+    // }, [])
 
     const SigninUser = async () => {
 
@@ -71,7 +71,7 @@ export function SigninScreen({ route, navigation }) {
                                 // left={<TextInput.Icon name="account" />}
                                 style={styles.input}
                                 onChangeText={(newText) => setEmail(newText)}
-                                // defaultValue={usernameText}
+                                defaultValue={email}
                                 autoCapitalize="none"
                             />
 
@@ -81,7 +81,7 @@ export function SigninScreen({ route, navigation }) {
                                 // left={<TextInput.Icon name="form-textbox-password" />}
                                 style={styles.input}
                                 onChangeText={(newText) => setPassword(newText)}
-                                // defaultValue={pwdText}
+                                defaultValue={password}
                                 autoCapitalize="none"
                                 secureTextEntry={true}
                             />
@@ -96,6 +96,7 @@ export function SigninScreen({ route, navigation }) {
                                             (result) => {
                                                 // console.log("return code=", result)
                                                 if (result == 0) {
+                                                    setPassword("");
                                                     navigation.navigate('Tasks', { uid: auth.currentUser.uid });
                                                     // navigation.navigate('Tasks');
                                                 }
