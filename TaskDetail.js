@@ -3,6 +3,7 @@ import {
   Alert,
   Keyboard,
   KeyboardAvoidingView,
+  Modal,
   Pressable,
   SafeAreaView,
   ScrollView,
@@ -15,7 +16,7 @@ import {
 import { FontAwesome } from '@expo/vector-icons';
 import { db, auth } from './firebase.config';
 import { signOut } from "firebase/auth";
-import { doc, collection, collectionGroup, query, getDoc, getDocs, setDoc, deleteDoc, onSnapshot, where, orderBy } from "firebase/firestore";
+import { doc, collection, collectionGroup, query, getDoc, getDocs, setDoc, addDoc, deleteDoc, onSnapshot, where, orderBy } from "firebase/firestore";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import InputSpinner from "react-native-input-spinner";
 
@@ -35,10 +36,14 @@ export function TaskDetailScreen({ route, navigation }) {
   const [task, setTask] = useState({});
   const [userGroupNames, setUserGroupNames] = useState([]);
   const [taskGroupNames, setTaskGroupNames] = useState([]);
+  const [taskGroupUpdated, setTaskGroupUpdated] = useState(0);
 
   // date picker variables
   const [isStartDatePickerVisible, setStartDatePickerVisibility] = useState(false);
   const [isEndDatePickerVisible, setEndDatePickerVisibility] = useState(false);
+
+  // add task groups modal
+  const [taskGroupPickerVisible, setTaskGroupPickerVisible] = useState(false);
 
   const handleStartDatePickerConfirm = (date) => {
     setTask((prevState) => ({ ...prevState, startDate: Date.parse(date) }));
@@ -64,7 +69,7 @@ export function TaskDetailScreen({ route, navigation }) {
 
   // get user 
   useEffect(() => {
-    // console.log("Getting user", uid)
+    console.log("Running useEffect - Getting user", uid)
     async function getUser() {
       try {
         const docSnap = await getDoc(doc(db, "Users", uid));
@@ -76,115 +81,112 @@ export function TaskDetailScreen({ route, navigation }) {
     getUser();
   }, [])
 
-
-
-
-
-
-
-
-
-
   // get task and related info
   useEffect(() => {
+    console.log("Running useEffect - Getting task", taskId)
     var unsubscribe;
+    var unsubscribe2;
+
     // console.log("Getting task", uid, taskId);
     async function getTask() {
       try {
-        var docSnap = await getDoc(doc(db, "Tasks", taskId), where("assignee", "==", uid));
+
+        // get the task doc
+        var docSnap = await getDoc(doc(db, "Tasks", taskId));
         setOrigTask(docSnap.data());
         setTask(docSnap.data());
 
-        // get user info for the user that created this task
-        docSnap = await getDoc(doc(db, "Users", docSnap.data().creator));
-        setCreatedByUser(docSnap.data().name + " (" + docSnap.data().email + ")")
+        // get user doc for the task creator
+        var docSnap2 = await getDoc(doc(db, "Users", docSnap.data().creator));
+        setCreatedByUser(docSnap2.data().name + " (" + docSnap2.data().email + ")")
 
-        //////////////////////////////////////////////////////////
-        function getTaskGroup(taskGroupSnaps) {
+        var taskgroups = await gettaskgroups()
+        console.log("left gettaskgroups")
+        var usergroups = await getusergroups(taskgroups)
+        console.log("left getusergroups")
+
+
+        async function gettaskgroups() {
+          console.log("reached gettaskgroups")
+          // get groups subcollection for the task
+          // unsubscribe = onSnapshot(
+
+          var querySnapshot = await getDocs(query(collection(db, "Tasks", taskId, "TaskGroups")));
+          console.log("reached gettaskgroups2")
+          var retrievedGroupNames = await getTaskGroup(querySnapshot.docs)
+          console.log("Setting task groups", retrievedGroupNames)
+          setTaskGroupNames(retrievedGroupNames)
+
+          console.log("reached gettaskgroups3")
+          // )
+        }
+
+        async function getTaskGroup(taskGroupSnaps) {
           return Promise.all(taskGroupSnaps.map(async (taskGroup) => {
 
             const groupId = taskGroup.data().groupId;
             const parentDoc = await getDoc(doc(db, "Groups", groupId))
-
 
             return {
               "id": parentDoc?.id,
               "name": parentDoc?.data().name,
             }
           }))
-          // setUserGroupNames(retrievedGroupNames)
         }
 
-        // get task groups
-        unsubscribe = onSnapshot(
-          collection(db, "Tasks", taskId, "TaskGroups"), (querySnapshot) => {
+        async function getusergroups() {
+          console.log("reached getusergroups")
+          var querySnapshot = await getDocs(query(collectionGroup(db, 'GroupUsers'), where('userId', '==', uid)));
+          var retrievedGroupNames2 = await getGroupUsersParents(querySnapshot.docs)
+          console.log("Setting user groups", retrievedGroupNames2)
+          setUserGroupNames(retrievedGroupNames2.filter(item => item != undefined))
+        }
 
 
+        function getGroupUsersParents(groupUsersSnaps) {
+          return Promise.all(groupUsersSnaps.map(async (groupUser) => {
+            const docRef = groupUser.ref;
+            const parentCollectionRef = docRef.parent; // CollectionReference
+            const immediateParentDocumentRef = parentCollectionRef.parent; // DocumentReference
+            const parentDoc = await getDoc(immediateParentDocumentRef)
 
-            getTaskGroup(querySnapshot.docs)
-              .then((retrievedGroupNames) => {
-                setTaskGroupNames(retrievedGroupNames)
-              })
-              .catch((error) => {
-                console.log(error)
-              })
+            // check if task is already in a group, if so don't need to save it
+            console.log("contents of taskgroupnames", taskGroupNames)
+            var alreadyInGroup = false;
+            for (var taskGroup of taskGroupNames) {
+              console.log("checking", taskGroup.name)
+              if (parentDoc?.id == taskGroup.id) {
+                console.log("Task is in group", taskGroup.name)
+                alreadyInGroup = true;
+              }
+            }
+
+            if (alreadyInGroup) {
+              console.log("already in group", taskGroup.name)
+            } else {
+              return {
+                "id": parentDoc?.id,
+                "name": parentDoc?.data().name,
+              }
+            }
 
 
-          });
-        //////////////////////////////////////////////////////////
-
-
+          }))
+        }
 
       } catch (error) {
         console.error(error);
       }
     }
+
     getTask();
+
     return function cleanup() {
-      unsubscribe();
+      // unsubscribe();
+      // unsubscribe2();
+
     };
-  }, [])
-
-  // get user's groups
-  function getGroupUsersParents(groupUsersSnaps) {
-    return Promise.all(groupUsersSnaps.map(async (groupUser) => {
-      const docRef = groupUser.ref;
-      const parentCollectionRef = docRef.parent; // CollectionReference
-      const immediateParentDocumentRef = parentCollectionRef.parent; // DocumentReference
-      const parentDoc = await getDoc(immediateParentDocumentRef)
-      return {
-        "id": parentDoc?.id,
-        "name": parentDoc?.data().name,
-      }
-    }))
-  }
-
-  useEffect(() => {
-    var unsubscribe;
-    async function getGroupUsers() {
-      try {
-        unsubscribe = onSnapshot(
-          query(
-            collectionGroup(db, 'GroupUsers'), where('userId', '==', uid)), (querySnapshot) => {
-              getGroupUsersParents(querySnapshot.docs)
-                .then((retrievedGroupNames) => {
-                  setUserGroupNames(retrievedGroupNames)
-                })
-                .catch((error) => {
-                  console.log(error)
-                })
-
-            });
-      } catch (error) {
-        console.error(error);
-      }
-    }
-    getGroupUsers();
-    return function cleanup() {
-      unsubscribe();
-    };
-  }, [])
-
+  }, [taskGroupUpdated])
 
   const taskChanged = () => {
     const keys1 = Object.keys(task);
@@ -222,12 +224,6 @@ export function TaskDetailScreen({ route, navigation }) {
 
     return 0;
   }
-  // console.log("task", task)
-  // console.log("origTask", origTask)
-  // console.log("REFRESHED", Date())
-  // console.log("userGroupNames", userGroupNames)
-  // console.log("taskGroupNames", taskGroupNames)
-
 
   const confirmDelete = (groupId, groupName) => {
     Alert.alert("Remove task from group " + groupName,
@@ -245,6 +241,20 @@ export function TaskDetailScreen({ route, navigation }) {
   }
 
 
+  // add a group membership
+  const addTaskGroup = async (groupId) => {
+    console.log("adding task group", taskId, groupId)
+
+    var data = {groupId: groupId}
+    try {
+      addDoc(collection(db, "Tasks", taskId, "TaskGroups"), data)
+    } catch (error) {
+      console.error(error);
+    }
+
+
+  }
+
   // delete a group membership
   const deleteTaskGroup = async (groupId) => {
 
@@ -257,8 +267,8 @@ export function TaskDetailScreen({ route, navigation }) {
       const querySnapshot = await getDocs(query(collection(db, "Tasks", taskId, "TaskGroups"), where('groupId', '==', groupId)));
       // console.log(typeof querySnapshot)
       querySnapshot.forEach((doc) => {
-          // console.log("deleting docref", doc.ref)
-          deleteDoc(doc.ref)
+        // console.log("deleting docref", doc.ref)
+        deleteDoc(doc.ref)
       })
 
 
@@ -267,6 +277,8 @@ export function TaskDetailScreen({ route, navigation }) {
     }
   }
 
+  // console.log("Task Groups", taskGroupNames)
+  // console.log("User Groups", userGroupNames)
 
   return (
     <SafeAreaView style={[styles.safeView]}>
@@ -474,7 +486,7 @@ export function TaskDetailScreen({ route, navigation }) {
                     )
                   }
                   <Pressable
-                    onPress={() => alert("add group membership")}
+                    onPress={() => setTaskGroupPickerVisible(true)}
                   >
                     <Text style={styles.groupText}>
                       +
@@ -483,6 +495,41 @@ export function TaskDetailScreen({ route, navigation }) {
 
 
                 </View>
+
+
+                {/* modal for selecting groups  */}
+                <Modal
+                  animationType="slide"
+                  transparent={true}
+                  visible={taskGroupPickerVisible}
+                  onRequestClose={() => {
+                    setTaskGroupPickerVisible(false);
+                  }}>
+                  <View style={styles.modalView}>
+                    <Text style={styles.pageTitleText}>Add Task to Groups</Text>
+                    <View style={{ marginBottom: 15, alignItems: "flex-start", flexWrap: "wrap", flexDirection: "row" }}>
+
+                      {
+                        userGroupNames.map((item) =>
+                          <Pressable key={item.id}
+                            onPress={() => addTaskGroup(item.id)}
+                          >
+                            <Text style={styles.groupText}>
+                              {item.name}
+                            </Text>
+                          </Pressable>
+                        )
+                      }
+                    </View>
+                    <Pressable
+                      style={styles.mainButton}
+                      onPress={() => setTaskGroupPickerVisible(!taskGroupPickerVisible)}>
+                      <Text style={styles.buttonText}>Hide Modal</Text>
+                    </Pressable>
+                  </View>
+                </Modal>
+
+
 
                 <Text style={styles.inputLabel}>Resources</Text>
                 <TextInput
