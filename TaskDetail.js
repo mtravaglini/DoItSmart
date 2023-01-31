@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  FlatList,
+  Alert,
   Keyboard,
   KeyboardAvoidingView,
   Pressable,
@@ -15,7 +15,7 @@ import {
 import { FontAwesome } from '@expo/vector-icons';
 import { db, auth } from './firebase.config';
 import { signOut } from "firebase/auth";
-import { doc, collection, collectionGroup, query, getDoc, setDoc, onSnapshot, where, orderBy } from "firebase/firestore";
+import { doc, collection, collectionGroup, query, getDoc, getDocs, setDoc, deleteDoc, onSnapshot, where, orderBy } from "firebase/firestore";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import InputSpinner from "react-native-input-spinner";
 
@@ -226,7 +226,47 @@ export function TaskDetailScreen({ route, navigation }) {
   // console.log("origTask", origTask)
   // console.log("REFRESHED", Date())
   // console.log("userGroupNames", userGroupNames)
-  console.log("taskGroupNames", taskGroupNames)
+  // console.log("taskGroupNames", taskGroupNames)
+
+
+  const confirmDelete = (groupId, groupName) => {
+    Alert.alert("Remove task from group " + groupName,
+      "Are you sure?",
+      [{
+        text: "Remove",
+        onPress: () => deleteTaskGroup(groupId),
+
+      },
+      {
+        text: "Cancel"
+      }]
+    )
+    return
+  }
+
+
+  // delete a group membership
+  const deleteTaskGroup = async (groupId) => {
+
+    console.log("deleting task group", taskId, groupId)
+    try {
+      // await deleteDoc(doc(db, "Tasks", taskId, "TaskGroups", groupId));
+
+
+
+      const querySnapshot = await getDocs(query(collection(db, "Tasks", taskId, "TaskGroups"), where('groupId', '==', groupId)));
+      // console.log(typeof querySnapshot)
+      querySnapshot.forEach((doc) => {
+          // console.log("deleting docref", doc.ref)
+          deleteDoc(doc.ref)
+      })
+
+
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
 
   return (
     <SafeAreaView style={[styles.safeView]}>
