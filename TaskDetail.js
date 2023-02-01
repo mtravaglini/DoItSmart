@@ -44,6 +44,7 @@ export function TaskDetailScreen({ route, navigation }) {
 
   // add task groups modal
   const [taskGroupPickerVisible, setTaskGroupPickerVisible] = useState(false);
+  const [backgroundOpacity, setBackgroundOpacity] = useState(1.0);
 
   const handleStartDatePickerConfirm = (date) => {
     setTask((prevState) => ({ ...prevState, startDate: Date.parse(date) }));
@@ -108,11 +109,11 @@ export function TaskDetailScreen({ route, navigation }) {
         var retrievedGroupNames2 = await processUserGroups(userGroupsSnap)
         var savedUserGroups = await saveUserGroups(retrievedGroupNames2)
         var filterResult = await filterGroups(savedTaskGroups, savedUserGroups)
-console.log("NEW GROUPS", filterResult)
-setUserGroupNames(filterResult)
+        console.log("NEW GROUPS", filterResult)
+        setUserGroupNames(filterResult)
 
         async function gettaskgroups() {
-            console.log("gettaskgroups")
+          console.log("gettaskgroups")
           // unsubscribe = onSnapshot(
           // get groups subcollection for the task
           var querySnapshot = await getDocs(query(collection(db, "Tasks", taskId, "TaskGroups")));
@@ -158,7 +159,7 @@ setUserGroupNames(filterResult)
           // console.log("Setting user groups", retrievedGroupNames2)
         }
 
-        async function processUserGroups (querySnapshot) {
+        async function processUserGroups(querySnapshot) {
           console.log("processUserGroups", querySnapshot.docs.length)
 
           var retrievedGroupNames2 = await getGroupUsersParents(querySnapshot.docs)
@@ -178,7 +179,7 @@ setUserGroupNames(filterResult)
               "name": parentDoc?.data().name,
             }
 
-            
+
 
           }))
         }
@@ -214,7 +215,7 @@ setUserGroupNames(filterResult)
           }
 
 
-          
+
           console.log("contents of newusergroupnames", newUserGroupNames.length)
           return newUserGroupNames
         }
@@ -283,6 +284,7 @@ setUserGroupNames(filterResult)
       addDoc(collection(db, "Tasks", taskId, "TaskGroups"), data)
       setTaskGroupUpdated(taskGroupUpdated + 1);
       setTaskGroupPickerVisible(false)
+      setBackgroundOpacity(1.0)
     } catch (error) {
       console.error(error);
     }
@@ -335,7 +337,7 @@ setUserGroupNames(filterResult)
   console.log("============================================= render")
 
   return (
-    <SafeAreaView style={[styles.safeView]}>
+    <SafeAreaView style={[styles.safeView, { opacity: backgroundOpacity }]}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
@@ -444,7 +446,7 @@ setUserGroupNames(filterResult)
                       width={150}
                       style={[styles.input, {
                         borderRadius: 15,
-                        shadowColor: "#e5e5e5"
+                        shadowColor: "cornflowerblue"
                       }]}
                       shadow={false}
                       max={10}
@@ -473,7 +475,7 @@ setUserGroupNames(filterResult)
                       width={150}
                       style={[styles.input, {
                         borderRadius: 15,
-                        shadowColor: "#e5e5e5"
+                        shadowColor: "cornflowerblue"
                       }]}
                       shadow={false}
                       max={10080}
@@ -540,7 +542,10 @@ setUserGroupNames(filterResult)
                     )
                   }
                   <Pressable
-                    onPress={() => setTaskGroupPickerVisible(true)}
+                    onPress={() => {
+                      setTaskGroupPickerVisible(true)
+                      setBackgroundOpacity(.33)
+                    }}
                   >
                     <Text style={styles.groupText}>
                       +
@@ -574,10 +579,14 @@ setUserGroupNames(filterResult)
                   transparent={true}
                   visible={taskGroupPickerVisible}
                   onRequestClose={() => {
-                    setTaskGroupPickerVisible(false);
+                    setTaskGroupPickerVisible(false)
+                    setBackgroundOpacity(1.0)
                   }}>
                   <View style={styles.modalView}>
                     <Text style={styles.pageTitleText}>Add Task to Groups</Text>
+
+                    <Text style={[styles.inputLabel, { paddingTop: 15, alignSelf: 'flex-start' }]}>Groups</Text>
+
                     <View style={{ marginBottom: 15, alignItems: "flex-start", flexWrap: "wrap", flexDirection: "row" }}>
 
                       {
@@ -592,13 +601,31 @@ setUserGroupNames(filterResult)
                         )
                       }
                     </View>
+
                     <Pressable
-                      style={styles.mainButton}
-                      onPress={() => setTaskGroupPickerVisible(false)}>
-                      <Text style={styles.buttonText}>Hide Modal</Text>
-                    </Pressable>
+                  style={[styles.mainButton, styles.btnWarning, styles.btnNarrow]}
+                  onPress={() => {
+                    setTaskGroupPickerVisible(false)
+                    setBackgroundOpacity(1.0)
+                  }}>
+                  <Text style={[styles.buttonText]}>
+                    <FontAwesome
+                      style={[{ fontSize: 35 }]}
+                      name='arrow-circle-o-left'
+                      color='white'
+                    />
+                  </Text>
+                </Pressable>
+                
                   </View>
                 </Modal>
+
+
+
+
+
+
+
 
 
 
@@ -611,7 +638,7 @@ setUserGroupNames(filterResult)
                 />
 
                 <View style={{ alignItems: "center" }}>
-                  <TouchableOpacity style={[styles.mainButton, { opacity: (!taskChanged()) ? 0.5 : 1.0 }]}
+                  <TouchableOpacity style={[styles.mainButton, styles.btnSuccess, { opacity: (!taskChanged()) ? 0.5 : 1.0 }]}
                     disabled={!taskChanged()}
                     onPress={async () => {
                       await SaveTask().then(
@@ -624,7 +651,7 @@ setUserGroupNames(filterResult)
                     }}
                   >
                     <Text
-                      style={styles.buttonText}
+                      style={[styles.buttonText]}
                     >Save
                     </Text>
                   </TouchableOpacity>

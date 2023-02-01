@@ -287,7 +287,7 @@ export function ProfileScreen({ route, navigation }) {
                                 )}
 
                                 <View style={{ alignItems: "center" }}>
-                                    <TouchableOpacity style={[styles.mainButton, { opacity: (!userChanged()) ? 0.5 : 1.0 }]}
+                                    <TouchableOpacity style={[styles.mainButton, styles.btnSuccess,{ opacity: (!userChanged()) ? 0.5 : 1.0 }]}
                                         disabled={!userChanged()}
                                         onPress={async () => {
                                             await SaveUser().then(

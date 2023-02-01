@@ -66,7 +66,16 @@ module.exports = StyleSheet.create({
     marginTop: 10,
     marginBottom: 10,
     backgroundColor: "cornflowerblue",
-    justifyContent: "center"
+    justifyContent: "center",
+
+    shadowColor: 'cornflowerblue',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
   buttonText: {
     textAlign: "center",
@@ -84,14 +93,36 @@ module.exports = StyleSheet.create({
     backgroundColor: "white",
     justifyContent: "center",
     borderWidth: 1,
-    borderColor: "cornflowerblue"
+    borderColor: "cornflowerblue",
+
+    shadowColor: 'cornflowerblue',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
   secondaryButtonText: {
     textAlign: "center",
     textAlignVertical: "center",
     color: "cornflowerblue",
     // fontWeight: "bold",
-    fontSize: 15
+    fontSize: 15,
+  },
+  btnNarrow: {
+    width: "25%",
+    marginHorizontal: 5,
+    // height: 35,
+  },
+  btnSuccess: {
+    backgroundColor: "green",
+    shadowColor: 'green',
+  },
+  btnWarning: {
+    backgroundColor: "red",
+    shadowColor: 'red',
   },
   // ########################################
 
@@ -113,7 +144,16 @@ module.exports = StyleSheet.create({
     // marginLeft: 0,
     marginRight: "2%",
     fontSize: 18,
-    backgroundColor: "white"
+    backgroundColor: "white",
+
+    shadowColor: 'cornflowerblue',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
   inputButton: {
     height: 48,
@@ -121,7 +161,17 @@ module.exports = StyleSheet.create({
     width: "28%",
     alignItems: 'center',
     backgroundColor: "cornflowerblue",
-    justifyContent: "center"
+    justifyContent: "center",
+
+    shadowColor: 'cornflowerblue',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+
   },
   // ########################################
 
@@ -140,7 +190,7 @@ module.exports = StyleSheet.create({
   },
   input: {
     height: 48,
-    // width: "95%",
+    width: "95%",
     borderRadius: 15,
     overflow: 'hidden',
     paddingLeft: 10,
@@ -150,6 +200,22 @@ module.exports = StyleSheet.create({
     fontSize: 18,
     backgroundColor: "white",
     alignContent: "center",
+
+    shadowColor: 'cornflowerblue',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+
+
+    // borderColor: "cornflowerblue",
+    // borderBottomWidth: 4,
+    // borderTopWidth: 1,
+    // borderLeftWidth: 4,
+    // borderRightWidth: 1,
     // justifyContent: "center"
   },
   // ########################################
@@ -157,7 +223,7 @@ module.exports = StyleSheet.create({
   // task list  ########################################
   listContainer: {
     // backgroundColor: "red",
-    backgroundColor: "white",
+    backgroundColor: "cornflowerblue",
     // padding: 15,
     borderRadius: 15,
     margin: "1%",
@@ -175,6 +241,7 @@ module.exports = StyleSheet.create({
   listText: {
     fontWeight: "bold",
     fontSize: 18,
+    color: "white",
     // marginRight: 22,
   },
   // ########################################
@@ -189,37 +256,46 @@ module.exports = StyleSheet.create({
     marginBottom: 15,
     fontSize: 18,
     backgroundColor: "white",
+
+    shadowColor: 'cornflowerblue',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
 
-// Groups on secondary screens
-groupContainer: {
-  color: "cornflowerblue",
-  borderColor: "cornflowerblue",
-  borderRadius: 15,
-  margin: "1%",
-  // height: 48,
-  marginHorizontal: "5%",
-  flexDirection: 'row',
-  alignItems: 'center',
-  // paddingTop: 300,
-},
-groupButton:{
-  width: "19%",
-  marginRight: "1%",
-},
-groupText: {
-  fontSize: 15,
-  // fontWeight: "bold",
-  // fontFamily: Platform.OS === "android" ? "sans-serif-thin" : "AppleSDGothicNeo-Thin",
-  color: "white",
-  backgroundColor: "cornflowerblue",
-  borderColor: "white",
-  borderWidth: 1,
-  borderRadius: 5,
-  paddingHorizontal: 15,
-  // marginBottom: 10
+  // Groups on secondary screens
+  groupContainer: {
+    color: "cornflowerblue",
+    borderColor: "cornflowerblue",
+    borderRadius: 15,
+    margin: "1%",
+    // height: 48,
+    marginHorizontal: "5%",
+    flexDirection: 'row',
+    alignItems: 'center',
+    // paddingTop: 300,
+  },
+  groupButton: {
+    width: "19%",
+    marginRight: "1%",
+  },
+  groupText: {
+    fontSize: 15,
+    // fontWeight: "bold",
+    // fontFamily: Platform.OS === "android" ? "sans-serif-thin" : "AppleSDGothicNeo-Thin",
+    color: "white",
+    backgroundColor: "cornflowerblue",
+    borderColor: "white",
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingHorizontal: 15,
+    // marginBottom: 10
 
-},
+  },
 
   // footer
   footer: {
@@ -269,14 +345,19 @@ groupText: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 22,
-    margin: 20,
-    marginVertical: 150,
-    backgroundColor: 'white',
+    marginHorizontal: 30,
+    marginTop: "20%",
+    marginBottom: "60%",
+    // marginVertical: "50%",
+    backgroundColor: '#e5e5e5',
     borderRadius: 20,
+    borderColor: "cornflowerblue",
+    borderWidth: 1,
     padding: 35,
     alignItems: 'center',
-    shadowColor: '#000',
+
+
+    shadowColor: 'cornflowerblue',
     shadowOffset: {
       width: 0,
       height: 2,
