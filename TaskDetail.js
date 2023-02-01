@@ -100,28 +100,37 @@ export function TaskDetailScreen({ route, navigation }) {
         var docSnap2 = await getDoc(doc(db, "Users", docSnap.data().creator));
         setCreatedByUser(docSnap2.data().name + " (" + docSnap2.data().email + ")")
 
-        var taskgroups = await gettaskgroups()
-        console.log("left gettaskgroups")
-        var usergroups = await getusergroups(taskgroups)
-        console.log("left getusergroups")
-
+        // Promise Chaining
+        var taskGroupsSnap = await gettaskgroups()
+        var retrievedGroupNames = await processTaskGroups(taskGroupsSnap)
+        var savedTaskGroups = await saveTaskGroups(retrievedGroupNames)
+        var userGroupsSnap = await getusergroups(savedTaskGroups)
+        var retrievedGroupNames2 = await processUserGroups(userGroupsSnap)
+        var savedUserGroups = await saveUserGroups(retrievedGroupNames2)
+        var filterResult = await filterGroups(savedTaskGroups, savedUserGroups)
+console.log("NEW GROUPS", filterResult)
+setUserGroupNames(filterResult)
 
         async function gettaskgroups() {
-          console.log("reached gettaskgroups")
-          // get groups subcollection for the task
+            console.log("gettaskgroups")
           // unsubscribe = onSnapshot(
-
+          // get groups subcollection for the task
           var querySnapshot = await getDocs(query(collection(db, "Tasks", taskId, "TaskGroups")));
-          console.log("reached gettaskgroups2")
-          var retrievedGroupNames = await getTaskGroup(querySnapshot.docs)
-          console.log("Setting task groups", retrievedGroupNames)
-          setTaskGroupNames(retrievedGroupNames)
+          return querySnapshot
+          // console.log("reached gettaskgroups2")
+          // console.log("Setting task groups", retrievedGroupNames)
 
-          console.log("reached gettaskgroups3")
-          // )
         }
 
-        async function getTaskGroup(taskGroupSnaps) {
+        async function processTaskGroups(querySnapshot) {
+          console.log("processTaskGroups", querySnapshot.docs.length)
+          var retrievedGroupNames = await getTaskGroupParents(querySnapshot.docs)
+          return retrievedGroupNames
+        }
+
+
+
+        async function getTaskGroupParents(taskGroupSnaps) {
           return Promise.all(taskGroupSnaps.map(async (taskGroup) => {
 
             const groupId = taskGroup.data().groupId;
@@ -134,14 +143,27 @@ export function TaskDetailScreen({ route, navigation }) {
           }))
         }
 
-        async function getusergroups() {
-          console.log("reached getusergroups")
-          var querySnapshot = await getDocs(query(collectionGroup(db, 'GroupUsers'), where('userId', '==', uid)));
-          var retrievedGroupNames2 = await getGroupUsersParents(querySnapshot.docs)
-          console.log("Setting user groups", retrievedGroupNames2)
-          setUserGroupNames(retrievedGroupNames2.filter(item => item != undefined))
+        async function saveTaskGroups(retrievedGroupNames) {
+          console.log("saveTaskGroups", retrievedGroupNames)
+
+          setTaskGroupNames(retrievedGroupNames)
+          return retrievedGroupNames
         }
 
+        async function getusergroups(savedTaskGroups) {
+          console.log("getusergroups", savedTaskGroups)
+          // console.log("reached getusergroups")
+          var querySnapshot = await getDocs(query(collectionGroup(db, 'GroupUsers'), where('userId', '==', uid)));
+          return querySnapshot
+          // console.log("Setting user groups", retrievedGroupNames2)
+        }
+
+        async function processUserGroups (querySnapshot) {
+          console.log("processUserGroups", querySnapshot.docs.length)
+
+          var retrievedGroupNames2 = await getGroupUsersParents(querySnapshot.docs)
+          return retrievedGroupNames2
+        }
 
         function getGroupUsersParents(groupUsersSnaps) {
           return Promise.all(groupUsersSnaps.map(async (groupUser) => {
@@ -150,29 +172,53 @@ export function TaskDetailScreen({ route, navigation }) {
             const immediateParentDocumentRef = parentCollectionRef.parent; // DocumentReference
             const parentDoc = await getDoc(immediateParentDocumentRef)
 
-            // check if task is already in a group, if so don't need to save it
-            console.log("contents of taskgroupnames", taskGroupNames)
+
+            return {
+              "id": parentDoc?.id,
+              "name": parentDoc?.data().name,
+            }
+
+            
+
+          }))
+        }
+
+        async function saveUserGroups(retrievedGroupNames2) {
+          console.log("saveUserGroups", retrievedGroupNames2)
+          setUserGroupNames(retrievedGroupNames2)
+          return retrievedGroupNames2
+        }
+
+
+        async function filterGroups(savedTaskGroups, savedUserGroups) {
+          console.log("filterGroups", savedTaskGroups.length)
+          console.log("filterGroups", savedUserGroups.length)
+
+          // check if task is already in a group, if so don't need to save it
+
+          const newUserGroupNames = [];
+
+          for (var userGroup of savedUserGroups) {
             var alreadyInGroup = false;
-            for (var taskGroup of taskGroupNames) {
+            for (var taskGroup of savedTaskGroups) {
               console.log("checking", taskGroup.name)
-              if (parentDoc?.id == taskGroup.id) {
+              if (userGroup.id == taskGroup.id) {
                 console.log("Task is in group", taskGroup.name)
                 alreadyInGroup = true;
               }
             }
 
-            if (alreadyInGroup) {
-              console.log("already in group", taskGroup.name)
-            } else {
-              return {
-                "id": parentDoc?.id,
-                "name": parentDoc?.data().name,
-              }
+            if (!alreadyInGroup) {
+              newUserGroupNames.push(userGroup)
             }
+          }
 
 
-          }))
+          
+          console.log("contents of newusergroupnames", newUserGroupNames.length)
+          return newUserGroupNames
         }
+
 
       } catch (error) {
         console.error(error);
@@ -225,6 +271,26 @@ export function TaskDetailScreen({ route, navigation }) {
     return 0;
   }
 
+
+
+
+  // add a group membership
+  const addTaskGroup = async (groupId) => {
+    // console.log("adding task group", taskId, groupId)
+
+    var data = { groupId: groupId }
+    try {
+      addDoc(collection(db, "Tasks", taskId, "TaskGroups"), data)
+      setTaskGroupUpdated(taskGroupUpdated + 1);
+      setTaskGroupPickerVisible(false)
+    } catch (error) {
+      console.error(error);
+    }
+
+
+  }
+
+  // confirm delete a group membership
   const confirmDelete = (groupId, groupName) => {
     Alert.alert("Remove task from group " + groupName,
       "Are you sure?",
@@ -239,26 +305,10 @@ export function TaskDetailScreen({ route, navigation }) {
     )
     return
   }
-
-
-  // add a group membership
-  const addTaskGroup = async (groupId) => {
-    console.log("adding task group", taskId, groupId)
-
-    var data = {groupId: groupId}
-    try {
-      addDoc(collection(db, "Tasks", taskId, "TaskGroups"), data)
-    } catch (error) {
-      console.error(error);
-    }
-
-
-  }
-
   // delete a group membership
   const deleteTaskGroup = async (groupId) => {
 
-    console.log("deleting task group", taskId, groupId)
+    // console.log("deleting task group", taskId, groupId)
     try {
       // await deleteDoc(doc(db, "Tasks", taskId, "TaskGroups", groupId));
 
@@ -269,6 +319,7 @@ export function TaskDetailScreen({ route, navigation }) {
       querySnapshot.forEach((doc) => {
         // console.log("deleting docref", doc.ref)
         deleteDoc(doc.ref)
+        setTaskGroupUpdated(taskGroupUpdated + 1);
       })
 
 
@@ -277,8 +328,11 @@ export function TaskDetailScreen({ route, navigation }) {
     }
   }
 
-  // console.log("Task Groups", taskGroupNames)
-  // console.log("User Groups", userGroupNames)
+
+  console.log("END contents of taskgroupnames", taskGroupNames.length)
+  console.log("END contents of usergroupnames", userGroupNames.length)
+
+  console.log("============================================= render")
 
   return (
     <SafeAreaView style={[styles.safeView]}>
@@ -494,6 +548,23 @@ export function TaskDetailScreen({ route, navigation }) {
                   </Pressable>
 
 
+
+                  {/* {
+                    userGroupNames.map((item) =>
+                      <Pressable key={item.id}
+                        onPress={() => addTaskGroup(item.id)}
+                      >
+                        <Text style={styles.groupText}>
+                          {item.name}
+                        </Text>
+                      </Pressable>
+                    )
+                  } */}
+
+
+
+
+
                 </View>
 
 
@@ -523,7 +594,7 @@ export function TaskDetailScreen({ route, navigation }) {
                     </View>
                     <Pressable
                       style={styles.mainButton}
-                      onPress={() => setTaskGroupPickerVisible(!taskGroupPickerVisible)}>
+                      onPress={() => setTaskGroupPickerVisible(false)}>
                       <Text style={styles.buttonText}>Hide Modal</Text>
                     </Pressable>
                   </View>
