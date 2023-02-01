@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   Keyboard,
   KeyboardAvoidingView,
+  Modal,
   Pressable,
   SafeAreaView,
   ScrollView,
@@ -13,8 +14,7 @@ import {
 } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { db, auth } from './firebase.config';
-import { signOut } from "firebase/auth";
-import { doc, collection, query, getDoc, getDocs, setDoc, onSnapshot, where, orderBy } from "firebase/firestore";
+import { doc, collection, query, addDoc, getDoc, getDocs, setDoc, onSnapshot, where, orderBy, DocumentReference } from "firebase/firestore";
 
 // use custom style sheet
 const styles = require('./Style.js');
@@ -31,6 +31,13 @@ export function GroupDetailScreen({ route, navigation }) {
   const [origGroup, setOrigGroup] = useState({});
   const [group, setGroup] = useState({});
   const [groupUserNames, setGroupUserNames] = useState([]);
+  const [emailInvite, setEmailInvite] = useState("");
+
+
+  // invite user modal
+  const [inviteUserVisible, setInviteUserVisible] = useState(false);
+  const [backgroundOpacity, setBackgroundOpacity] = useState(1.0);
+
 
   // get user 
   useEffect(() => {
@@ -67,36 +74,40 @@ export function GroupDetailScreen({ route, navigation }) {
         // var savedGroupUsers = await saveTaskGroups(retrievedUserNames)
 
 
+        // get users subcollection for the group
         async function getGroupUsers() {
-          // get users subcollection for the group
           // console.log("getGroupUsers", groupId)
           var querySnapshot = await getDocs(query(collection(db, "Groups", groupId, "GroupUsers")));
-          // console.log("XX", querySnapshot)
           return querySnapshot
         }
 
+        // process each user in the group's subcollection
         async function processGroupUsers(querySnapshot) {
           console.log("processGroupUsers", querySnapshot.docs.length)
-          var retrievedUserNames = await getGroupUsersParents(querySnapshot.docs)
+          var retrievedUserNames = await getGroupUsersDetails(querySnapshot.docs)
           setGroupUserNames(retrievedUserNames)
           return retrievedUserNames
         }
 
-        function getGroupUsersParents(groupUsersSnaps) {
+        // for each user in the group's subcollection, retrieve the main user document
+        function getGroupUsersDetails(groupUsersSnaps) {
           return Promise.all(groupUsersSnaps.map(async (groupUser) => {
-            const docRef = groupUser.ref;
-            const parentCollectionRef = docRef.parent; // CollectionReference
-            const immediateParentDocumentRef = parentCollectionRef.parent; // DocumentReference
-            const parentDoc = await getDoc(immediateParentDocumentRef)
-console.log("DOCREF", parentDoc.data() )
+            // console.log("docref", groupUser.size)
+
+            // get the groupuser doc from the subcollection
+            docSnap = await getDoc(groupUser.ref);
+            var groupUid = docSnap.data().userId
+
+            // get the main user doc
+            docSnap = await getDoc(doc(db, "Users", groupUid));
 
             return {
-              "uid": parentDoc?.id,
-              "name": parentDoc?.data().name,
-              "email": parentDoc?.data().email,
+              "uid": docSnap.id,
+              "name": docSnap.data().name,
+              "email": docSnap.data().email,
             }
 
-            
+
 
           }))
         }
@@ -113,6 +124,33 @@ console.log("DOCREF", parentDoc.data() )
     }
     getGroup();
   }, [])
+
+
+  // add a group membership
+  const inviteUser = async () => {
+
+    const timestamp = Math.floor(Date.now()) //serverTimestamp();
+
+    var data = {
+      inviter: uid,
+      invitee: emailInvite,
+      createdDate: timestamp
+    }
+
+    try {
+      addDoc(collection(db, "GroupInvites"), data)
+    } catch (error) {
+      console.error(error);
+    }
+
+    setInviteUserVisible(false)
+    setBackgroundOpacity(1.0)
+    setEmailInvite("")
+
+
+  }
+
+
 
   const groupChanged = () => {
     const keys1 = Object.keys(group);
@@ -156,7 +194,7 @@ console.log("DOCREF", parentDoc.data() )
 
 
   return (
-    <SafeAreaView style={[styles.safeView]}>
+    <SafeAreaView style={[styles.safeView, { opacity: backgroundOpacity }]}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
@@ -198,26 +236,94 @@ console.log("DOCREF", parentDoc.data() )
 
 
 
-<View style={{ marginBottom: 15, alignItems: "flex-start", flexWrap: "wrap", flexDirection: "row" }}>
+                <View style={{ marginBottom: 15, alignItems: "flex-start", flexWrap: "wrap", flexDirection: "row" }}>
 
-{
-  groupUserNames.map((item) =>
-    <Pressable key={item.uid}
-      onPress={() => deleteGroupUser(item.id)}
-    >
-      <Text style={styles.groupText}>
-        {item.name}
-      </Text>
-    </Pressable>
-  )
-}
-</View>
+                  {
+                    groupUserNames.map((item) =>
+                      <Pressable key={item.uid}
+                        onPress={() => deleteGroupUser(item.id)}
+                      >
+                        <Text style={styles.groupText}>
+                          {item.name}
+                        </Text>
+                      </Pressable>
+                    )
+                  }
+                  <Pressable
+                    onPress={() => {
+                      setInviteUserVisible(true)
+                      setBackgroundOpacity(.33)
+                    }}
+                  >
+                    <Text style={styles.groupText}>
+                      +
+                    </Text>
+                  </Pressable>
+
+                </View>
+
+
+
+                {/* modal for selecting groups  */}
+                <Modal
+                  animationType="slide"
+                  transparent={true}
+                  visible={inviteUserVisible}
+                  onRequestClose={() => {
+                    setInviteUserVisible(false)
+                    setBackgroundOpacity(1.0)
+                  }}>
+                  <View style={styles.modalView}>
+                    <Text style={styles.pageTitleText}>Invite User to Group</Text>
+                    {/* <View style={{ marginBottom: 15, alignItems: "flex-start", flexWrap: "wrap", flexDirection: "row" }}> */}
+                    <View style={styles.inputFormContainer}>
+
+
+                      <Text style={[styles.inputLabel, { paddingTop: 15 }]}>Email</Text>
+                      <TextInput style={[styles.input, { width: 250 }]}
+                        onChangeText={(newValue) => { setEmailInvite(newValue) }}
+                        value={emailInvite}
+                        underlineColorAndroid='transparent'
+                        autoCapitalize='none'
+                      />
+
+                    </View>
+                    {/* </View> */}
+
+                    <View style={{ flexDirection: "row", alignItems: "center" }}>
+
+                      <Pressable
+                        style={[styles.mainButton, styles.btnWarning, styles.btnNarrow]}
+                        onPress={() => {
+                          setInviteUserVisible(false)
+                          setBackgroundOpacity(1.0)
+                        }}>
+                        <Text style={[styles.buttonText]}>
+                          <FontAwesome
+                            style={[{ fontSize: 35 }]}
+                            name='arrow-circle-o-left'
+                            color='white'
+                          />
+                        </Text>
+                      </Pressable>
+
+                      <Pressable
+                        style={[styles.mainButton, styles.btnSuccess]}
+                        onPress={() => inviteUser()}>
+                        <Text style={styles.buttonText}>Invite</Text>
+                      </Pressable>
+
+
+                    </View>
+
+                  </View>
+                </Modal>
 
 
 
 
                 <View style={{ alignItems: "center" }}>
-                  <TouchableOpacity style={[styles.mainButton, { opacity: (!groupChanged()) ? 0.5 : 1.0 }]}
+                  <TouchableOpacity style={[styles.mainButton, styles.btnSuccess, { opacity: (!groupChanged()) ? 0.5 : 1.0 }]}
                     disabled={!groupChanged()}
                     onPress={async () => {
                       await SaveGroup().then(
@@ -230,7 +336,7 @@ console.log("DOCREF", parentDoc.data() )
                     }}
                   >
                     <Text
-                      style={styles.buttonText}
+                      style={[styles.buttonText]}
                     >Save
                     </Text>
                   </TouchableOpacity>
