@@ -14,7 +14,7 @@ import {
 import { FontAwesome } from '@expo/vector-icons';
 import { db, auth } from './firebase.config';
 import { signOut } from "firebase/auth";
-import { doc, collection, query, getDoc, setDoc, onSnapshot, where, orderBy } from "firebase/firestore";
+import { doc, collection, query, getDoc, getDocs, setDoc, onSnapshot, where, orderBy } from "firebase/firestore";
 
 // use custom style sheet
 const styles = require('./Style.js');
@@ -30,6 +30,7 @@ export function GroupDetailScreen({ route, navigation }) {
   const [createdByUser, setCreatedByUser] = useState('');
   const [origGroup, setOrigGroup] = useState({});
   const [group, setGroup] = useState({});
+  const [groupUserNames, setGroupUserNames] = useState([]);
 
   // get user 
   useEffect(() => {
@@ -56,6 +57,55 @@ export function GroupDetailScreen({ route, navigation }) {
         // get user info for the user that created this group
         docSnap = await getDoc(doc(db, "Users", docSnap.data().creator));
         setCreatedByUser(docSnap.data().name + " (" + docSnap.data().email + ")")
+
+
+
+
+        // Promise Chaining
+        var groupUsersSnap = await getGroupUsers()
+        var retrievedUserNames = await processGroupUsers(groupUsersSnap)
+        // var savedGroupUsers = await saveTaskGroups(retrievedUserNames)
+
+
+        async function getGroupUsers() {
+          // get users subcollection for the group
+          // console.log("getGroupUsers", groupId)
+          var querySnapshot = await getDocs(query(collection(db, "Groups", groupId, "GroupUsers")));
+          // console.log("XX", querySnapshot)
+          return querySnapshot
+        }
+
+        async function processGroupUsers(querySnapshot) {
+          console.log("processGroupUsers", querySnapshot.docs.length)
+          var retrievedUserNames = await getGroupUsersParents(querySnapshot.docs)
+          setGroupUserNames(retrievedUserNames)
+          return retrievedUserNames
+        }
+
+        function getGroupUsersParents(groupUsersSnaps) {
+          return Promise.all(groupUsersSnaps.map(async (groupUser) => {
+            const docRef = groupUser.ref;
+            const parentCollectionRef = docRef.parent; // CollectionReference
+            const immediateParentDocumentRef = parentCollectionRef.parent; // DocumentReference
+            const parentDoc = await getDoc(immediateParentDocumentRef)
+console.log("DOCREF", parentDoc.data() )
+
+            return {
+              "uid": parentDoc?.id,
+              "name": parentDoc?.data().name,
+              "email": parentDoc?.data().email,
+            }
+
+            
+
+          }))
+        }
+
+
+
+
+
+
 
       } catch (error) {
         console.error(error);
@@ -145,6 +195,25 @@ export function GroupDetailScreen({ route, navigation }) {
                   underlineColorAndroid='transparent'
                   autoCapitalize='none'
                 />
+
+
+
+<View style={{ marginBottom: 15, alignItems: "flex-start", flexWrap: "wrap", flexDirection: "row" }}>
+
+{
+  groupUserNames.map((item) =>
+    <Pressable key={item.uid}
+      onPress={() => deleteGroupUser(item.id)}
+    >
+      <Text style={styles.groupText}>
+        {item.name}
+      </Text>
+    </Pressable>
+  )
+}
+</View>
+
+
 
 
                 <View style={{ alignItems: "center" }}>
