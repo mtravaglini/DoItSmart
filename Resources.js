@@ -154,7 +154,7 @@ export function ResourcesScreen({ route, navigation }) {
                                             <FontAwesome
                                                 style={styles.listDelIcon}
                                                 name='trash-o'
-                                                color='red'
+                                                color='lightgrey'
                                                 onPress={() => deleteResource(item.id)} />
                                             {/* <View > */}
                                             <Text style={styles.listText} >

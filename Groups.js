@@ -162,7 +162,7 @@ export function GroupsScreen({ route, navigation }) {
                                             <FontAwesome
                                                 style={styles.listDelIcon}
                                                 name='trash-o'
-                                                color='red'
+                                                color='lightgrey'
                                                 onPress={() => deleteGroup(item.id)} />
                                             {/* <View > */}
                                             <Text style={styles.listText} >
