@@ -132,6 +132,7 @@ export function GroupDetailScreen({ route, navigation }) {
     const timestamp = Math.floor(Date.now()) //serverTimestamp();
 
     var data = {
+      groupId: groupId,
       inviter: uid,
       invitee: emailInvite,
       createdDate: timestamp
