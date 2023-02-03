@@ -35,6 +35,7 @@ export function ProfileScreen({ route, navigation }) {
     const [invites, setInvites] = useState([]);
 
     const [isLoading, setLoading] = useState(true);
+    const [profileGroupUpdated, setProfileGroupUpdated] = useState(0);
 
     useEffect(() => {
         // var unsubscribe;
@@ -161,6 +162,7 @@ export function ProfileScreen({ route, navigation }) {
                 const groupParentDoc = await getDoc(doc(db, "Groups", docRef.data().groupId))
 
                 return {
+                    "inviteId": docRef.id,
                     "inviterName": inviterParentDoc?.data().name,
                     "inviterUid": docRef.data().inviter,
                     "groupName": groupParentDoc?.data().name,
@@ -197,7 +199,7 @@ export function ProfileScreen({ route, navigation }) {
         return function cleanup() {
             // unsubscribe();
         };
-    }, [])
+    }, [profileGroupUpdated])
 
     const confirmDelete = (groupId, groupName) => {
         Alert.alert("Leave group " + groupName,
@@ -223,6 +225,8 @@ export function ProfileScreen({ route, navigation }) {
             querySnapshot.forEach((doc) => {
                 // console.log("deleting docref", doc.ref)
                 deleteDoc(doc.ref)
+                setProfileGroupUpdated(profileGroupUpdated + 1);
+
             })
         } catch (error) {
             console.error(error);
@@ -241,6 +245,25 @@ export function ProfileScreen({ route, navigation }) {
             }
         }
         return false;
+    }
+
+
+    const acceptInvite = async (groupId, inviteId) => {
+        try {
+            const timestamp = Math.floor(Date.now()) //serverTimestamp();
+            const data = {
+                userId: uid,
+                createdDate: timestamp
+            }
+            await addDoc(collection(db, "Groups", groupId, "GroupUsers"), data)
+            await deleteDoc(doc(db, "GroupInvites", inviteId))
+            setProfileGroupUpdated(profileGroupUpdated + 1);
+
+        } catch (error) {
+            const errorMessage = error.message;
+            alert(errorMessage);
+        }
+        return;
     }
 
     const SaveUser = async () => {
@@ -322,7 +345,7 @@ export function ProfileScreen({ route, navigation }) {
                                             {
                                                 invites.map((item) =>
                                                     <Pressable key={item.groupId}
-                                                        onPress={() => acceptInvite(item.groupId)}
+                                                        onPress={() => acceptInvite(item.groupId, item.inviteId)}
                                                     >
                                                         <Text style={styles.groupText}>
                                                             {item.groupName} (Invited by {item.inviterName})
@@ -330,17 +353,6 @@ export function ProfileScreen({ route, navigation }) {
                                                     </Pressable>
                                                 )
                                             }
-                                            <Pressable
-                                                onPress={() => {
-                                                    setInviteUserVisible(true)
-                                                    setBackgroundOpacity(.33)
-                                                }}
-                                            >
-                                                <Text style={styles.groupText}>
-                                                    +
-                                                </Text>
-                                            </Pressable>
-
                                         </View>
 
                                     </View>
