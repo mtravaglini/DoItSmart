@@ -37,14 +37,19 @@ export function ProfileScreen({ route, navigation }) {
     const [isLoading, setLoading] = useState(true);
 
     useEffect(() => {
-        var unsubscribe;
+        // var unsubscribe;
 
         //promise chaining
         async function getProfile() {
-            var userSnap = await getUser();
-            var groupSnaps = await getGroupUsers(userSnap);
+            var userSnap = await getUser()
+
+            var groupSnaps = await getGroupUsers(userSnap)
             var retrievedGroupNames = await processGroupUsers(groupSnaps)
-            var savedGroupNames = await saveGroupNames(retrievedGroupNames)
+            await saveGroupNames(retrievedGroupNames)
+
+            var inviteInfo = await getInvites(userSnap)
+            var retrievedInvites = await processInvites(inviteInfo)
+            await saveInvites(retrievedInvites)
         }
 
         // get user 
@@ -54,7 +59,7 @@ export function ProfileScreen({ route, navigation }) {
                 setOrigUser(docSnap.data());
                 setUser(docSnap.data());
                 setLoading(false);
-                console.log("userSnap", docSnap)
+                console.log("userSnap", docSnap.data())
                 return docSnap;
             } catch (error) {
                 console.error(error);
@@ -62,28 +67,37 @@ export function ProfileScreen({ route, navigation }) {
         }
 
         // get all the groupuser subcollection of the groups collection for the user
-        async function getGroupUsers() {
+        async function getGroupUsers(userSnap) {
             try {
-                unsubscribe = onSnapshot(querySnapshot =
-                    query(collectionGroup(db, 'GroupUsers'), where('userId', '==', uid)), () => {
-                    });
-                console.log("groupSnaps", querySnapshot)
+                // var querySnapshot;
+                // unsubscribe = onSnapshot(
+                querySnapshot = await
+                    getDocs(query(collectionGroup(db, 'GroupUsers'), where('userId', '==', userSnap.id)))
+                //     , () => {
+                //     });
+                console.log("groupSnaps", typeof querySnapshot)
                 return querySnapshot
             } catch (error) {
                 console.error(error);
             }
         }
 
+        // process all the groupuser docs
         async function processGroupUsers(querySnapshot) {
-            var retrievedGroupNames = await getGroupUsersParents(querySnapshot.docs)
-            console.log("groupSnaps", retrievedGroupNames)
-            return retrievedGroupNames
+            try {
+                var retrievedGroupNames = await getGroupUsersParents(querySnapshot.docs)
+                console.log("retreivedGroupNames", retrievedGroupNames)
+                return retrievedGroupNames
+            } catch (error) {
+                console.error(error);
+            }
         }
 
         // from the groupuser doc, get user's group informtion from the parent group collection
         function getGroupUsersParents(groupUsersSnaps) {
             return Promise.all(groupUsersSnaps.map(async (groupUser) => {
 
+                console.log("groupUsersSnaps IN", groupUsersSnaps.length)
                 const docRef = groupUser.ref;
                 const parentCollectionRef = docRef.parent; // CollectionReference
                 const immediateParentDocumentRef = parentCollectionRef.parent; // DocumentReference
@@ -101,33 +115,87 @@ export function ProfileScreen({ route, navigation }) {
             return retrievedGroupNames
         }
 
+        // get all the groupinvites for the user
+        async function getInvites(userSnap) {
+            try {
+                //     unsubscribe = onSnapshot(
+                querySnapshot = await
+                    getDocs(query(collectionGroup(db, 'GroupInvites'), where('invitee', '==', userSnap.data().email)))
+                // , () => {
 
-        // // get all the groupinvites for the user
-        // async function getInvites() {
-        //     try {
-        //         var querySnapshot;
-        //         unsubscribe = onSnapshot(querySnapshot =
-        //             query(collectionGroup(db, 'GroupInvites'), where('invitee', '==', 'swisssarah@outlook.com')), () => {
-        //                 // const retrievedInvites = [];
-        //                 // querySnapshot.forEach((doc) => {
-        //                 //     groupObj = doc.data();
-        //                 //     groupObj.id = doc.id;
-        //                 //     retrievedInvites.push(groupObj)
-        //                 // })
-        //                 // setInvites(retrievedInvites)
-        //                 // console.log(invites);
-        //             })
-        //         console.log("querySnapshot", querySnapshot)
-        //         return querySnapshot
-        //     } catch (error) {
-        //         console.error(error);
-        //     }
-        // }
+                // const retrievedInvites = [];
+                // querySnapshot.forEach((doc) => {
+                //     groupObj = doc.data();
+                //     groupObj.id = doc.id;
+                //     retrievedInvites.push(groupObj)
+                // })
+                // setInvites(retrievedInvites)
+                // console.log(invites);
+                // })
+                console.log("inviteSnaps", typeof querySnapshot)
+                return querySnapshot
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        // process all the invites for the user
+        async function processInvites(querySnapshot) {
+            try {
+                var retrievedInvite = await getInviteParents(querySnapshot.docs)
+                console.log("retreivedInviteInfo", retrievedInvite)
+                return retrievedInvite
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        // from the grouppinvite doc, get group informtion using group id and inviter user information using the invter id
+        function getInviteParents(inviteSnaps) {
+            return Promise.all(inviteSnaps.map(async (invite) => {
+
+                console.log("inviteSnaps IN", inviteSnaps.length)
+                const docRef = invite;
+                console.log("invite docref", invite.data())
+                const inviterParentDoc = await getDoc(doc(db, "Users", docRef.data().inviter))
+                const groupParentDoc = await getDoc(doc(db, "Groups", docRef.data().groupId))
+
+                return {
+                    "inviterName": inviterParentDoc?.data().name,
+                    "inviterUid": docRef.data().inviter,
+                    "groupName": groupParentDoc?.data().name,
+                    "groupId": docRef.data().groupId
+                }
+            }))
+        }
+
+
+        async function saveInvites(retrievedInvite) {
+            setInvites(retrievedInvite)
+            return retrievedInvite
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         getProfile();
 
         return function cleanup() {
-            unsubscribe();
+            // unsubscribe();
         };
     }, [])
 
@@ -246,6 +314,35 @@ export function ProfileScreen({ route, navigation }) {
                                                 )
                                             }
                                         </View>
+
+
+                                        <Text style={styles.inputLabel}>Your group invitations</Text>
+                                        <View style={{ marginBottom: 15, alignItems: "flex-start", flexWrap: "wrap", flexDirection: "row" }}>
+
+                                            {
+                                                invites.map((item) =>
+                                                    <Pressable key={item.groupId}
+                                                        onPress={() => acceptInvite(item.groupId)}
+                                                    >
+                                                        <Text style={styles.groupText}>
+                                                            {item.groupName} (Invited by {item.inviterName})
+                                                        </Text>
+                                                    </Pressable>
+                                                )
+                                            }
+                                            <Pressable
+                                                onPress={() => {
+                                                    setInviteUserVisible(true)
+                                                    setBackgroundOpacity(.33)
+                                                }}
+                                            >
+                                                <Text style={styles.groupText}>
+                                                    +
+                                                </Text>
+                                            </Pressable>
+
+                                        </View>
+
                                     </View>
                                 )}
 
