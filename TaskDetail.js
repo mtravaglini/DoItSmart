@@ -41,19 +41,23 @@ export function TaskDetailScreen({ route, navigation }) {
   // date picker variables
   const [isStartDatePickerVisible, setStartDatePickerVisibility] = useState(false);
   const [isEndDatePickerVisible, setEndDatePickerVisibility] = useState(false);
-
   // add task groups modal
   const [taskGroupPickerVisible, setTaskGroupPickerVisible] = useState(false);
+  // reassign task modal
+  const [reassignVisible, setReassignVisible] = useState(false);
+  // opacity
   const [backgroundOpacity, setBackgroundOpacity] = useState(1.0);
 
   const handleStartDatePickerConfirm = (date) => {
     setTask((prevState) => ({ ...prevState, startDate: Date.parse(date) }));
     setStartDatePickerVisibility(false);
+    setBackgroundOpacity(1.0)
   }
 
   const handleEndDatePickerConfirm = (date) => {
     setTask((prevState) => ({ ...prevState, endDate: Date.parse(date) }));
     setEndDatePickerVisibility(false);
+    setBackgroundOpacity(1.0)
   }
 
   const formatDate = (date) => {
@@ -392,7 +396,10 @@ export function TaskDetailScreen({ route, navigation }) {
                   <View style={{ flexDirection: "column", flex: 1 }}>
                     <Text style={styles.inputLabel}>Start After</Text>
                     <Pressable
-                      onPress={() => setStartDatePickerVisibility(true)}>
+                      onPress={() => {
+                        setStartDatePickerVisibility(true)
+                        setBackgroundOpacity(0.33)
+                      }}>
                       <Text style={styles.dateText}>
                         {formatDate(task.startDate)}
                       </Text>
@@ -407,7 +414,10 @@ export function TaskDetailScreen({ route, navigation }) {
                         date={new Date(task.startDate)}
                         maximumDate={new Date(task.endDate)}
                         onConfirm={handleStartDatePickerConfirm}
-                        onCancel={() => setStartDatePickerVisibility(false)}
+                        onCancel={() => {
+                          setStartDatePickerVisibility(false)
+                          setBackgroundOpacity(1.0)
+                        }}
                       />
                     </TouchableOpacity>
                   </View>
@@ -415,7 +425,10 @@ export function TaskDetailScreen({ route, navigation }) {
                   <View style={{ flexDirection: "column", flex: 1 }}>
                     <Text style={styles.inputLabel}>Finish by</Text>
                     <Pressable
-                      onPress={() => setEndDatePickerVisibility(true)}>
+                      onPress={() => {
+                        setEndDatePickerVisibility(true)
+                        setBackgroundOpacity(0.33)
+                      }}>
                       <Text style={styles.dateText}>
                         {formatDate(task.endDate)}
                       </Text>
@@ -430,7 +443,10 @@ export function TaskDetailScreen({ route, navigation }) {
                         date={new Date(task.endDate)}
                         minimumDate={new Date(task.startDate)}
                         onConfirm={handleEndDatePickerConfirm}
-                        onCancel={() => setEndDatePickerVisibility(false)}
+                        onCancel={() => {
+                          setEndDatePickerVisibility(false)
+                          setBackgroundOpacity(1.0)
+                        }}
                       />
                     </TouchableOpacity>
                   </View>
@@ -603,20 +619,20 @@ export function TaskDetailScreen({ route, navigation }) {
                     </View>
 
                     <Pressable
-                  style={[styles.mainButton, styles.btnWarning, styles.btnNarrow]}
-                  onPress={() => {
-                    setTaskGroupPickerVisible(false)
-                    setBackgroundOpacity(1.0)
-                  }}>
-                  <Text style={[styles.buttonText]}>
-                    <FontAwesome
-                      style={[{ fontSize: 35 }]}
-                      name='arrow-circle-o-left'
-                      color='white'
-                    />
-                  </Text>
-                </Pressable>
-                
+                      style={[styles.mainButton, styles.btnWarning, styles.btnNarrow]}
+                      onPress={() => {
+                        setTaskGroupPickerVisible(false)
+                        setBackgroundOpacity(1.0)
+                      }}>
+                      <Text style={[styles.buttonText]}>
+                        <FontAwesome
+                          style={[{ fontSize: 35 }]}
+                          name='arrow-circle-o-left'
+                          color='white'
+                        />
+                      </Text>
+                    </Pressable>
+
                   </View>
                 </Modal>
 
@@ -636,6 +652,23 @@ export function TaskDetailScreen({ route, navigation }) {
                   underlineColorAndroid='transparent'
                   autoCapitalize='none'
                 />
+
+
+
+                <Pressable
+                  onPress={() => {
+                    setReassignVisible(true)
+                    setBackgroundOpacity(.33)
+                  }}
+                >
+                  <Text style={styles.groupText}>
+                    Reassign Task
+                  </Text>
+                </Pressable>
+
+
+
+
 
                 <View style={{ alignItems: "center" }}>
                   <TouchableOpacity style={[styles.mainButton, styles.btnSuccess, { opacity: (!taskChanged()) ? 0.5 : 1.0 }]}
