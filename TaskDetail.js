@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
+  ActivityIndicator,
   Alert,
   Keyboard,
   KeyboardAvoidingView,
@@ -37,7 +38,6 @@ export function TaskDetailScreen({ route, navigation }) {
   const [userGroupNames, setUserGroupNames] = useState([]);
   const [taskGroupNames, setTaskGroupNames] = useState([]);
   const [taskGroupUpdated, setTaskGroupUpdated] = useState(0);
-
   // date picker variables
   const [isStartDatePickerVisible, setStartDatePickerVisibility] = useState(false);
   const [isEndDatePickerVisible, setEndDatePickerVisibility] = useState(false);
@@ -47,6 +47,19 @@ export function TaskDetailScreen({ route, navigation }) {
   const [reassignVisible, setReassignVisible] = useState(false);
   // opacity
   const [backgroundOpacity, setBackgroundOpacity] = useState(1.0);
+  // user pool - all the users from all the groups that current user belongs to
+  const [userPool, setUserPool] = useState([
+    {
+      id: "SynbJcxgL7ZcfxNTVOHA3wSkBX32",
+      userName: "Marco Travaglini"
+    },
+    {
+      id: "BHJBiafbJ3XrC0S20whMHVt4mic2",
+      userName: "Sarah Travaglini"
+    }
+  ]);
+  const [isUserPoolLoading, setIsUserPoolLoading] = useState(true)
+
 
   const handleStartDatePickerConfirm = (date) => {
     setTask((prevState) => ({ ...prevState, startDate: Date.parse(date) }));
@@ -74,7 +87,7 @@ export function TaskDetailScreen({ route, navigation }) {
 
   // get user 
   useEffect(() => {
-    console.log("Running useEffect - Getting user", uid)
+    // console.log("Running useEffect - Getting user", uid)
     async function getUser() {
       try {
         const docSnap = await getDoc(doc(db, "Users", uid));
@@ -88,7 +101,7 @@ export function TaskDetailScreen({ route, navigation }) {
 
   // get task and related info
   useEffect(() => {
-    console.log("Running useEffect - Getting task", taskId)
+    // console.log("Running useEffect - Getting task", taskId)
     var unsubscribe;
     var unsubscribe2;
 
@@ -113,11 +126,11 @@ export function TaskDetailScreen({ route, navigation }) {
         var retrievedGroupNames2 = await processUserGroups(userGroupsSnap)
         var savedUserGroups = await saveUserGroups(retrievedGroupNames2)
         var filterResult = await filterGroups(savedTaskGroups, savedUserGroups)
-        console.log("NEW GROUPS", filterResult)
+        // console.log("NEW GROUPS", filterResult)
         setUserGroupNames(filterResult)
 
         async function gettaskgroups() {
-          console.log("gettaskgroups")
+          // console.log("gettaskgroups")
           // unsubscribe = onSnapshot(
           // get groups subcollection for the task
           var querySnapshot = await getDocs(query(collection(db, "Tasks", taskId, "TaskGroups")));
@@ -128,7 +141,7 @@ export function TaskDetailScreen({ route, navigation }) {
         }
 
         async function processTaskGroups(querySnapshot) {
-          console.log("processTaskGroups", querySnapshot.docs.length)
+          // console.log("processTaskGroups", querySnapshot.docs.length)
           var retrievedGroupNames = await getTaskGroupParents(querySnapshot.docs)
           return retrievedGroupNames
         }
@@ -149,14 +162,14 @@ export function TaskDetailScreen({ route, navigation }) {
         }
 
         async function saveTaskGroups(retrievedGroupNames) {
-          console.log("saveTaskGroups", retrievedGroupNames)
+          // console.log("saveTaskGroups", retrievedGroupNames)
 
           setTaskGroupNames(retrievedGroupNames)
           return retrievedGroupNames
         }
 
         async function getusergroups(savedTaskGroups) {
-          console.log("getusergroups", savedTaskGroups)
+          // console.log("getusergroups", savedTaskGroups)
           // console.log("reached getusergroups")
           var querySnapshot = await getDocs(query(collectionGroup(db, 'GroupUsers'), where('userId', '==', uid)));
           return querySnapshot
@@ -164,7 +177,7 @@ export function TaskDetailScreen({ route, navigation }) {
         }
 
         async function processUserGroups(querySnapshot) {
-          console.log("processUserGroups", querySnapshot.docs.length)
+          // console.log("processUserGroups", querySnapshot.docs.length)
 
           var retrievedGroupNames2 = await getGroupUsersParents(querySnapshot.docs)
           return retrievedGroupNames2
@@ -189,15 +202,14 @@ export function TaskDetailScreen({ route, navigation }) {
         }
 
         async function saveUserGroups(retrievedGroupNames2) {
-          console.log("saveUserGroups", retrievedGroupNames2)
+          // console.log("saveUserGroups", retrievedGroupNames2)
           setUserGroupNames(retrievedGroupNames2)
           return retrievedGroupNames2
         }
 
 
         async function filterGroups(savedTaskGroups, savedUserGroups) {
-          console.log("filterGroups", savedTaskGroups.length)
-          console.log("filterGroups", savedUserGroups.length)
+          // console.log("filterGroups", savedTaskGroups.length)
 
           // check if task is already in a group, if so don't need to save it
 
@@ -206,9 +218,9 @@ export function TaskDetailScreen({ route, navigation }) {
           for (var userGroup of savedUserGroups) {
             var alreadyInGroup = false;
             for (var taskGroup of savedTaskGroups) {
-              console.log("checking", taskGroup.name)
+              // console.log("checking", taskGroup.name)
               if (userGroup.id == taskGroup.id) {
-                console.log("Task is in group", taskGroup.name)
+                // console.log("Task is in group", taskGroup.name)
                 alreadyInGroup = true;
               }
             }
@@ -220,7 +232,7 @@ export function TaskDetailScreen({ route, navigation }) {
 
 
 
-          console.log("contents of newusergroupnames", newUserGroupNames.length)
+          // console.log("contents of newusergroupnames", newUserGroupNames.length)
           return newUserGroupNames
         }
 
@@ -238,6 +250,44 @@ export function TaskDetailScreen({ route, navigation }) {
 
     };
   }, [taskGroupUpdated])
+
+
+
+
+
+  const getUserPool = () => {
+    // add logic to retrieve all groups for current user, then all users from those groups
+    setIsUserPoolLoading(false)
+  }
+
+
+  const reassignTask = async (userId, userName) => {
+    // add logic to reassign task to selected user
+    console.log("reassign task", taskId, "to user", userId)
+
+    setTask((prevState) => ({ ...prevState, assignee: userId }))
+
+    try {
+      await setDoc(doc(db, "Tasks", taskId), task)
+    } catch (error) {
+      // const errorCode = error.code;
+      const errorMessage = error.message;
+      alert(errorMessage);
+      return 1;
+    }
+
+
+
+    Alert.alert("Task Reassigned", "Task has been reassigned to " + userName,
+      [
+        {
+          text: "Ok"
+        }])
+    setReassignVisible(false);
+    setBackgroundOpacity(1.0);
+  }
+
+
 
   const taskChanged = () => {
     const keys1 = Object.keys(task);
@@ -335,10 +385,10 @@ export function TaskDetailScreen({ route, navigation }) {
   }
 
 
-  console.log("END contents of taskgroupnames", taskGroupNames.length)
-  console.log("END contents of usergroupnames", userGroupNames.length)
+  // console.log("END contents of taskgroupnames", taskGroupNames.length)
+  // console.log("END contents of usergroupnames", userGroupNames.length)
 
-  console.log("============================================= render")
+  // console.log("============================================= render")
 
   return (
     <SafeAreaView style={[styles.safeView, { opacity: backgroundOpacity }]}>
@@ -657,6 +707,8 @@ export function TaskDetailScreen({ route, navigation }) {
 
                 <Pressable
                   onPress={() => {
+                    getUserPool()
+                    console.log("USERPOOL at invoke reassign", userPool)
                     setReassignVisible(true)
                     setBackgroundOpacity(.33)
                   }}
@@ -666,7 +718,62 @@ export function TaskDetailScreen({ route, navigation }) {
                   </Text>
                 </Pressable>
 
+                {/* modal for reassigning task  */}
+                <Modal
+                  animationType="slide"
+                  transparent={true}
+                  visible={reassignVisible}
+                  onRequestClose={() => {
+                    setReassignVisible(false)
+                    setBackgroundOpacity(1.0)
+                  }}>
+                  <View style={styles.modalView}>
+                    <Text style={styles.pageTitleText}>Reassign Task</Text>
 
+                    <Text style={[styles.inputLabel, { paddingTop: 15, alignSelf: 'flex-start' }]}>Users</Text>
+
+
+                    {isUserPoolLoading ?
+                      (
+                        <ActivityIndicator size="large" color="cornflowerblue" />
+                      )
+                      :
+                      (
+                        <View style={{ marginBottom: 15, alignItems: "flex-start", flexWrap: "wrap", flexDirection: "row" }}>
+
+                          {
+                            userPool.map((item) =>
+                              <Pressable key={item.id}
+                                onPress={() => {
+                                  reassignTask(item.id, item.userName)
+                                }}
+                              >
+                                <Text style={styles.groupText}>
+                                  {item.userName}
+                                </Text>
+                              </Pressable>
+                            )
+                          }
+                        </View>
+                      )}
+
+                    <Pressable
+                      style={[styles.mainButton, styles.btnWarning, styles.btnNarrow]}
+                      onPress={() => {
+                        setReassignVisible(false)
+                        setBackgroundOpacity(1.0)
+                      }}>
+                      <Text style={[styles.buttonText]}>
+                        <FontAwesome
+                          style={[{ fontSize: 35 }]}
+                          name='arrow-circle-o-left'
+                          color='white'
+                        />
+                      </Text>
+                    </Pressable>
+
+                  </View>
+                </Modal>
 
 
 
