@@ -15,12 +15,13 @@ import {
 } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { db, auth } from './firebase.config';
-import { doc, collection, query, addDoc, getDoc, getDocs, setDoc, onSnapshot, where, orderBy, DocumentReference } from "firebase/firestore";
+import { doc, collection, query, addDoc, getDoc, getDocs, setDoc, deleteDoc, onSnapshot, where, orderBy, DocumentReference } from "firebase/firestore";
 
 // use custom style sheet
 const styles = require('./Style.js');
 // use custom components
 import { Title, Footer } from './Components.js'
+import { useTheme } from 'react-native-paper';
 
 export function GroupDetailScreen({ route, navigation }) {
 
@@ -33,7 +34,7 @@ export function GroupDetailScreen({ route, navigation }) {
   const [group, setGroup] = useState({});
   const [groupUserNames, setGroupUserNames] = useState([]);
   const [emailInvite, setEmailInvite] = useState("");
-
+  const [groupMembersUpdated, setGroupMembersUpdated] = useState(0);
 
   // invite user modal
   const [inviteUserVisible, setInviteUserVisible] = useState(false);
@@ -124,10 +125,10 @@ export function GroupDetailScreen({ route, navigation }) {
       }
     }
     getGroup();
-  }, [])
+  }, [groupMembersUpdated])
 
 
-  // add a group membership
+  // invite a user to the group
   const inviteUser = async () => {
 
     var alreadyInvitedOrInGroup = false;
@@ -144,9 +145,9 @@ export function GroupDetailScreen({ route, navigation }) {
     try {
       // see if user already in group or already invited
       console.log("Checking if user is already in here:", groupUserNames)
-      for (var groupUser of groupUserNames){
+      for (var groupUser of groupUserNames) {
         console.log(groupUser.email)
-        if (groupUser.email == emailInvite){
+        if (groupUser.email == emailInvite) {
           Alert.alert("Already in Group", emailInvite + " is already in this group.")
           alreadyInvitedOrInGroup = true;
           break
@@ -161,7 +162,7 @@ export function GroupDetailScreen({ route, navigation }) {
         // console.log("OK to add")
       }
 
-      if (!alreadyInvitedOrInGroup){
+      if (!alreadyInvitedOrInGroup) {
         addDoc(collection(db, "GroupInvites"), data)
         Alert.alert("Invitation Sent", emailInvite + " has been invited to the group.")
       }
@@ -174,6 +175,50 @@ export function GroupDetailScreen({ route, navigation }) {
     setEmailInvite("")
 
 
+  }
+
+  const confirmDeleteGroupMembership = (userId, userName) => {
+    // check if user is group owner, don't allow removal
+    if (userId == uid) {
+      Alert.alert("Group Owner",
+        "You are the group owner and can't remove yourself from the group",
+        [
+          {
+            text: "Ok"
+          }]
+      )
+      return
+    }
+
+    Alert.alert("Remove User",
+      "Are you sure your want remove " + userName + " from this group?",
+      [{
+        text: "Remove",
+        onPress: () => deleteGroupMembership(userId),
+
+      },
+      {
+        text: "Cancel"
+      }]
+    )
+    return
+  }
+
+  // delete a group membership
+  const deleteGroupMembership = async (userId) => {
+    // console.log("deleting the group membership", groupId, uid)
+    try {
+      const querySnapshot = await getDocs(query(collection(db, "Groups", groupId, "GroupUsers"), where('userId', '==', userId)));
+      // console.log(typeof querySnapshot)
+      querySnapshot.forEach((doc) => {
+        // console.log("deleting docref", doc.ref)
+        deleteDoc(doc.ref)
+        setGroupMembersUpdated(groupMembersUpdated + 1);
+
+      })
+    } catch (error) {
+      console.error(error);
+    }
   }
 
 
@@ -267,7 +312,7 @@ export function GroupDetailScreen({ route, navigation }) {
                   {
                     groupUserNames.map((item) =>
                       <Pressable key={item.uid}
-                        onPress={() => deleteGroupUser(item.id)}
+                        onPress={() => confirmDeleteGroupMembership(item.uid, item.name)}
                       >
                         <Text style={styles.groupText}>
                           {item.name}
