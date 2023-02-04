@@ -252,8 +252,14 @@ module.exports = StyleSheet.create({
     fontSize: 18,
     color: "white",
   },
+  txtSuccess: {
+    color: "green",
+  },
   txtWarning: {
     color: "orange",
+  },
+  txtError: {
+    color: "red",
   },
   
   // Date ###################################
