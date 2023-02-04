@@ -306,6 +306,7 @@ export function GroupDetailScreen({ route, navigation }) {
                 />
 
 
+                <Text style={styles.inputLabel}>Group Members</Text>
 
                 <View style={{ marginBottom: 15, alignItems: "flex-start", flexWrap: "wrap", flexDirection: "row" }}>
 
