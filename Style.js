@@ -121,8 +121,8 @@ module.exports = StyleSheet.create({
     shadowColor: 'green',
   },
   btnWarning: {
-    backgroundColor: "red",
-    shadowColor: 'red',
+    backgroundColor: "orange",
+    shadowColor: 'orange',
   },
   // ########################################
 
@@ -246,6 +246,16 @@ module.exports = StyleSheet.create({
   },
   // ########################################
 
+  // Standard Text
+  standardText: {
+    fontWeight: "bold",
+    fontSize: 18,
+    color: "white",
+  },
+  txtWarning: {
+    color: "orange",
+  },
+  
   // Date ###################################
   dateText: {
     height: 48,
