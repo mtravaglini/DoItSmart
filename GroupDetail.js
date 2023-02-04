@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
+  Alert,
   Keyboard,
   KeyboardAvoidingView,
   Modal,
@@ -129,6 +130,8 @@ export function GroupDetailScreen({ route, navigation }) {
   // add a group membership
   const inviteUser = async () => {
 
+    var alreadyInvitedOrInGroup = false;
+
     const timestamp = Math.floor(Date.now()) //serverTimestamp();
 
     var data = {
@@ -139,7 +142,29 @@ export function GroupDetailScreen({ route, navigation }) {
     }
 
     try {
-      addDoc(collection(db, "GroupInvites"), data)
+      // see if user already in group or already invited
+      console.log("Checking if user is already in here:", groupUserNames)
+      for (var groupUser of groupUserNames){
+        console.log(groupUser.email)
+        if (groupUser.email == emailInvite){
+          Alert.alert("Already in Group", emailInvite + " is already in this group.")
+          alreadyInvitedOrInGroup = true;
+          break
+        }
+      }
+
+      // check for existing invite
+      const existingInvites = await getDocs(query(collection(db, "GroupInvites"), where("invitee", "==", emailInvite), where("groupId", "==", groupId)))
+      if (existingInvites.docs.length > 0) {
+        Alert.alert("Already Invited", emailInvite + " already has a pending invitation to this group.")
+        alreadyInvitedOrInGroup = true;
+        // console.log("OK to add")
+      }
+
+      if (!alreadyInvitedOrInGroup){
+        addDoc(collection(db, "GroupInvites"), data)
+        Alert.alert("Invitation Sent", emailInvite + " has been invited to the group.")
+      }
     } catch (error) {
       console.error(error);
     }
