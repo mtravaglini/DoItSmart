@@ -322,7 +322,7 @@ export function ProfileScreen({ route, navigation }) {
                                             autoCapitalize='none'
                                         />
 
-                                        <Text style={styles.inputLabel}>Your groups</Text>
+                                        {(groupNames.length > 0) ? <Text style={styles.inputLabel}>Your groups</Text> : ''}
                                         <View style={{ marginBottom: 15, alignItems: "flex-start", flexWrap: "wrap", flexDirection: "row" }}>
                                             {
                                                 groupNames.map((item) =>
@@ -338,8 +338,7 @@ export function ProfileScreen({ route, navigation }) {
                                             }
                                         </View>
 
-
-                                        <Text style={styles.inputLabel}>Your group invitations</Text>
+                                        {(invites.length > 0) ? <Text style={styles.inputLabel}>Your group invitations</Text> : ''}
                                         <View style={{ marginBottom: 15, alignItems: "flex-start", flexWrap: "wrap", flexDirection: "row" }}>
 
                                             {
