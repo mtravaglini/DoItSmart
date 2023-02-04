@@ -201,7 +201,7 @@ export function ProfileScreen({ route, navigation }) {
         };
     }, [profileGroupUpdated])
 
-    const confirmDelete = (groupId, groupName) => {
+    const confirmDeleteGroupMembership = (groupId, groupName) => {
         Alert.alert("Leave group " + groupName,
             "Are you sure?",
             [{
@@ -233,20 +233,32 @@ export function ProfileScreen({ route, navigation }) {
         }
     }
 
-    const userChanged = () => {
-        const keys1 = Object.keys(user);
-        const keys2 = Object.keys(origUser);
-        if (keys1.length !== keys2.length) {
-            return true;
-        }
-        for (let key of keys1) {
-            if (user[key] !== origUser[key]) {
-                return true;
-            }
-        }
-        return false;
+    const confirmDeleteGroupInvite = (inviteId, groupName) => {
+        Alert.alert("Decline invitation to " + groupName,
+            "Are you sure?",
+            [{
+                text: "Decline",
+                onPress: () => deleteGroupInvite(inviteId),
+
+            },
+            {
+                text: "Cancel"
+            }]
+        )
+        return
     }
 
+        const deleteGroupInvite = async (inviteId) => {
+            try {
+                await deleteDoc(doc(db, "GroupInvites", inviteId))
+                setProfileGroupUpdated(profileGroupUpdated + 1);
+    
+            } catch (error) {
+                const errorMessage = error.message;
+                alert(errorMessage);
+            }
+            return;
+        }
 
     const acceptInvite = async (groupId, inviteId) => {
         try {
@@ -264,6 +276,20 @@ export function ProfileScreen({ route, navigation }) {
             alert(errorMessage);
         }
         return;
+    }
+
+    const userChanged = () => {
+        const keys1 = Object.keys(user);
+        const keys2 = Object.keys(origUser);
+        if (keys1.length !== keys2.length) {
+            return true;
+        }
+        for (let key of keys1) {
+            if (user[key] !== origUser[key]) {
+                return true;
+            }
+        }
+        return false;
     }
 
     const SaveUser = async () => {
@@ -328,7 +354,7 @@ export function ProfileScreen({ route, navigation }) {
                                                 groupNames.map((item) =>
                                                     <Pressable key={item.id}
                                                         onPress={() => navigation.navigate('GroupDetail', { uid: uid, groupId: item.id })}
-                                                        onLongPress={() => confirmDelete(item.id, item.name)}
+                                                        onLongPress={() => confirmDeleteGroupMembership(item.id, item.name)}
                                                     >
                                                         <Text style={styles.groupText}>
                                                             {item.name}
@@ -345,6 +371,8 @@ export function ProfileScreen({ route, navigation }) {
                                                 invites.map((item) =>
                                                     <Pressable key={item.groupId}
                                                         onPress={() => acceptInvite(item.groupId, item.inviteId)}
+                                                        onLongPress={() => confirmDeleteGroupInvite(item.inviteId, item.groupName)}
+
                                                     >
                                                         <Text style={styles.groupText}>
                                                             {item.groupName} (Invited by {item.inviterName})
