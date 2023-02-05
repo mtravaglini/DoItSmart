@@ -277,7 +277,7 @@ export function GroupDetailScreen({ route, navigation }) {
               name={user.name}
               navigation={navigation} />
 
-            <ScrollView style={{ height: "84%", marginBottom: 15 }}>
+            <ScrollView style={{ height: "81%", marginBottom: 15 }}>
 
               <View style={styles.inputFormContainer}>
                 <Text style={styles.inputLabel}>Created by {createdByUser}</Text>

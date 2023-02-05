@@ -144,7 +144,7 @@ export function TasksScreen({ route, navigation }) {
                         {isLoading ? (
                             <ActivityIndicator size="large" color="cornflowerblue" />
                         ) : (
-                            <FlatList style={{ height: "76%", marginBottom: 15 }}
+                            <FlatList style={{ height: "73%", marginBottom: 15 }}
                                 data={tasks}
                                 ListEmptyComponent={<Text style={[styles.listText, styles.txtSuccess, { alignSelf: "center" }]}>
                                     All done! Add more tasks!

@@ -328,7 +328,7 @@ export function ProfileScreen({ route, navigation }) {
               name={user.name}
               navigation={navigation} />
 
-            <ScrollView style={{ height: "84%", marginBottom: 15 }}>
+            <ScrollView style={{ height: "81%", marginBottom: 15 }}>
               <View style={styles.inputFormContainer}>
 
                 {/* show acivity indicator when waiting to return to groups screen */}

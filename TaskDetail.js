@@ -480,19 +480,19 @@ export function TaskDetailScreen({ route, navigation }) {
   // console.log("============================================= render")
 
   return (
-    <SafeAreaView style={[styles.safeView, { opacity: backgroundOpacity }]}>
+    <SafeAreaView style={[styles.safeView, {flex: 1,  opacity: backgroundOpacity }]}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View>
+        {/* <TouchableWithoutFeedback style={{flex: 1}} onPress={Keyboard.dismiss}> */}
+          <View style={{flex: 1}}>
 
             <Title
               title="Task Details"
               name={user.name}
               navigation={navigation} />
 
-            <ScrollView style={{ height: "84%", marginBottom: 15 }}>
+            <ScrollView style={{ height: "81%", marginBottom: 15 }}>
 
               <View style={styles.inputFormContainer}>
                 <Text style={styles.inputLabel}>Created by {createdByUser}</Text>
@@ -894,7 +894,7 @@ export function TaskDetailScreen({ route, navigation }) {
               uid={uid} />
 
           </View>
-        </TouchableWithoutFeedback>
+        {/* </TouchableWithoutFeedback> */}
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
