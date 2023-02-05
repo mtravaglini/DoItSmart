@@ -49,14 +49,14 @@ export function TaskDetailScreen({ route, navigation }) {
   const [backgroundOpacity, setBackgroundOpacity] = useState(1.0);
   // user pool - all the users from all the groups that current user belongs to
   const [userPool, setUserPool] = useState([
-    {
-      id: "SynbJcxgL7ZcfxNTVOHA3wSkBX32",
-      userName: "Marco Travaglini"
-    },
-    {
-      id: "BHJBiafbJ3XrC0S20whMHVt4mic2",
-      userName: "Sarah Travaglini"
-    }
+    // {
+    //   id: "SynbJcxgL7ZcfxNTVOHA3wSkBX32",
+    //   userName: "Marco Travaglini"
+    // },
+    // {
+    //   id: "BHJBiafbJ3XrC0S20whMHVt4mic2",
+    //   userName: "Sarah Travaglini"
+    // }
   ]);
   const [isUserPoolLoading, setIsUserPoolLoading] = useState(true)
 
@@ -255,8 +255,90 @@ export function TaskDetailScreen({ route, navigation }) {
 
 
 
-  const getUserPool = () => {
-    // add logic to retrieve all groups for current user, then all users from those groups
+  const getUserPool = async () => {
+
+    // get all the groups for the current user
+    async function getGroupUsers() {
+      try {
+        // console.log("getting groupusers for", uid)
+        querySnapshot = await getDocs(query(collectionGroup(db, "GroupUsers"), where('userId', '==', uid)))
+        return querySnapshot
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    // process each groupid for the current user
+    async function processGroupUsers(querySnapshot) {
+      // console.log("processGroupUsers", querySnapshot.docs.length)
+      var retrievedGroupIds = await getGroupUsersDetails(querySnapshot.docs)
+      // console.log("retrievedUserNames", retrievedUserNames)
+      return retrievedGroupIds
+    }
+
+    function getGroupUsersDetails(groupUsersSnaps) {
+      return Promise.all(groupUsersSnaps.map(async (groupUser) => {
+        const docRef = groupUser.ref;
+        const parentCollectionRef = docRef.parent; // GroupUsers CollectionReference
+        const immediateParentDocumentRef = parentCollectionRef.parent; // Groups DocumentReference
+        const parentDoc = await getDoc(immediateParentDocumentRef)
+        return parentDoc.id
+      }))
+    }
+
+    // get all the users in each groupid 
+    async function processGroups(groupArray) {
+      // console.log("processGroups", groupArray)
+      // use a set to just store unique values
+      var userArray = new Set();
+
+      for (groupId of groupArray) {
+        // console.log("Getting users for group", groupId)
+        querySnapshot = await getDocs(query(collection(db, "Groups", groupId, "GroupUsers")));
+        querySnapshot.forEach((doc) => {
+          // console.log("xxxxx",groupId, doc.data().userId, uid)
+          if (doc.data().userId !== uid) {
+            userArray.add(doc.data().userId)
+          }
+        })
+      }
+      // console.log(userArray)
+      return userArray
+    }
+
+    // get user info for the userids retrieved above
+    async function processUsers(userArray) {
+      // console.log("processUsers", userArray)
+
+      var userNameArray = []
+
+      for (var userId of userArray) {
+        // const querySnapshot = await getDocs(query(collection(db, "Users"), where("userId", "==", userId)));
+        const userDoc = await getDoc(doc(db, "Users", userId));
+        var data = {
+          id: userId,
+          userName: userDoc.data().name
+        }
+
+        userNameArray.push(data)
+
+      }
+
+      // console.log(userNameArray)
+      setUserPool(userNameArray)
+      return userNameArray
+    }
+
+
+    var groupUsersSnaps = await getGroupUsers()
+    // console.log("################ groups for this user", groupUsersSnaps.docs.length)
+    var groupArray = await processGroupUsers(groupUsersSnaps)
+    // console.log("################ groups for this user", groupArray)
+    var userArray = await processGroups(groupArray)
+    // console.log("################ userids in all those groups", userArray)
+    var userNameArray = await processUsers(userArray)
+    console.log("################", userNameArray)
+
     setIsUserPoolLoading(false)
   }
 
@@ -265,10 +347,12 @@ export function TaskDetailScreen({ route, navigation }) {
     // add logic to reassign task to selected user
     console.log("reassign task", taskId, "to user", userId)
 
-    setTask((prevState) => ({ ...prevState, assignee: userId }))
+    var newTask = { ...task, assignee: userId }
+    setTask(newTask)
+    console.log("newTask", newTask)
 
     try {
-      await setDoc(doc(db, "Tasks", taskId), task)
+      await setDoc(doc(db, "Tasks", taskId), newTask)
     } catch (error) {
       // const errorCode = error.code;
       const errorMessage = error.message;
@@ -277,14 +361,19 @@ export function TaskDetailScreen({ route, navigation }) {
     }
 
 
+    setReassignVisible(false);
+    setBackgroundOpacity(1.0);
+    navigation.goBack();
+
 
     Alert.alert("Task Reassigned", "Task has been reassigned to " + userName,
       [
         {
           text: "Ok"
         }])
-    setReassignVisible(false);
-    setBackgroundOpacity(1.0);
+
+
+
   }
 
 
@@ -705,19 +794,20 @@ export function TaskDetailScreen({ route, navigation }) {
 
 
 
-                <Pressable
-                  onPress={() => {
-                    getUserPool()
-                    console.log("USERPOOL at invoke reassign", userPool)
+<View style={{ alignItems: "center" }}>
+                <Pressable style={[styles.secondaryButton]}
+                  onPress={async () => {
+                    await getUserPool()
+                    // console.log("USERPOOL at invoke reassign", userPool)
                     setReassignVisible(true)
                     setBackgroundOpacity(.33)
                   }}
                 >
-                  <Text style={styles.groupText}>
+                  <Text style={styles.secondaryButtonText}>
                     Reassign Task
                   </Text>
                 </Pressable>
-
+</View>
                 {/* modal for reassigning task  */}
                 <Modal
                   animationType="slide"
@@ -730,7 +820,7 @@ export function TaskDetailScreen({ route, navigation }) {
                   <View style={styles.modalView}>
                     <Text style={styles.pageTitleText}>Reassign Task</Text>
 
-                    <Text style={[styles.inputLabel, { paddingTop: 15, alignSelf: 'flex-start' }]}>Users</Text>
+                    <Text style={[styles.inputLabel, { paddingTop: 15, alignSelf: 'flex-start' }]}>Select user to reassign task</Text>
 
 
                     {isUserPoolLoading ?
