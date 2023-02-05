@@ -288,23 +288,23 @@ module.exports = StyleSheet.create({
     elevation: 5,
   },
 
-  // Groups on secondary screens
-  groupContainer: {
-    color: "cornflowerblue",
-    borderColor: "cornflowerblue",
-    borderRadius: 15,
-    margin: "1%",
-    // height: 48,
-    marginHorizontal: "5%",
-    flexDirection: 'row',
-    alignItems: 'center',
-    // paddingTop: 300,
-  },
-  groupButton: {
-    width: "19%",
-    marginRight: "1%",
-  },
-  groupText: {
+  // Groups or resources on secondary screens
+  // groupContainer: {
+  //   color: "cornflowerblue",
+  //   borderColor: "cornflowerblue",
+  //   borderRadius: 15,
+  //   margin: "1%",
+  //   // height: 48,
+  //   marginHorizontal: "5%",
+  //   flexDirection: 'row',
+  //   alignItems: 'center',
+  //   // paddingTop: 300,
+  // },
+  // groupButton: {
+  //   width: "19%",
+  //   marginRight: "1%",
+  // },
+  groupResourceText: {
     fontSize: 15,
     // fontWeight: "bold",
     // fontFamily: Platform.OS === "android" ? "sans-serif-thin" : "AppleSDGothicNeo-Thin",

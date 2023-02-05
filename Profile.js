@@ -356,7 +356,7 @@ export function ProfileScreen({ route, navigation }) {
                             onPress={() => navigation.navigate('GroupDetail', { uid: uid, groupId: item.id })}
                             onLongPress={() => confirmDeleteGroupMembership(item.id, item.name)}
                           >
-                            <Text style={styles.groupText}>
+                            <Text style={styles.groupResourceText}>
                               {item.name}
                             </Text>
                           </Pressable>
@@ -374,7 +374,7 @@ export function ProfileScreen({ route, navigation }) {
                             onLongPress={() => confirmDeleteGroupInvite(item.inviteId, item.groupName)}
 
                           >
-                            <Text style={styles.groupText}>
+                            <Text style={styles.groupResourceText}>
                               {item.groupName} (Invited by {item.inviterName})
                             </Text>
                           </Pressable>

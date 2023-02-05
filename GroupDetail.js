@@ -315,7 +315,7 @@ export function GroupDetailScreen({ route, navigation }) {
                       <Pressable key={item.uid}
                         onPress={() => confirmDeleteGroupMembership(item.uid, item.name)}
                       >
-                        <Text style={styles.groupText}>
+                        <Text style={styles.groupResourceText}>
                           {item.name}
                         </Text>
                       </Pressable>
@@ -327,7 +327,7 @@ export function GroupDetailScreen({ route, navigation }) {
                       setBackgroundOpacity(.33)
                     }}
                   >
-                    <Text style={styles.groupText}>
+                    <Text style={styles.groupResourceText}>
                       +
                     </Text>
                   </Pressable>
