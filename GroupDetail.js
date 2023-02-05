@@ -295,6 +295,7 @@ export function GroupDetailScreen({ route, navigation }) {
                 <Text style={styles.inputLabel}>Notes</Text>
                 <TextInput
                   style={[styles.input, {
+                    paddingTop: 10,
                     height: 120,
                     textAlignVertical: "top" // android fix for centering it at the top-left corner 
                   }]}
@@ -315,7 +316,7 @@ export function GroupDetailScreen({ route, navigation }) {
                       <Pressable key={item.uid}
                         onPress={() => confirmDeleteGroupMembership(item.uid, item.name)}
                       >
-                        <Text style={styles.groupResourceText}>
+                        <Text style={styles.groupText}>
                           {item.name}
                         </Text>
                       </Pressable>
@@ -327,7 +328,7 @@ export function GroupDetailScreen({ route, navigation }) {
                       setBackgroundOpacity(.33)
                     }}
                   >
-                    <Text style={styles.groupResourceText}>
+                    <Text style={styles.groupText}>
                       +
                     </Text>
                   </Pressable>

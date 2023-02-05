@@ -195,7 +195,8 @@ module.exports = StyleSheet.create({
   },
   input: {
     height: 48,
-    width: "95%",
+marginHorizontal: "1%",
+    // width: "95%",
     borderRadius: 15,
     overflow: 'hidden',
     paddingLeft: 10,

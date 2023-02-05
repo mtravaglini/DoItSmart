@@ -520,6 +520,7 @@ export function TaskDetailScreen({ route, navigation }) {
                 <Text style={styles.inputLabel}>Notes</Text>
                 <TextInput
                   style={[styles.input, {
+                    paddingTop: 10,
                     height: 120,
                     textAlignVertical: "top" // android fix for centering it at the top-left corner 
                   }]}
