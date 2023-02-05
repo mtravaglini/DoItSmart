@@ -15,16 +15,21 @@ module.exports = StyleSheet.create({
   // main title screen text ########################################
   mainTitleContainer: {
     alignItems: 'center',
-    paddingTop: "25%",
-    paddingBottom: "25%",
+    paddingTop: "15%",
+    paddingBottom: "15%",
     paddingLeft: "10%",
-    paddingRight: "10%"
+    paddingRight: "10%",
+    backgroundColor: "cornflowerblue",
+    marginTop: "10%",
+    marginBottom: "10%",
+    marginHorizontal: "1%",
+    borderRadius: 5,
   },
   titleText: {
     fontSize: 35,
     fontWeight: "bold",
-    fontFamily: Platform.OS === "android" ? "sans-serif-thin" : "AppleSDGothicNeo-Thin",
-    color: "cornflowerblue",
+    fontFamily: Platform.OS === "android" ? "sans-serif" : "AppleSDGothicNeo",
+    color: "white",
   },
   logo: {
     width: 66,
