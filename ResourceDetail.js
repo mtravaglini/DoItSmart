@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { db, auth } from './firebase.config';
-import { doc, collection, query, addDoc, getDoc, getDocs, setDoc, deleteDoc, onSnapshot, where, orderBy, DocumentReference, collectionGroup } from "firebase/firestore";
+import { doc, collection, query, addDoc, getDoc, getDocs, setDoc, deleteDoc, onSnapshot, where, orderBy, DocumentReference, collectionGroup, documentId } from "firebase/firestore";
 
 // use custom style sheet
 const styles = require('./Style.js');
@@ -32,95 +32,146 @@ export function ResourceDetailScreen({ route, navigation }) {
   const [createdByUser, setCreatedByUser] = useState('');
   const [origResource, setOrigResource] = useState({});
   const [resource, setResource] = useState({});
-  // const [groupUserNames, setGroupUserNames] = useState([]);
-  // const [emailInvite, setEmailInvite] = useState("");
-  // const [groupMembersUpdated, setGroupMembersUpdated] = useState(0);
+  const [userGroupNames, setUserGroupNames] = useState([]);
+  const [resourceGroupNames, setResourceGroupNames] = useState([]);
+  const [resourceGroupsUpdated, setResourceGroupsUpdated] = useState(0);
+
+  // add task groups modal
+  const [resourceGroupPickerVisible, setResourceGroupPickerVisible] = useState(false);
+  const [backgroundOpacity, setBackgroundOpacity] = useState(1.0);
 
 
-  // get user 
   useEffect(() => {
-    // console.log("Getting user", uid)
-    async function getUser() {
-      try {
-        const docSnap = await getDoc(doc(db, "Users", uid));
-        setUser(docSnap.data());
-      } catch (error) {
-        console.error(error);
+
+    async function getResoureceInfo() {
+
+      var userSnap = await getUser()
+      var resoureceSnap = await getResource()
+
+      // promise chaining
+      var resourceGroupsSnap = await getresourcegroups()
+      var retrievedGroupNames1 = await processResourceGroups(resourceGroupsSnap)
+      var userGroupsSnap = await getusergroups(userSnap)
+      var retrievedGroupNames2 = await processUserGroups(userGroupsSnap)
+
+      async function getUser() {
+        try {
+          const docSnap = await getDoc(doc(db, "Users", uid));
+          setUser(docSnap.data());
+          return docSnap;
+        } catch (error) {
+          console.error(error);
+        }
       }
-    }
-    getUser();
-  }, [])
 
-  // get resource and related info
-  useEffect(() => {
-    // console.log("Getting group", uid, groupId);
-    async function getResource() {
-      try {
-        var docSnap = await getDoc(doc(db, "Resources", resourceId));
-        setOrigResource(docSnap.data());
-        setResource(docSnap.data());
-        // get user info for the user that created this resource
-        docSnap = await getDoc(doc(db, "Users", docSnap.data().creator));
-        setCreatedByUser(docSnap.data().name + " (" + docSnap.data().email + ")")
-
-
-
-
-        // Promise Chaining
-        var groupUsersSnap = await getGroupUsers()
-        var retrievedUserNames = await processGroupUsers(groupUsersSnap)
-        // var savedGroupUsers = await saveTaskGroups(retrievedUserNames)
-
-
-        // get all groups that the current user belongs to
-        async function getGroupUsers() {
-          // console.log("getGroupUsers", groupId)
-          var querySnapshot = await getDocs(query(collectionGroup(db, "GroupUsers"), where("userId", "==", uid)));
-          return querySnapshot
+      // console.log("Getting group", uid, groupId);
+      async function getResource() {
+        try {
+          var docSnap = await getDoc(doc(db, "Resources", resourceId));
+          setOrigResource(docSnap.data());
+          setResource(docSnap.data());
+          // get user info for the user that created this resource
+          docSnap = await getDoc(doc(db, "Users", docSnap.data().creator));
+          setCreatedByUser(docSnap.data().name + " (" + docSnap.data().email + ")")
+          return docSnap
+        } catch (error) {
+          console.error(error);
         }
-
-        // process each groupuser
-        async function processGroupUsers(querySnapshot) {
-          console.log("processGroupUsers", querySnapshot.docs.length)
-          var retrievedUserNames = await getGroupUsersDetails(querySnapshot.docs)
-          setGroupUserNames(retrievedUserNames)
-          return retrievedUserNames
-        }
-
-        // for each groupuser, retrieve the main group document
-        function getGroupUsersDetails(groupUsersSnaps) {
-          return Promise.all(groupUsersSnaps.map(async (groupUser) => {
-            // console.log("docref", groupUser.size)
-
-            // get the groupuser doc from the subcollection
-            docSnap = await getDoc(groupUser.ref);
-            var groupUid = docSnap.data().userId
-
-            // get the main group doc
-            docSnap = await getDoc(doc(db, "Groups", groupId));
-
-            return {
-              "id": docSnap.id,
-              "name": docSnap.data().name
-            }
-
-
-
-          }))
-        }
-
-
-
-
-
-
-
-      } catch (error) {
-        console.error(error);
       }
+
+      // get resource groups for this resource
+      async function getresourcegroups() {
+        // console.log("gettaskgroups")
+        // unsubscribe = onSnapshot(
+        // get groups subcollection for the task
+        var querySnapshot = await getDocs(query(collectionGroup(db, "GroupResources"), where("resourceId", "==", resourceId)));
+        return querySnapshot
+        // console.log("reached gettaskgroups2")
+        // console.log("Setting task groups", retrievedGroupNames)
+
+      }
+      async function processResourceGroups(querySnapshot) {
+        // console.log("processUserGroups", querySnapshot.docs.length)
+
+        var retrievedGroupNames = await getGroupUsersParents(querySnapshot.docs)
+        setResourceGroupNames(retrievedGroupNames)
+        return retrievedGroupNames
+      }
+
+
+      async function getusergroups(userSnap) {
+        // console.log("getusergroups", savedTaskGroups)
+        // console.log("reached getusergroups")
+        var querySnapshot = await getDocs(query(collectionGroup(db, 'GroupUsers'), where('userId', '==', uid)));
+        return querySnapshot
+        // console.log("Setting user groups", retrievedGroupNames2)
+      }
+
+      async function processUserGroups(querySnapshot) {
+        // console.log("processUserGroups", querySnapshot.docs.length)
+
+        var retrievedGroupNames = await getGroupUsersParents(querySnapshot.docs)
+        setUserGroupNames(retrievedGroupNames)
+        return retrievedGroupNames
+      }
+
+      function getGroupUsersParents(groupUsersSnaps) {
+        return Promise.all(groupUsersSnaps.map(async (groupUser) => {
+          const docRef = groupUser.ref;
+          const parentCollectionRef = docRef.parent; // CollectionReference
+          const immediateParentDocumentRef = parentCollectionRef.parent; // DocumentReference
+          const parentDoc = await getDoc(immediateParentDocumentRef)
+
+          return {
+            "id": parentDoc?.id,
+            "name": parentDoc?.data().name,
+          }
+        }))
+      }
+
+
     }
-    getResource();
-  }, [groupMembersUpdated])
+
+    getResoureceInfo();
+
+  }, [resourceGroupsUpdated])
+
+
+
+
+
+  const confirmDeleteGroupMembership = (groupId, groupName) => {
+    Alert.alert("Remove resource from group " + groupName,
+      "Are you sure?",
+      [{
+        text: "Remove",
+        onPress: () => deleteGroupMembership(groupId),
+
+      },
+      {
+        text: "Cancel"
+      }]
+    )
+    return
+  }
+
+  // delete a group membership
+  const deleteGroupMembership = async (groupId) => {
+    // console.log("deleting the group membership", groupId, uid)
+    try {
+      const querySnapshot = await getDocs(query(collection(db, "Groups", groupId, "GroupResources"), where('resourceId', '==', resourceId)));
+      // console.log(typeof querySnapshot)
+      querySnapshot.forEach((doc) => {
+        // console.log("deleting docref", doc.ref)
+        deleteDoc(doc.ref)
+        setResourceGroupsUpdated(resourceGroupsUpdated + 1);
+
+      })
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
 
 
 
@@ -166,8 +217,28 @@ export function ResourceDetailScreen({ route, navigation }) {
   }
   // console.log("group", group)
   // console.log("origGroup", origGroup)
-  console.log("REFRESHED", Date())
+  // console.log("REFRESHED", Date())
 
+  // add a group membership
+  const addResourceGroup = async (groupId) => {
+    console.log("adding resource group", resourceId, groupId)
+    const timestamp = Math.floor(Date.now()) //serverTimestamp();
+
+    var data = {
+      resourceId: resourceId,
+      createdDate: timestamp
+    }
+    try {
+      addDoc(collection(db, "Groups", groupId, "GroupResources"), data)
+      setResourceGroupsUpdated(resourceGroupsUpdated + 1);
+      setResourceGroupPickerVisible(false)
+      setBackgroundOpacity(1.0)
+    } catch (error) {
+      console.error(error);
+    }
+
+
+  }
 
   return (
     <SafeAreaView style={[styles.safeView, { opacity: backgroundOpacity }]}>
@@ -200,6 +271,7 @@ export function ResourceDetailScreen({ route, navigation }) {
                 <Text style={styles.inputLabel}>Notes</Text>
                 <TextInput
                   style={[styles.input, {
+                    paddingTop: 10,
                     height: 120,
                     textAlignVertical: "top" // android fix for centering it at the top-left corner 
                   }]}
@@ -213,26 +285,29 @@ export function ResourceDetailScreen({ route, navigation }) {
 
                 <Text style={styles.inputLabel}>Resource Groups</Text>
 
-                <View style={{ marginBottom: 15, alignItems: "flex-start", flexWrap: "wrap", flexDirection: "row" }}>
+                <View style={{
+                  backgroundColor: "white", padding: "3%", borderRadius: 15, marginHorizontal: "1%",
+                  marginBottom: 15, alignItems: "flex-start", flexWrap: "wrap", flexDirection: "row"
+                }}>
 
-                  {/* {
-                    resourceUserNames.map((item) =>
-                      <Pressable key={item.uid}
-                        onPress={() => confirmDeleteResourceMembership(item.uid, item.name)}
+                  {
+                    resourceGroupNames.map((item) =>
+                      <Pressable key={item.id}
+                        onPress={() => confirmDeleteGroupMembership(item.id, item.name)}
                       >
-                        <Text style={styles.resourceText}>
+                        <Text style={styles.groupResourceText}>
                           {item.name}
                         </Text>
                       </Pressable>
                     )
-                  } */}
+                  }
                   <Pressable
                     onPress={() => {
-                      setInviteUserVisible(true)
+                      setResourceGroupPickerVisible(true)
                       setBackgroundOpacity(.33)
                     }}
                   >
-                    <Text style={styles.resourceText}>
+                    <Text style={styles.groupResourceText}>
                       +
                     </Text>
                   </Pressable>
@@ -240,6 +315,55 @@ export function ResourceDetailScreen({ route, navigation }) {
                 </View>
 
 
+
+
+
+                {/* modal for selecting groups  */}
+                <Modal
+                  animationType="slide"
+                  transparent={true}
+                  visible={resourceGroupPickerVisible}
+                  onRequestClose={() => {
+                    setResourceGroupPickerVisible(false)
+                    setBackgroundOpacity(1.0)
+                  }}>
+                  <View style={styles.modalView}>
+                    <Text style={styles.pageTitleText}>Add Resource to Groups</Text>
+
+                    <Text style={[styles.inputLabel, { paddingTop: 15, alignSelf: 'flex-start' }]}>Groups</Text>
+
+                    <View style={{ marginBottom: 15, alignItems: "flex-start", flexWrap: "wrap", flexDirection: "row" }}>
+
+                      {
+                        userGroupNames.map((item) =>
+                          <Pressable key={item.id}
+                            onPress={() => addResourceGroup(item.id)}
+                          >
+                            <Text style={styles.groupResourceText}>
+                              {item.name}
+                            </Text>
+                          </Pressable>
+                        )
+                      }
+                    </View>
+
+                    <Pressable
+                      style={[styles.mainButton, styles.btnWarning, styles.btnNarrow]}
+                      onPress={() => {
+                        setResourceGroupPickerVisible(false)
+                        setBackgroundOpacity(1.0)
+                      }}>
+                      <Text style={[styles.buttonText]}>
+                        <FontAwesome
+                          style={[{ fontSize: 35 }]}
+                          name='arrow-circle-o-left'
+                          color='white'
+                        />
+                      </Text>
+                    </Pressable>
+
+                  </View>
+                </Modal>
 
                 <View style={{ alignItems: "center" }}>
                   <TouchableOpacity style={[styles.mainButton, styles.btnSuccess, { opacity: (!resourceChanged()) ? 0.5 : 1.0 }]}
