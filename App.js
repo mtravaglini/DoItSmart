@@ -11,6 +11,7 @@ import { TaskDetailScreen } from './TaskDetail.js';
 import { GroupsScreen } from './Groups.js';
 import { GroupDetailScreen } from './GroupDetail.js';
 import { ResourcesScreen } from './Resources.js';
+import { ResourceDetailScreen } from './ResourceDetail.js';
 import { ProfileScreen } from './Profile.js';
 
 // create the Navigation stack
@@ -27,6 +28,7 @@ export default function App() {
         <Stack.Screen name="Groups" component={GroupsScreen} />
         <Stack.Screen name="GroupDetail" component={GroupDetailScreen} />
         <Stack.Screen name="Resources" component={ResourcesScreen} />
+        <Stack.Screen name="ResourceDetail" component={ResourceDetailScreen} />
         <Stack.Screen name="Profile" component={ProfileScreen} />
       </Stack.Navigator>
     </NavigationContainer>
