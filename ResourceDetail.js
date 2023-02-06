@@ -40,7 +40,6 @@ export function ResourceDetailScreen({ route, navigation }) {
   const [resourceGroupPickerVisible, setResourceGroupPickerVisible] = useState(false);
   const [backgroundOpacity, setBackgroundOpacity] = useState(1.0);
 
-
   useEffect(() => {
 
     async function getResoureceInfo() {
@@ -49,12 +48,14 @@ export function ResourceDetailScreen({ route, navigation }) {
       var resoureceSnap = await getResource()
 
       // promise chaining
-      var resourceGroupsSnap = await getresourcegroups()
-      var retrievedGroupNames1 = await processResourceGroups(resourceGroupsSnap)
-      var userGroupsSnap = await getusergroups(userSnap)
-      var retrievedGroupNames2 = await processUserGroups(userGroupsSnap)
-      var filterResult = await filterGroups(retrievedGroupNames1, retrievedGroupNames2)
-      setUserGroupNames(filterResult)
+      var resourceGroupsSnap = await getResourceGroups()
+      var retrievedResourceGroupNames = await processResourceGroups(resourceGroupsSnap)
+
+      var userGroupsSnap = await getUserGroups(userSnap)
+      var retrievedUserGroupNames = await processUserGroups(userGroupsSnap)
+
+      var filterGroupsResult = await filterGroups(retrievedResourceGroupNames, retrievedUserGroupNames)
+      setUserGroupNames(filterGroupsResult)
 
       async function getUser() {
         try {
@@ -82,8 +83,8 @@ export function ResourceDetailScreen({ route, navigation }) {
       }
 
       // get resource groups for this resource
-      async function getresourcegroups() {
-        // console.log("gettaskgroups")
+      async function getResourceGroups() {
+        // console.log("getTaskGroups")
         // unsubscribe = onSnapshot(
         // get groups subcollection for the task
         var querySnapshot = await getDocs(query(collectionGroup(db, "GroupResources"), where("resourceId", "==", resourceId)));
@@ -97,23 +98,6 @@ export function ResourceDetailScreen({ route, navigation }) {
 
         var retrievedGroupNames = await getGroupUsersParents(querySnapshot.docs)
         setResourceGroupNames(retrievedGroupNames)
-        return retrievedGroupNames
-      }
-
-
-      async function getusergroups(userSnap) {
-        // console.log("getusergroups", savedTaskGroups)
-        // console.log("reached getusergroups")
-        var querySnapshot = await getDocs(query(collectionGroup(db, 'GroupUsers'), where('userId', '==', uid)));
-        return querySnapshot
-        // console.log("Setting user groups", retrievedGroupNames2)
-      }
-
-      async function processUserGroups(querySnapshot) {
-        // console.log("processUserGroups", querySnapshot.docs.length)
-
-        var retrievedGroupNames = await getGroupUsersParents(querySnapshot.docs)
-        // setUserGroupNames(retrievedGroupNames)
         return retrievedGroupNames
       }
 
@@ -131,42 +115,49 @@ export function ResourceDetailScreen({ route, navigation }) {
         }))
       }
 
-        async function filterGroups(savedResourceGroups, savedUserGroups) {
-          // console.log("filterGroups", savedTaskGroups.length)
+      async function getUserGroups(userSnap) {
+        // console.log("getUserGroups", savedTaskGroups)
+        // console.log("reached getUserGroups")
+        var querySnapshot = await getDocs(query(collectionGroup(db, 'GroupUsers'), where('userId', '==', uid)));
+        return querySnapshot
+        // console.log("Setting user groups", retrievedUserGroupNames)
+      }
 
-          // check if resource is already in a group, if so don't need to save it
+      async function processUserGroups(querySnapshot) {
+        // console.log("processUserGroups", querySnapshot.docs.length)
 
-          const newUserGroupNames = [];
+        var retrievedGroupNames = await getGroupUsersParents(querySnapshot.docs)
+        // setUserGroupNames(retrievedGroupNames)
+        return retrievedGroupNames
+      }
 
-          for (var userGroup of savedUserGroups) {
-            var alreadyInGroup = false;
-            for (var resourceGroup of savedResourceGroups) {
-              // console.log("checking", resourceGroup.name)
-              if (userGroup.id == resourceGroup.id) {
-                // console.log("Resource is in group", resourceGroup.name)
-                alreadyInGroup = true;
-              }
-            }
+      async function filterGroups(savedResourceGroups, savedUserGroups) {
+        // check if resource is already in a group, if so don't need to save it
+        const newUserGroupNames = [];
 
-            if (!alreadyInGroup) {
-              newUserGroupNames.push(userGroup)
+        for (var userGroup of savedUserGroups) {
+          var alreadyInGroup = false;
+          for (var resourceGroup of savedResourceGroups) {
+            // console.log("checking", resourceGroup.name)
+            if (userGroup.id == resourceGroup.id) {
+              // console.log("Resource is in group", resourceGroup.name)
+              alreadyInGroup = true;
             }
           }
 
-
-
-          // console.log("contents of newusergroupnames", newUserGroupNames.length)
-          return newUserGroupNames
+          if (!alreadyInGroup) {
+            newUserGroupNames.push(userGroup)
+          }
         }
+
+        // console.log("contents of newusergroupnames", newUserGroupNames.length)
+        return newUserGroupNames
+      }
     }
 
     getResoureceInfo();
 
   }, [resourceGroupsUpdated])
-
-
-
-
 
   const confirmDeleteGroupMembership = (groupId, groupName) => {
     Alert.alert("Remove resource from group " + groupName,
@@ -174,7 +165,6 @@ export function ResourceDetailScreen({ route, navigation }) {
       [{
         text: "Remove",
         onPress: () => deleteGroupMembership(groupId),
-
       },
       {
         text: "Cancel"
@@ -200,13 +190,6 @@ export function ResourceDetailScreen({ route, navigation }) {
     }
   }
 
-
-
-
-
-
-
-
   const resourceChanged = () => {
     const keys1 = Object.keys(resource);
     const keys2 = Object.keys(origResource);
@@ -220,8 +203,6 @@ export function ResourceDetailScreen({ route, navigation }) {
     }
     return false;
   }
-
-
 
   const SaveResource = async () => {
 
@@ -264,8 +245,6 @@ export function ResourceDetailScreen({ route, navigation }) {
     } catch (error) {
       console.error(error);
     }
-
-
   }
 
   return (
@@ -321,8 +300,8 @@ export function ResourceDetailScreen({ route, navigation }) {
                   {
                     resourceGroupNames.map((item) =>
                       <Pressable key={item.id}
-                      onLongPress={() => confirmDeleteGroupMembership(item.id, item.name)}
-                      onPress={() => navigation.navigate('GroupDetail', { uid: uid, groupId: item.id })}
+                        onLongPress={() => confirmDeleteGroupMembership(item.id, item.name)}
+                        onPress={() => navigation.navigate('GroupDetail', { uid: uid, groupId: item.id })}
                       >
                         <Text style={styles.groupResourceText}>
                           {item.name}
@@ -342,10 +321,6 @@ export function ResourceDetailScreen({ route, navigation }) {
                   </Pressable>
 
                 </View>
-
-
-
-
 
                 {/* modal for selecting groups  */}
                 <Modal
