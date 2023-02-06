@@ -53,6 +53,8 @@ export function ResourceDetailScreen({ route, navigation }) {
       var retrievedGroupNames1 = await processResourceGroups(resourceGroupsSnap)
       var userGroupsSnap = await getusergroups(userSnap)
       var retrievedGroupNames2 = await processUserGroups(userGroupsSnap)
+      var filterResult = await filterGroups(retrievedGroupNames1, retrievedGroupNames2)
+      setUserGroupNames(filterResult)
 
       async function getUser() {
         try {
@@ -111,7 +113,7 @@ export function ResourceDetailScreen({ route, navigation }) {
         // console.log("processUserGroups", querySnapshot.docs.length)
 
         var retrievedGroupNames = await getGroupUsersParents(querySnapshot.docs)
-        setUserGroupNames(retrievedGroupNames)
+        // setUserGroupNames(retrievedGroupNames)
         return retrievedGroupNames
       }
 
@@ -129,7 +131,33 @@ export function ResourceDetailScreen({ route, navigation }) {
         }))
       }
 
+        async function filterGroups(savedResourceGroups, savedUserGroups) {
+          // console.log("filterGroups", savedTaskGroups.length)
 
+          // check if resource is already in a group, if so don't need to save it
+
+          const newUserGroupNames = [];
+
+          for (var userGroup of savedUserGroups) {
+            var alreadyInGroup = false;
+            for (var resourceGroup of savedResourceGroups) {
+              // console.log("checking", resourceGroup.name)
+              if (userGroup.id == resourceGroup.id) {
+                // console.log("Resource is in group", resourceGroup.name)
+                alreadyInGroup = true;
+              }
+            }
+
+            if (!alreadyInGroup) {
+              newUserGroupNames.push(userGroup)
+            }
+          }
+
+
+
+          // console.log("contents of newusergroupnames", newUserGroupNames.length)
+          return newUserGroupNames
+        }
     }
 
     getResoureceInfo();
