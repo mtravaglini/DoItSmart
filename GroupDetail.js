@@ -41,63 +41,74 @@ export function GroupDetailScreen({ route, navigation }) {
   const [backgroundOpacity, setBackgroundOpacity] = useState(1.0);
 
 
-  // get user 
-  useEffect(() => {
-    // console.log("Getting user", uid)
-    async function getUser() {
-      try {
-        const docSnap = await getDoc(doc(db, "Users", uid));
-        setUser(docSnap.data());
-      } catch (error) {
-        console.error(error);
-      }
-    }
-    getUser();
-  }, [])
 
   // get group and related info
   useEffect(() => {
     // console.log("Getting group", uid, groupId);
-    async function getGroup() {
-      try {
-        var docSnap = await getDoc(doc(db, "Groups", groupId));
-        setOrigGroup(docSnap.data());
-        setGroup(docSnap.data());
-        // get user info for the user that created this group
-        docSnap = await getDoc(doc(db, "Users", docSnap.data().creator));
-        setCreatedByUser(docSnap.data().name + " (" + docSnap.data().email + ")")
+    async function getGroupInfo() {
 
+      var userSnap = await getUser()
+      var groupSnap = await getGroup()
 
+      // Promise Chaining
+      var groupUsersSnap = await getGroupUsers()
+      var retrievedUserNames = await processGroupUsers(groupUsersSnap)
+      // var savedGroupUsers = await saveTaskGroups(retrievedUserNames)
 
+      // get user 
+      async function getUser() {
+        try {
+          const docSnap = await getDoc(doc(db, "Users", uid));
+          setUser(docSnap.data());
+        } catch (error) {
+          console.error(error);
+        }
+      }
 
-        // Promise Chaining
-        var groupUsersSnap = await getGroupUsers()
-        var retrievedUserNames = await processGroupUsers(groupUsersSnap)
-        // var savedGroupUsers = await saveTaskGroups(retrievedUserNames)
+      async function getGroup() {
+        try {
+          var docSnap = await getDoc(doc(db, "Groups", groupId));
+          setOrigGroup(docSnap.data());
+          setGroup(docSnap.data());
+          // get user info for the user that created this group
+          docSnap = await getDoc(doc(db, "Users", docSnap.data().creator));
+          setCreatedByUser(docSnap.data().name + " (" + docSnap.data().email + ")")
+        } catch (error) {
+          console.error(error);
+        }
+      }
 
-
-        // get users subcollection for the group
-        async function getGroupUsers() {
-          // console.log("getGroupUsers", groupId)
+      // get users subcollection for the group
+      async function getGroupUsers() {
+        // console.log("getGroupUsers", groupId)
+        try {
           var querySnapshot = await getDocs(query(collection(db, "Groups", groupId, "GroupUsers")));
           return querySnapshot
+        } catch (error) {
+          console.error(error);
         }
+      }
 
-        // process each user in the group's subcollection
-        async function processGroupUsers(querySnapshot) {
+      // process each user in the group's subcollection
+      async function processGroupUsers(querySnapshot) {
+        try {
           console.log("processGroupUsers", querySnapshot.docs.length)
           var retrievedUserNames = await getGroupUsersDetails(querySnapshot.docs)
           setGroupUserNames(retrievedUserNames)
           return retrievedUserNames
+        } catch (error) {
+          console.error(error);
         }
+      }
 
-        // for each user in the group's subcollection, retrieve the main user document
-        function getGroupUsersDetails(groupUsersSnaps) {
+      // for each user in the group's subcollection, retrieve the main user document
+      async function getGroupUsersDetails(groupUsersSnaps) {
+        try {
           return Promise.all(groupUsersSnaps.map(async (groupUser) => {
             // console.log("docref", groupUser.size)
 
             // get the groupuser doc from the subcollection
-            docSnap = await getDoc(groupUser.ref);
+            var docSnap = await getDoc(groupUser.ref);
             var groupUid = docSnap.data().userId
 
             // get the main user doc
@@ -112,29 +123,20 @@ export function GroupDetailScreen({ route, navigation }) {
 
 
           }))
+        } catch (error) {
+          console.error(error);
         }
-
-
-
-
-
-
-
-      } catch (error) {
-        console.error(error);
       }
     }
-    getGroup();
-  }, [groupMembersUpdated])
 
+    getGroupInfo();
+
+  }, [groupMembersUpdated])
 
   // invite a user to the group
   const inviteUser = async () => {
-
     var alreadyInvitedOrInGroup = false;
-
     const timestamp = Math.floor(Date.now()) //serverTimestamp();
-
     var data = {
       groupId: groupId,
       inviter: uid,
@@ -173,8 +175,6 @@ export function GroupDetailScreen({ route, navigation }) {
     setInviteUserVisible(false)
     setBackgroundOpacity(1.0)
     setEmailInvite("")
-
-
   }
 
   const confirmDeleteGroupMembership = (userId, userName) => {
@@ -214,14 +214,11 @@ export function GroupDetailScreen({ route, navigation }) {
         // console.log("deleting docref", doc.ref)
         deleteDoc(doc.ref)
         setGroupMembersUpdated(groupMembersUpdated + 1);
-
       })
     } catch (error) {
       console.error(error);
     }
   }
-
-
 
   const groupChanged = () => {
     const keys1 = Object.keys(group);
@@ -237,17 +234,12 @@ export function GroupDetailScreen({ route, navigation }) {
     return false;
   }
 
-
-
   const SaveGroup = async () => {
-
     if (!groupChanged()) {
       // console.log("!groupChanged()")
       return 0
     }
-
     // console.log("Saving group", uid, groupId)
-
     try {
       await setDoc(doc(db, "Groups", groupId), group)
     } catch (error) {
@@ -256,13 +248,11 @@ export function GroupDetailScreen({ route, navigation }) {
       alert(errorMessage);
       return 1;
     }
-
     return 0;
   }
   // console.log("group", group)
   // console.log("origGroup", origGroup)
-  console.log("REFRESHED", Date())
-
+  // console.log("REFRESHED", Date())
 
   return (
     <SafeAreaView style={[styles.safeView, { opacity: backgroundOpacity }]}>

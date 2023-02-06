@@ -33,11 +33,11 @@ export function ResourceDetailScreen({ route, navigation }) {
   const [origResource, setOrigResource] = useState({});
   const [resource, setResource] = useState({});
   const [userGroupNames, setUserGroupNames] = useState([]);
-  const [resourceGroupNames, setResourceGroupNames] = useState([]);
-  const [resourceGroupsUpdated, setResourceGroupsUpdated] = useState(0);
+  const [groupResourceNames, setGroupResourceNames] = useState([]);
+  const [groupResourcesUpdated, setGroupResourcesUpdated] = useState(0);
 
   // add task groups modal
-  const [resourceGroupPickerVisible, setResourceGroupPickerVisible] = useState(false);
+  const [groupResourcePickerVisible, setGroupResourcePickerVisible] = useState(false);
   const [backgroundOpacity, setBackgroundOpacity] = useState(1.0);
 
   useEffect(() => {
@@ -48,13 +48,14 @@ export function ResourceDetailScreen({ route, navigation }) {
       var resoureceSnap = await getResource()
 
       // promise chaining
-      var resourceGroupsSnap = await getResourceGroups()
-      var retrievedResourceGroupNames = await processResourceGroups(resourceGroupsSnap)
+      var groupResourcesSnap = await getGroupResources()
+      var retrievedGroupResourceNames = await processGroupSubcollection(groupResourcesSnap)
+      setGroupResourceNames(retrievedGroupResourceNames)
 
       var userGroupsSnap = await getUserGroups(userSnap)
-      var retrievedUserGroupNames = await processUserGroups(userGroupsSnap)
+      var retrievedUserGroupNames = await processGroupSubcollection(userGroupsSnap)
 
-      var filterGroupsResult = await filterGroups(retrievedResourceGroupNames, retrievedUserGroupNames)
+      var filterGroupsResult = await filterGroups(retrievedGroupResourceNames, retrievedUserGroupNames)
       setUserGroupNames(filterGroupsResult)
 
       async function getUser() {
@@ -67,7 +68,6 @@ export function ResourceDetailScreen({ route, navigation }) {
         }
       }
 
-      // console.log("Getting group", uid, groupId);
       async function getResource() {
         try {
           var docSnap = await getDoc(doc(db, "Resources", resourceId));
@@ -83,64 +83,64 @@ export function ResourceDetailScreen({ route, navigation }) {
       }
 
       // get resource groups for this resource
-      async function getResourceGroups() {
-        // console.log("getTaskGroups")
-        // unsubscribe = onSnapshot(
-        // get groups subcollection for the task
-        var querySnapshot = await getDocs(query(collectionGroup(db, "GroupResources"), where("resourceId", "==", resourceId)));
-        return querySnapshot
-        // console.log("reached gettaskgroups2")
-        // console.log("Setting task groups", retrievedGroupNames)
-
-      }
-      async function processResourceGroups(querySnapshot) {
-        // console.log("processUserGroups", querySnapshot.docs.length)
-
-        var retrievedGroupNames = await getGroupUsersParents(querySnapshot.docs)
-        setResourceGroupNames(retrievedGroupNames)
-        return retrievedGroupNames
-      }
-
-      function getGroupUsersParents(groupUsersSnaps) {
-        return Promise.all(groupUsersSnaps.map(async (groupUser) => {
-          const docRef = groupUser.ref;
-          const parentCollectionRef = docRef.parent; // CollectionReference
-          const immediateParentDocumentRef = parentCollectionRef.parent; // DocumentReference
-          const parentDoc = await getDoc(immediateParentDocumentRef)
-
-          return {
-            "id": parentDoc?.id,
-            "name": parentDoc?.data().name,
-          }
-        }))
+      async function getGroupResources() {
+        // get groups subcollection for the resource
+        try {
+          var querySnapshot = await getDocs(query(collectionGroup(db, "GroupResources"), where("resourceId", "==", resourceId)));
+          return querySnapshot
+        } catch (error) {
+          console.error(error);
+        }
       }
 
       async function getUserGroups(userSnap) {
-        // console.log("getUserGroups", savedTaskGroups)
-        // console.log("reached getUserGroups")
-        var querySnapshot = await getDocs(query(collectionGroup(db, 'GroupUsers'), where('userId', '==', uid)));
-        return querySnapshot
-        // console.log("Setting user groups", retrievedUserGroupNames)
+        try {
+          var querySnapshot = await getDocs(query(collectionGroup(db, 'GroupUsers'), where('userId', '==', uid)));
+          return querySnapshot
+          // console.log("Setting user groups", retrievedUserGroupNames)
+        } catch (error) {
+          console.error(error);
+        }
       }
 
-      async function processUserGroups(querySnapshot) {
-        // console.log("processUserGroups", querySnapshot.docs.length)
-
-        var retrievedGroupNames = await getGroupUsersParents(querySnapshot.docs)
-        // setUserGroupNames(retrievedGroupNames)
-        return retrievedGroupNames
+      async function processGroupSubcollection(querySnapshot) {
+        try {
+          var retrievedGroupNames = await getGroupSubcollectionParents(querySnapshot.docs)
+          return retrievedGroupNames
+        } catch (error) {
+          console.error(error);
+        }
       }
 
-      async function filterGroups(savedResourceGroups, savedUserGroups) {
+
+      async function getGroupSubcollectionParents(groupUsersSnaps) {
+        try {
+          return Promise.all(groupUsersSnaps.map(async (groupUser) => {
+            const docRef = groupUser.ref;
+            const parentCollectionRef = docRef.parent; // CollectionReference
+            const immediateParentDocumentRef = parentCollectionRef.parent; // DocumentReference
+            const parentDoc = await getDoc(immediateParentDocumentRef)
+
+            return {
+              "id": parentDoc?.id,
+              "name": parentDoc?.data().name,
+            }
+          }))
+        } catch (error) {
+          console.error(error);
+        }
+      }
+
+      async function filterGroups(savedGroupResources, savedUserGroups) {
         // check if resource is already in a group, if so don't need to save it
         const newUserGroupNames = [];
 
         for (var userGroup of savedUserGroups) {
           var alreadyInGroup = false;
-          for (var resourceGroup of savedResourceGroups) {
-            // console.log("checking", resourceGroup.name)
-            if (userGroup.id == resourceGroup.id) {
-              // console.log("Resource is in group", resourceGroup.name)
+          for (var groupResource of savedGroupResources) {
+            // console.log("checking", groupResource.name)
+            if (userGroup.id == groupResource.id) {
+              // console.log("Resource is in group", groupResource.name)
               alreadyInGroup = true;
             }
           }
@@ -157,7 +157,7 @@ export function ResourceDetailScreen({ route, navigation }) {
 
     getResoureceInfo();
 
-  }, [resourceGroupsUpdated])
+  }, [groupResourcesUpdated])
 
   const confirmDeleteGroupMembership = (groupId, groupName) => {
     Alert.alert("Remove resource from group " + groupName,
@@ -182,7 +182,7 @@ export function ResourceDetailScreen({ route, navigation }) {
       querySnapshot.forEach((doc) => {
         // console.log("deleting docref", doc.ref)
         deleteDoc(doc.ref)
-        setResourceGroupsUpdated(resourceGroupsUpdated + 1);
+        setGroupResourcesUpdated(groupResourcesUpdated + 1);
 
       })
     } catch (error) {
@@ -229,7 +229,7 @@ export function ResourceDetailScreen({ route, navigation }) {
   // console.log("REFRESHED", Date())
 
   // add a group membership
-  const addResourceGroup = async (groupId) => {
+  const addGroupResource = async (groupId) => {
     console.log("adding resource group", resourceId, groupId)
     const timestamp = Math.floor(Date.now()) //serverTimestamp();
 
@@ -239,8 +239,8 @@ export function ResourceDetailScreen({ route, navigation }) {
     }
     try {
       addDoc(collection(db, "Groups", groupId, "GroupResources"), data)
-      setResourceGroupsUpdated(resourceGroupsUpdated + 1);
-      setResourceGroupPickerVisible(false)
+      setGroupResourcesUpdated(groupResourcesUpdated + 1);
+      setGroupResourcePickerVisible(false)
       setBackgroundOpacity(1.0)
     } catch (error) {
       console.error(error);
@@ -298,7 +298,7 @@ export function ResourceDetailScreen({ route, navigation }) {
                 }}>
 
                   {
-                    resourceGroupNames.map((item) =>
+                    groupResourceNames.map((item) =>
                       <Pressable key={item.id}
                         onLongPress={() => confirmDeleteGroupMembership(item.id, item.name)}
                         onPress={() => navigation.navigate('GroupDetail', { uid: uid, groupId: item.id })}
@@ -311,7 +311,7 @@ export function ResourceDetailScreen({ route, navigation }) {
                   }
                   <Pressable
                     onPress={() => {
-                      setResourceGroupPickerVisible(true)
+                      setGroupResourcePickerVisible(true)
                       setBackgroundOpacity(.33)
                     }}
                   >
@@ -326,9 +326,9 @@ export function ResourceDetailScreen({ route, navigation }) {
                 <Modal
                   animationType="slide"
                   transparent={true}
-                  visible={resourceGroupPickerVisible}
+                  visible={groupResourcePickerVisible}
                   onRequestClose={() => {
-                    setResourceGroupPickerVisible(false)
+                    setGroupResourcePickerVisible(false)
                     setBackgroundOpacity(1.0)
                   }}>
                   <View style={styles.modalView}>
@@ -341,7 +341,7 @@ export function ResourceDetailScreen({ route, navigation }) {
                       {
                         userGroupNames.map((item) =>
                           <Pressable key={item.id}
-                            onPress={() => addResourceGroup(item.id)}
+                            onPress={() => addGroupResource(item.id)}
                           >
                             <Text style={styles.groupResourceText}>
                               {item.name}
@@ -354,7 +354,7 @@ export function ResourceDetailScreen({ route, navigation }) {
                     <Pressable
                       style={[styles.mainButton, styles.btnWarning, styles.btnNarrow]}
                       onPress={() => {
-                        setResourceGroupPickerVisible(false)
+                        setGroupResourcePickerVisible(false)
                         setBackgroundOpacity(1.0)
                       }}>
                       <Text style={[styles.buttonText]}>

@@ -48,16 +48,7 @@ export function TaskDetailScreen({ route, navigation }) {
   // opacity
   const [backgroundOpacity, setBackgroundOpacity] = useState(1.0);
   // user pool - all the users from all the groups that current user belongs to
-  const [userPool, setUserPool] = useState([
-    // {
-    //   id: "SynbJcxgL7ZcfxNTVOHA3wSkBX32",
-    //   userName: "Marco Travaglini"
-    // },
-    // {
-    //   id: "BHJBiafbJ3XrC0S20whMHVt4mic2",
-    //   userName: "Sarah Travaglini"
-    // }
-  ]);
+  const [userPool, setUserPool] = useState([]);
   const [isUserPoolLoading, setIsUserPoolLoading] = useState(true)
 
 
@@ -85,70 +76,78 @@ export function TaskDetailScreen({ route, navigation }) {
     return formattedDate.toString().slice(0, 10) + " " + formattedDate.toString().slice(16, 21)
   }
 
-  // get user 
-  useEffect(() => {
-    // console.log("Running useEffect - Getting user", uid)
-    async function getUser() {
-      try {
-        const docSnap = await getDoc(doc(db, "Users", uid));
-        setUser(docSnap.data());
-      } catch (error) {
-        console.error(error);
-      }
-    }
-    getUser();
-  }, [])
-
   // get task and related info
   useEffect(() => {
-    // console.log("Running useEffect - Getting task", taskId)
-    var unsubscribe;
-    var unsubscribe2;
 
-    // console.log("Getting task", uid, taskId);
-    async function getTask() {
-      try {
+    async function getTaskInfo() {
 
-        // get the task doc
-        var docSnap = await getDoc(doc(db, "Tasks", taskId));
-        setOrigTask(docSnap.data());
-        setTask(docSnap.data());
+      var userSnap = await getUser()
+      var taskSnap = await getTask()
 
-        // get user doc for the task creator
-        var docSnap2 = await getDoc(doc(db, "Users", docSnap.data().creator));
-        setCreatedByUser(docSnap2.data().name + " (" + docSnap2.data().email + ")")
+      // Promise Chaining
+      var taskGroupsSnap = await getTaskGroups()
+      var retrievedTaskGroupNames = await processTaskGroups(taskGroupsSnap)
+      setTaskGroupNames(retrievedTaskGroupNames)
 
-        // Promise Chaining
-        var taskGroupsSnap = await gettaskgroups()
-        var retrievedGroupNames = await processTaskGroups(taskGroupsSnap)
-        var savedTaskGroups = await saveTaskGroups(retrievedGroupNames)
-        var userGroupsSnap = await getusergroups(savedTaskGroups)
-        var retrievedGroupNames2 = await processUserGroups(userGroupsSnap)
-        var savedUserGroups = await saveUserGroups(retrievedGroupNames2)
-        var filterResult = await filterGroups(savedTaskGroups, savedUserGroups)
-        // console.log("NEW GROUPS", filterResult)
-        setUserGroupNames(filterResult)
+      var userGroupsSnap = await getUserGroups(retrievedTaskGroupNames)
+      var retrievedUserGroupNames = await processUserGroups(userGroupsSnap)
 
-        async function gettaskgroups() {
-          // console.log("gettaskgroups")
-          // unsubscribe = onSnapshot(
-          // get groups subcollection for the task
+      var filterGroupsResult = await filterGroups(retrievedTaskGroupNames, retrievedUserGroupNames)
+      setUserGroupNames(filterGroupsResult)
+
+      async function getUser() {
+        try {
+          const docSnap = await getDoc(doc(db, "Users", uid));
+          setUser(docSnap.data());
+          return docSnap;
+        } catch (error) {
+          console.error(error);
+        }
+      }
+
+      async function getTask() {
+        try {
+          // get the task doc
+          var docSnap = await getDoc(doc(db, "Tasks", taskId));
+          setOrigTask(docSnap.data());
+          setTask(docSnap.data());
+
+          // get user doc for the task creator
+          var docSnap2 = await getDoc(doc(db, "Users", docSnap.data().creator));
+          setCreatedByUser(docSnap2.data().name + " (" + docSnap2.data().email + ")")
+        } catch (error) {
+          console.error(error);
+        }
+      }
+
+      async function getTaskGroups() {
+        // console.log("getTaskGroups")
+        // unsubscribe = onSnapshot(
+        // get groups subcollection for the task
+        try {
           var querySnapshot = await getDocs(query(collection(db, "Tasks", taskId, "TaskGroups")));
           return querySnapshot
           // console.log("reached gettaskgroups2")
-          // console.log("Setting task groups", retrievedGroupNames)
-
+          // console.log("Setting task groups", retrievedTaskGroupNames)
+        } catch (error) {
+          console.error(error);
         }
+      }
 
-        async function processTaskGroups(querySnapshot) {
-          // console.log("processTaskGroups", querySnapshot.docs.length)
-          var retrievedGroupNames = await getTaskGroupParents(querySnapshot.docs)
-          return retrievedGroupNames
+      async function processTaskGroups(querySnapshot) {
+        // console.log("processTaskGroups", querySnapshot.docs.length)
+        try {
+          var retrievedTaskGroupNames = await getTaskGroupParents(querySnapshot.docs)
+          return retrievedTaskGroupNames
+        } catch (error) {
+          console.error(error);
         }
+      }
 
 
 
-        async function getTaskGroupParents(taskGroupSnaps) {
+      async function getTaskGroupParents(taskGroupSnaps) {
+        try {
           return Promise.all(taskGroupSnaps.map(async (taskGroup) => {
 
             const groupId = taskGroup.data().groupId;
@@ -159,96 +158,74 @@ export function TaskDetailScreen({ route, navigation }) {
               "name": parentDoc?.data().name,
             }
           }))
+        } catch (error) {
+          console.error(error);
         }
+      }
 
-        async function saveTaskGroups(retrievedGroupNames) {
-          // console.log("saveTaskGroups", retrievedGroupNames)
-
-          setTaskGroupNames(retrievedGroupNames)
-          return retrievedGroupNames
-        }
-
-        async function getusergroups(savedTaskGroups) {
-          // console.log("getusergroups", savedTaskGroups)
-          // console.log("reached getusergroups")
+      async function getUserGroups(savedTaskGroups) {
+        try {
           var querySnapshot = await getDocs(query(collectionGroup(db, 'GroupUsers'), where('userId', '==', uid)));
           return querySnapshot
-          // console.log("Setting user groups", retrievedGroupNames2)
+        } catch (error) {
+          console.error(error);
         }
+      }
 
-        async function processUserGroups(querySnapshot) {
-          // console.log("processUserGroups", querySnapshot.docs.length)
-
-          var retrievedGroupNames2 = await getGroupUsersParents(querySnapshot.docs)
-          return retrievedGroupNames2
+      async function processUserGroups(querySnapshot) {
+        try {
+          var retrievedUserGroupNames = await getGroupUsersParents(querySnapshot.docs)
+          return retrievedUserGroupNames
+        } catch (error) {
+          console.error(error);
         }
+      }
 
-        function getGroupUsersParents(groupUsersSnaps) {
+      async function getGroupUsersParents(groupUsersSnaps) {
+        try {
           return Promise.all(groupUsersSnaps.map(async (groupUser) => {
             const docRef = groupUser.ref;
             const parentCollectionRef = docRef.parent; // CollectionReference
             const immediateParentDocumentRef = parentCollectionRef.parent; // DocumentReference
             const parentDoc = await getDoc(immediateParentDocumentRef)
 
-
             return {
               "id": parentDoc?.id,
               "name": parentDoc?.data().name,
             }
-
-
-
           }))
+        } catch (error) {
+          console.error(error);
         }
+      }
 
-        async function saveUserGroups(retrievedGroupNames2) {
-          // console.log("saveUserGroups", retrievedGroupNames2)
-          setUserGroupNames(retrievedGroupNames2)
-          return retrievedGroupNames2
-        }
+      async function filterGroups(savedTaskGroups, savedUserGroups) {
+        // check if task is already in a group, if so don't need to save it
 
+        const newUserGroupNames = [];
 
-        async function filterGroups(savedTaskGroups, savedUserGroups) {
-          // console.log("filterGroups", savedTaskGroups.length)
-
-          // check if task is already in a group, if so don't need to save it
-
-          const newUserGroupNames = [];
-
-          for (var userGroup of savedUserGroups) {
-            var alreadyInGroup = false;
-            for (var taskGroup of savedTaskGroups) {
-              // console.log("checking", taskGroup.name)
-              if (userGroup.id == taskGroup.id) {
-                // console.log("Task is in group", taskGroup.name)
-                alreadyInGroup = true;
-              }
-            }
-
-            if (!alreadyInGroup) {
-              newUserGroupNames.push(userGroup)
+        for (var userGroup of savedUserGroups) {
+          var alreadyInGroup = false;
+          for (var taskGroup of savedTaskGroups) {
+            // console.log("checking", taskGroup.name)
+            if (userGroup.id == taskGroup.id) {
+              // console.log("Task is in group", taskGroup.name)
+              alreadyInGroup = true;
             }
           }
 
-
-
-          // console.log("contents of newusergroupnames", newUserGroupNames.length)
-          return newUserGroupNames
+          if (!alreadyInGroup) {
+            newUserGroupNames.push(userGroup)
+          }
         }
 
-
-      } catch (error) {
-        console.error(error);
+        // console.log("contents of newusergroupnames", newUserGroupNames.length)
+        return newUserGroupNames
       }
     }
 
-    getTask();
+    getTaskInfo();
 
-    return function cleanup() {
-      // unsubscribe();
-      // unsubscribe2();
-
-    };
   }, [taskGroupUpdated])
 
 
@@ -256,11 +233,9 @@ export function TaskDetailScreen({ route, navigation }) {
 
 
   const getUserPool = async () => {
-
     // get all the groups for the current user
     async function getGroupUsers() {
       try {
-        // console.log("getting groupusers for", uid)
         querySnapshot = await getDocs(query(collectionGroup(db, "GroupUsers"), where('userId', '==', uid)))
         return querySnapshot
       } catch (error) {
@@ -270,13 +245,11 @@ export function TaskDetailScreen({ route, navigation }) {
 
     // process each groupid for the current user
     async function processGroupUsers(querySnapshot) {
-      // console.log("processGroupUsers", querySnapshot.docs.length)
       var retrievedGroupIds = await getGroupUsersDetails(querySnapshot.docs)
-      // console.log("retrievedUserNames", retrievedUserNames)
       return retrievedGroupIds
     }
 
-    function getGroupUsersDetails(groupUsersSnaps) {
+    async function getGroupUsersDetails(groupUsersSnaps) {
       return Promise.all(groupUsersSnaps.map(async (groupUser) => {
         const docRef = groupUser.ref;
         const parentCollectionRef = docRef.parent; // GroupUsers CollectionReference
@@ -292,7 +265,7 @@ export function TaskDetailScreen({ route, navigation }) {
       // use a set to just store unique values
       var userArray = new Set();
 
-      for (groupId of groupArray) {
+      for (var groupId of groupArray) {
         // console.log("Getting users for group", groupId)
         querySnapshot = await getDocs(query(collection(db, "Groups", groupId, "GroupUsers")));
         querySnapshot.forEach((doc) => {
@@ -480,34 +453,34 @@ export function TaskDetailScreen({ route, navigation }) {
   // console.log("============================================= render")
 
   return (
-    <SafeAreaView style={[styles.safeView, {flex: 1,  opacity: backgroundOpacity }]}>
+    <SafeAreaView style={[styles.safeView, { flex: 1, opacity: backgroundOpacity }]}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         {/* <TouchableWithoutFeedback style={{flex: 1}} onPress={Keyboard.dismiss}> */}
-          <View style={{flex: 1}}>
+        <View style={{ flex: 1 }}>
 
-            <Title
-              title="Task Details"
-              name={user.name}
-              navigation={navigation} />
+          <Title
+            title="Task Details"
+            name={user.name}
+            navigation={navigation} />
 
-            <ScrollView style={{ height: "81%", marginBottom: 15 }}>
+          <ScrollView style={{ height: "81%", marginBottom: 15 }}>
 
-              <View style={styles.inputFormContainer}>
-                <Text style={styles.inputLabel}>Created by {createdByUser}</Text>
-                <Text style={styles.inputLabel}>Created on {new Date(task.createdDate).toString().slice(0, 24)}</Text>
+            <View style={styles.inputFormContainer}>
+              <Text style={styles.inputLabel}>Created by {createdByUser}</Text>
+              <Text style={styles.inputLabel}>Created on {new Date(task.createdDate).toString().slice(0, 24)}</Text>
 
-                <Text style={[styles.inputLabel, { paddingTop: 15 }]}>Name</Text>
-                <TextInput
-                  style={styles.input}
-                  onChangeText={(newValue) => { setTask((prevState) => ({ ...prevState, name: newValue })) }}
-                  value={task.name}
-                  underlineColorAndroid='transparent'
-                  autoCapitalize='none'
-                />
+              <Text style={[styles.inputLabel, { paddingTop: 15 }]}>Name</Text>
+              <TextInput
+                style={styles.input}
+                onChangeText={(newValue) => { setTask((prevState) => ({ ...prevState, name: newValue })) }}
+                value={task.name}
+                underlineColorAndroid='transparent'
+                autoCapitalize='none'
+              />
 
-                {/* <TextInput
+              {/* <TextInput
                   readOnly={true}
                   style={styles.input}
                   // onChangeText={(newValue) => { setTask((prevState) => ({ ...prevState, creator: newValue })) }}
@@ -517,103 +490,103 @@ export function TaskDetailScreen({ route, navigation }) {
                   autoCapitalize='none'
                 /> */}
 
-                <Text style={styles.inputLabel}>Notes</Text>
-                <TextInput
-                  style={[styles.input, {
-                    paddingTop: 10,
-                    height: 120,
-                    textAlignVertical: "top" // android fix for centering it at the top-left corner 
-                  }]}
-                  multiline={true} // ios fix for centering it at the top-left corner 
-                  onChangeText={(newValue) => { setTask((prevState) => ({ ...prevState, notes: newValue })) }}
-                  value={task.notes}
-                  underlineColorAndroid='transparent'
-                  autoCapitalize='none'
-                />
+              <Text style={styles.inputLabel}>Notes</Text>
+              <TextInput
+                style={[styles.input, {
+                  paddingTop: 10,
+                  height: 120,
+                  textAlignVertical: "top" // android fix for centering it at the top-left corner 
+                }]}
+                multiline={true} // ios fix for centering it at the top-left corner 
+                onChangeText={(newValue) => { setTask((prevState) => ({ ...prevState, notes: newValue })) }}
+                value={task.notes}
+                underlineColorAndroid='transparent'
+                autoCapitalize='none'
+              />
 
-                <View style={{ flexDirection: "row" }}>
+              <View style={{ flexDirection: "row" }}>
 
-                  <View style={{ flexDirection: "column", flex: 1 }}>
-                    <Text style={styles.inputLabel}>Start After</Text>
-                    <Pressable
-                      onPress={() => {
-                        setStartDatePickerVisibility(true)
-                        setBackgroundOpacity(0.33)
-                      }}>
-                      <Text style={styles.dateText}>
-                        {formatDate(task.startDate)}
-                      </Text>
-                    </Pressable>
-                  </View>
-
-                  <View>
-                    <TouchableOpacity title="Show Date Picker">
-                      <DateTimePickerModal
-                        isVisible={isStartDatePickerVisible}
-                        mode="datetime"
-                        date={new Date(task.startDate)}
-                        maximumDate={new Date(task.endDate)}
-                        onConfirm={handleStartDatePickerConfirm}
-                        onCancel={() => {
-                          setStartDatePickerVisibility(false)
-                          setBackgroundOpacity(1.0)
-                        }}
-                      />
-                    </TouchableOpacity>
-                  </View>
-
-                  <View style={{ flexDirection: "column", flex: 1 }}>
-                    <Text style={styles.inputLabel}>Finish by</Text>
-                    <Pressable
-                      onPress={() => {
-                        setEndDatePickerVisibility(true)
-                        setBackgroundOpacity(0.33)
-                      }}>
-                      <Text style={styles.dateText}>
-                        {formatDate(task.endDate)}
-                      </Text>
-                    </Pressable>
-                  </View>
-
-                  <View>
-                    <TouchableOpacity title="Show Date Picker">
-                      <DateTimePickerModal
-                        isVisible={isEndDatePickerVisible}
-                        mode="datetime"
-                        date={new Date(task.endDate)}
-                        minimumDate={new Date(task.startDate)}
-                        onConfirm={handleEndDatePickerConfirm}
-                        onCancel={() => {
-                          setEndDatePickerVisibility(false)
-                          setBackgroundOpacity(1.0)
-                        }}
-                      />
-                    </TouchableOpacity>
-                  </View>
-
+                <View style={{ flexDirection: "column", flex: 1 }}>
+                  <Text style={styles.inputLabel}>Start After</Text>
+                  <Pressable
+                    onPress={() => {
+                      setStartDatePickerVisibility(true)
+                      setBackgroundOpacity(0.33)
+                    }}>
+                    <Text style={styles.dateText}>
+                      {formatDate(task.startDate)}
+                    </Text>
+                  </Pressable>
                 </View>
 
-                <View style={{ flexDirection: "row" }}>
-                  <View style={{ flexDirection: "column", flex: 1 }}>
-                    <Text style={styles.inputLabel}>Priority</Text>
-                    <InputSpinner
-                      skin={"clean"}
-                      height={48}
-                      width={150}
-                      style={[styles.input, {
-                        borderRadius: 15,
-                        shadowColor: "cornflowerblue"
-                      }]}
-                      shadow={false}
-                      max={10}
-                      min={0}
-                      step={1}
-                      // colorMax={"#f04048"}
-                      // colorMin={"#40c5f4"}
-                      value={task.priority?.toString()}
-                      onChange={(newValue) => { setTask((prevState) => ({ ...prevState, priority: +newValue })) }}
+                <View>
+                  <TouchableOpacity title="Show Date Picker">
+                    <DateTimePickerModal
+                      isVisible={isStartDatePickerVisible}
+                      mode="datetime"
+                      date={new Date(task.startDate)}
+                      maximumDate={new Date(task.endDate)}
+                      onConfirm={handleStartDatePickerConfirm}
+                      onCancel={() => {
+                        setStartDatePickerVisibility(false)
+                        setBackgroundOpacity(1.0)
+                      }}
                     />
-                    {/* <TextInput
+                  </TouchableOpacity>
+                </View>
+
+                <View style={{ flexDirection: "column", flex: 1 }}>
+                  <Text style={styles.inputLabel}>Finish by</Text>
+                  <Pressable
+                    onPress={() => {
+                      setEndDatePickerVisibility(true)
+                      setBackgroundOpacity(0.33)
+                    }}>
+                    <Text style={styles.dateText}>
+                      {formatDate(task.endDate)}
+                    </Text>
+                  </Pressable>
+                </View>
+
+                <View>
+                  <TouchableOpacity title="Show Date Picker">
+                    <DateTimePickerModal
+                      isVisible={isEndDatePickerVisible}
+                      mode="datetime"
+                      date={new Date(task.endDate)}
+                      minimumDate={new Date(task.startDate)}
+                      onConfirm={handleEndDatePickerConfirm}
+                      onCancel={() => {
+                        setEndDatePickerVisibility(false)
+                        setBackgroundOpacity(1.0)
+                      }}
+                    />
+                  </TouchableOpacity>
+                </View>
+
+              </View>
+
+              <View style={{ flexDirection: "row" }}>
+                <View style={{ flexDirection: "column", flex: 1 }}>
+                  <Text style={styles.inputLabel}>Priority</Text>
+                  <InputSpinner
+                    skin={"clean"}
+                    height={48}
+                    width={150}
+                    style={[styles.input, {
+                      borderRadius: 15,
+                      shadowColor: "cornflowerblue"
+                    }]}
+                    shadow={false}
+                    max={10}
+                    min={0}
+                    step={1}
+                    // colorMax={"#f04048"}
+                    // colorMin={"#40c5f4"}
+                    value={task.priority?.toString()}
+                    onChange={(newValue) => { setTask((prevState) => ({ ...prevState, priority: +newValue })) }}
+                  />
+                  {/* <TextInput
                       style={styles.input}
                       onChangeText={(newValue) => { setTask((prevState) => ({ ...prevState, priority: +newValue })) }}
                       value={task.priority?.toString()}
@@ -621,31 +594,31 @@ export function TaskDetailScreen({ route, navigation }) {
                       autoCapitalize='none'
                       keyboardType="numeric"
                     /> */}
-                  </View>
+                </View>
 
-                  <View style={{ flexDirection: "column", flex: 1 }}>
-                    <Text style={styles.inputLabel}>Effort</Text>
-                    <InputSpinner
-                      skin={"clean"}
-                      height={48}
-                      width={150}
-                      style={[styles.input, {
-                        borderRadius: 15,
-                        shadowColor: "cornflowerblue"
-                      }]}
-                      shadow={false}
-                      max={10080}
-                      min={10}
-                      step={5}
-                      longStep={30}
-                      speed={4}
-                      // colorMax={"#f04048"}
-                      // colorMin={"#40c5f4"}
-                      value={task.effort?.toString()}
-                      // value={formatEffort(task.effort)}
-                      onChange={(newValue) => { setTask((prevState) => ({ ...prevState, effort: +newValue })) }}
-                    />
-                    {/* <TextInput
+                <View style={{ flexDirection: "column", flex: 1 }}>
+                  <Text style={styles.inputLabel}>Effort</Text>
+                  <InputSpinner
+                    skin={"clean"}
+                    height={48}
+                    width={150}
+                    style={[styles.input, {
+                      borderRadius: 15,
+                      shadowColor: "cornflowerblue"
+                    }]}
+                    shadow={false}
+                    max={10080}
+                    min={10}
+                    step={5}
+                    longStep={30}
+                    speed={4}
+                    // colorMax={"#f04048"}
+                    // colorMin={"#40c5f4"}
+                    value={task.effort?.toString()}
+                    // value={formatEffort(task.effort)}
+                    onChange={(newValue) => { setTask((prevState) => ({ ...prevState, effort: +newValue })) }}
+                  />
+                  {/* <TextInput
                       style={[styles.input]}
                       onChangeText={(newValue) => { setTask((prevState) => ({ ...prevState, effort: +newValue })) }}
                       value={task.effort?.toString()}
@@ -653,10 +626,10 @@ export function TaskDetailScreen({ route, navigation }) {
                       autoCapitalize='none'
                       keyboardType="numeric"
                     /> */}
-                  </View>
                 </View>
+              </View>
 
-                {/* <Text style={styles.inputLabel}>Group</Text>
+              {/* <Text style={styles.inputLabel}>Group</Text>
                 <TextInput
                   style={styles.input}
                   value={task.taskGroup}
@@ -664,8 +637,8 @@ export function TaskDetailScreen({ route, navigation }) {
                   autoCapitalize='none'
                 /> */}
 
-                <Text style={styles.inputLabel}>Groups</Text>
-                {/* <FlatList style={{ height: "5%", marginBottom: 15, marginLeft: "1%" }}
+              <Text style={styles.inputLabel}>Groups</Text>
+              {/* <FlatList style={{ height: "5%", marginBottom: 15, marginLeft: "1%" }}
                   data={taskGroupNames}
                   ListEmptyComponent={<Text style={[styles.listText, { alignSelf: "center" }]}>
                     Task has no groups.
@@ -684,33 +657,33 @@ export function TaskDetailScreen({ route, navigation }) {
                 /> */}
 
 
-                <View style={{ marginBottom: 15, alignItems: "flex-start", flexWrap: "wrap", flexDirection: "row" }}>
-                  {
-                    taskGroupNames.map((item) =>
-                      <Pressable key={item.id}
-                        onPress={() => navigation.navigate('GroupDetail', { uid: uid, groupId: item.id })}
-                        onLongPress={() => confirmDelete(item.id, item.name)}
-                      >
-                        <Text style={styles.groupResourceText}>
-                          {item.name}
-                        </Text>
-                      </Pressable>
-                    )
-                  }
-                  <Pressable
-                    onPress={() => {
-                      setTaskGroupPickerVisible(true)
-                      setBackgroundOpacity(.33)
-                    }}
-                  >
-                    <Text style={styles.groupResourceText}>
-                      +
-                    </Text>
-                  </Pressable>
+              <View style={{ marginBottom: 15, alignItems: "flex-start", flexWrap: "wrap", flexDirection: "row" }}>
+                {
+                  taskGroupNames.map((item) =>
+                    <Pressable key={item.id}
+                      onPress={() => navigation.navigate('GroupDetail', { uid: uid, groupId: item.id })}
+                      onLongPress={() => confirmDelete(item.id, item.name)}
+                    >
+                      <Text style={styles.groupResourceText}>
+                        {item.name}
+                      </Text>
+                    </Pressable>
+                  )
+                }
+                <Pressable
+                  onPress={() => {
+                    setTaskGroupPickerVisible(true)
+                    setBackgroundOpacity(.33)
+                  }}
+                >
+                  <Text style={styles.groupResourceText}>
+                    +
+                  </Text>
+                </Pressable>
 
 
 
-                  {/* {
+                {/* {
                     userGroupNames.map((item) =>
                       <Pressable key={item.id}
                         onPress={() => addTaskGroup(item.id)}
@@ -726,55 +699,55 @@ export function TaskDetailScreen({ route, navigation }) {
 
 
 
-                </View>
+              </View>
 
 
-                {/* modal for selecting groups  */}
-                <Modal
-                  animationType="slide"
-                  transparent={true}
-                  visible={taskGroupPickerVisible}
-                  onRequestClose={() => {
-                    setTaskGroupPickerVisible(false)
-                    setBackgroundOpacity(1.0)
-                  }}>
-                  <View style={styles.modalView}>
-                    <Text style={styles.pageTitleText}>Add Task to Groups</Text>
+              {/* modal for selecting groups  */}
+              <Modal
+                animationType="slide"
+                transparent={true}
+                visible={taskGroupPickerVisible}
+                onRequestClose={() => {
+                  setTaskGroupPickerVisible(false)
+                  setBackgroundOpacity(1.0)
+                }}>
+                <View style={styles.modalView}>
+                  <Text style={styles.pageTitleText}>Add Task to Groups</Text>
 
-                    <Text style={[styles.inputLabel, { paddingTop: 15, alignSelf: 'flex-start' }]}>Groups</Text>
+                  <Text style={[styles.inputLabel, { paddingTop: 15, alignSelf: 'flex-start' }]}>Groups</Text>
 
-                    <View style={{ marginBottom: 15, alignItems: "flex-start", flexWrap: "wrap", flexDirection: "row" }}>
+                  <View style={{ marginBottom: 15, alignItems: "flex-start", flexWrap: "wrap", flexDirection: "row" }}>
 
-                      {
-                        userGroupNames.map((item) =>
-                          <Pressable key={item.id}
-                            onPress={() => addTaskGroup(item.id)}
-                          >
-                            <Text style={styles.groupResourceText}>
-                              {item.name}
-                            </Text>
-                          </Pressable>
-                        )
-                      }
-                    </View>
-
-                    <Pressable
-                      style={[styles.mainButton, styles.btnWarning, styles.btnNarrow]}
-                      onPress={() => {
-                        setTaskGroupPickerVisible(false)
-                        setBackgroundOpacity(1.0)
-                      }}>
-                      <Text style={[styles.buttonText]}>
-                        <FontAwesome
-                          style={[{ fontSize: 35 }]}
-                          name='arrow-circle-o-left'
-                          color='white'
-                        />
-                      </Text>
-                    </Pressable>
-
+                    {
+                      userGroupNames.map((item) =>
+                        <Pressable key={item.id}
+                          onPress={() => addTaskGroup(item.id)}
+                        >
+                          <Text style={styles.groupResourceText}>
+                            {item.name}
+                          </Text>
+                        </Pressable>
+                      )
+                    }
                   </View>
-                </Modal>
+
+                  <Pressable
+                    style={[styles.mainButton, styles.btnWarning, styles.btnNarrow]}
+                    onPress={() => {
+                      setTaskGroupPickerVisible(false)
+                      setBackgroundOpacity(1.0)
+                    }}>
+                    <Text style={[styles.buttonText]}>
+                      <FontAwesome
+                        style={[{ fontSize: 35 }]}
+                        name='arrow-circle-o-left'
+                        color='white'
+                      />
+                    </Text>
+                  </Pressable>
+
+                </View>
+              </Modal>
 
 
 
@@ -785,17 +758,17 @@ export function TaskDetailScreen({ route, navigation }) {
 
 
 
-                <Text style={styles.inputLabel}>Resources</Text>
-                <TextInput
-                  style={styles.input}
-                  value={task.taskResources}
-                  underlineColorAndroid='transparent'
-                  autoCapitalize='none'
-                />
+              <Text style={styles.inputLabel}>Resources</Text>
+              <TextInput
+                style={styles.input}
+                value={task.taskResources}
+                underlineColorAndroid='transparent'
+                autoCapitalize='none'
+              />
 
 
 
-<View style={{ alignItems: "center" }}>
+              <View style={{ alignItems: "center" }}>
                 <Pressable style={[styles.secondaryButton]}
                   onPress={async () => {
                     await getUserPool()
@@ -808,93 +781,93 @@ export function TaskDetailScreen({ route, navigation }) {
                     Reassign Task
                   </Text>
                 </Pressable>
-</View>
-                {/* modal for reassigning task  */}
-                <Modal
-                  animationType="slide"
-                  transparent={true}
-                  visible={reassignVisible}
-                  onRequestClose={() => {
-                    setReassignVisible(false)
-                    setBackgroundOpacity(1.0)
-                  }}>
-                  <View style={styles.modalView}>
-                    <Text style={styles.pageTitleText}>Reassign Task</Text>
-
-                    <Text style={[styles.inputLabel, { paddingTop: 15, alignSelf: 'flex-start' }]}>Select user to reassign task</Text>
-
-
-                    {isUserPoolLoading ?
-                      (
-                        <ActivityIndicator size="large" color="cornflowerblue" />
-                      )
-                      :
-                      (
-                        <View style={{ marginBottom: 15, alignItems: "flex-start", flexWrap: "wrap", flexDirection: "row" }}>
-
-                          {
-                            userPool.map((item) =>
-                              <Pressable key={item.id}
-                                onPress={() => {
-                                  reassignTask(item.id, item.userName)
-                                }}
-                              >
-                                <Text style={styles.groupResourceText}>
-                                  {item.userName}
-                                </Text>
-                              </Pressable>
-                            )
-                          }
-                        </View>
-                      )}
-
-                    <Pressable
-                      style={[styles.mainButton, styles.btnWarning, styles.btnNarrow]}
-                      onPress={() => {
-                        setReassignVisible(false)
-                        setBackgroundOpacity(1.0)
-                      }}>
-                      <Text style={[styles.buttonText]}>
-                        <FontAwesome
-                          style={[{ fontSize: 35 }]}
-                          name='arrow-circle-o-left'
-                          color='white'
-                        />
-                      </Text>
-                    </Pressable>
-
-                  </View>
-                </Modal>
-
-
-
-                <View style={{ alignItems: "center" }}>
-                  <TouchableOpacity style={[styles.mainButton, styles.btnSuccess, { opacity: (!taskChanged()) ? 0.5 : 1.0 }]}
-                    disabled={!taskChanged()}
-                    onPress={async () => {
-                      await SaveTask().then(
-                        (result) => {
-                          if (result == 0) {
-                            navigation.goBack();
-                          }
-                        }
-                      )
-                    }}
-                  >
-                    <Text
-                      style={[styles.buttonText]}
-                    >Save
-                    </Text>
-                  </TouchableOpacity>
-                </View>
               </View>
-            </ScrollView>
+              {/* modal for reassigning task  */}
+              <Modal
+                animationType="slide"
+                transparent={true}
+                visible={reassignVisible}
+                onRequestClose={() => {
+                  setReassignVisible(false)
+                  setBackgroundOpacity(1.0)
+                }}>
+                <View style={styles.modalView}>
+                  <Text style={styles.pageTitleText}>Reassign Task</Text>
 
-            <Footer auth={auth}
-              navigation={navigation}
-              uid={uid} />
+                  <Text style={[styles.inputLabel, { paddingTop: 15, alignSelf: 'flex-start' }]}>Select user to reassign task</Text>
 
-          </View>
+
+                  {isUserPoolLoading ?
+                    (
+                      <ActivityIndicator size="large" color="cornflowerblue" />
+                    )
+                    :
+                    (
+                      <View style={{ marginBottom: 15, alignItems: "flex-start", flexWrap: "wrap", flexDirection: "row" }}>
+
+                        {
+                          userPool.map((item) =>
+                            <Pressable key={item.id}
+                              onPress={() => {
+                                reassignTask(item.id, item.userName)
+                              }}
+                            >
+                              <Text style={styles.groupResourceText}>
+                                {item.userName}
+                              </Text>
+                            </Pressable>
+                          )
+                        }
+                      </View>
+                    )}
+
+                  <Pressable
+                    style={[styles.mainButton, styles.btnWarning, styles.btnNarrow]}
+                    onPress={() => {
+                      setReassignVisible(false)
+                      setBackgroundOpacity(1.0)
+                    }}>
+                    <Text style={[styles.buttonText]}>
+                      <FontAwesome
+                        style={[{ fontSize: 35 }]}
+                        name='arrow-circle-o-left'
+                        color='white'
+                      />
+                    </Text>
+                  </Pressable>
+
+                </View>
+              </Modal>
+
+
+
+              <View style={{ alignItems: "center" }}>
+                <TouchableOpacity style={[styles.mainButton, styles.btnSuccess, { opacity: (!taskChanged()) ? 0.5 : 1.0 }]}
+                  disabled={!taskChanged()}
+                  onPress={async () => {
+                    await SaveTask().then(
+                      (result) => {
+                        if (result == 0) {
+                          navigation.goBack();
+                        }
+                      }
+                    )
+                  }}
+                >
+                  <Text
+                    style={[styles.buttonText]}
+                  >Save
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </ScrollView>
+
+          <Footer auth={auth}
+            navigation={navigation}
+            uid={uid} />
+
+        </View>
         {/* </TouchableWithoutFeedback> */}
       </KeyboardAvoidingView>
     </SafeAreaView>
