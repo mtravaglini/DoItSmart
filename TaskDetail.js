@@ -49,7 +49,7 @@ export function TaskDetailScreen({ route, navigation }) {
   const [backgroundOpacity, setBackgroundOpacity] = useState(1.0);
   // user pool - all the users from all the groups that current user belongs to
   const [userPool, setUserPool] = useState([]);
-  const [isUserPoolLoading, setIsUserPoolLoading] = useState(true)
+  const [isTaskDetailLoading, setIsTaskDetailLoading] = useState(true)
 
 
   const handleStartDatePickerConfirm = (date) => {
@@ -94,6 +94,10 @@ export function TaskDetailScreen({ route, navigation }) {
 
       var filterGroupsResult = await filterGroups(retrievedTaskGroupNames, retrievedUserGroupNames)
       setUserGroupNames(filterGroupsResult)
+
+      // get info for reassigning tasks
+      var userArray = await processGroups(retrievedUserGroupNames)
+      var userNameArray = await processUsers(userArray)
 
       async function getUser() {
         try {
@@ -224,41 +228,6 @@ export function TaskDetailScreen({ route, navigation }) {
       }
     }
 
-    getTaskInfo();
-
-  }, [taskGroupUpdated])
-
-
-
-
-
-  const getUserPool = async () => {
-    // get all the groups for the current user
-    async function getGroupUsers() {
-      try {
-        querySnapshot = await getDocs(query(collectionGroup(db, "GroupUsers"), where('userId', '==', uid)))
-        return querySnapshot
-      } catch (error) {
-        console.error(error);
-      }
-    }
-
-    // process each groupid for the current user
-    async function processGroupUsers(querySnapshot) {
-      var retrievedGroupIds = await getGroupUsersDetails(querySnapshot.docs)
-      return retrievedGroupIds
-    }
-
-    async function getGroupUsersDetails(groupUsersSnaps) {
-      return Promise.all(groupUsersSnaps.map(async (groupUser) => {
-        const docRef = groupUser.ref;
-        const parentCollectionRef = docRef.parent; // GroupUsers CollectionReference
-        const immediateParentDocumentRef = parentCollectionRef.parent; // Groups DocumentReference
-        const parentDoc = await getDoc(immediateParentDocumentRef)
-        return parentDoc.id
-      }))
-    }
-
     // get all the users in each groupid 
     async function processGroups(groupArray) {
       // console.log("processGroups", groupArray)
@@ -267,7 +236,7 @@ export function TaskDetailScreen({ route, navigation }) {
 
       for (var groupId of groupArray) {
         // console.log("Getting users for group", groupId)
-        querySnapshot = await getDocs(query(collection(db, "Groups", groupId, "GroupUsers")));
+        querySnapshot = await getDocs(query(collection(db, "Groups", groupId.id, "GroupUsers")));
         querySnapshot.forEach((doc) => {
           // console.log("xxxxx",groupId, doc.data().userId, uid)
           if (doc.data().userId !== uid) {
@@ -302,18 +271,12 @@ export function TaskDetailScreen({ route, navigation }) {
       return userNameArray
     }
 
+    getTaskInfo();
+    // for (var x = 0; x<1000000000; x++){var i=x}
 
-    var groupUsersSnaps = await getGroupUsers()
-    // console.log("################ groups for this user", groupUsersSnaps.docs.length)
-    var groupArray = await processGroupUsers(groupUsersSnaps)
-    // console.log("################ groups for this user", groupArray)
-    var userArray = await processGroups(groupArray)
-    // console.log("################ userids in all those groups", userArray)
-    var userNameArray = await processUsers(userArray)
-    console.log("################", userNameArray)
+    setIsTaskDetailLoading(false)
 
-    setIsUserPoolLoading(false)
-  }
+  }, [taskGroupUpdated])
 
 
   const reassignTask = async (userId, userName) => {
@@ -465,22 +428,28 @@ export function TaskDetailScreen({ route, navigation }) {
             name={user.name}
             navigation={navigation} />
 
-          <ScrollView style={{ height: "81%", marginBottom: 15 }}>
+          {isTaskDetailLoading ?
+            (
+              <ActivityIndicator size="large" color="cornflowerblue" />
+            )
+            :
+            (
+              <ScrollView style={{ height: "81%", marginBottom: 15 }}>
 
-            <View style={styles.inputFormContainer}>
-              <Text style={styles.inputLabel}>Created by {createdByUser}</Text>
-              <Text style={styles.inputLabel}>Created on {new Date(task.createdDate).toString().slice(0, 24)}</Text>
+                <View style={styles.inputFormContainer}>
+                  <Text style={styles.inputLabel}>Created by {createdByUser}</Text>
+                  <Text style={styles.inputLabel}>Created on {new Date(task.createdDate).toString().slice(0, 24)}</Text>
 
-              <Text style={[styles.inputLabel, { paddingTop: 15 }]}>Name</Text>
-              <TextInput
-                style={styles.input}
-                onChangeText={(newValue) => { setTask((prevState) => ({ ...prevState, name: newValue })) }}
-                value={task.name}
-                underlineColorAndroid='transparent'
-                autoCapitalize='none'
-              />
+                  <Text style={[styles.inputLabel, { paddingTop: 15 }]}>Name</Text>
+                  <TextInput
+                    style={styles.input}
+                    onChangeText={(newValue) => { setTask((prevState) => ({ ...prevState, name: newValue })) }}
+                    value={task.name}
+                    underlineColorAndroid='transparent'
+                    autoCapitalize='none'
+                  />
 
-              {/* <TextInput
+                  {/* <TextInput
                   readOnly={true}
                   style={styles.input}
                   // onChangeText={(newValue) => { setTask((prevState) => ({ ...prevState, creator: newValue })) }}
@@ -490,103 +459,103 @@ export function TaskDetailScreen({ route, navigation }) {
                   autoCapitalize='none'
                 /> */}
 
-              <Text style={styles.inputLabel}>Notes</Text>
-              <TextInput
-                style={[styles.input, {
-                  paddingTop: 10,
-                  height: 120,
-                  textAlignVertical: "top" // android fix for centering it at the top-left corner 
-                }]}
-                multiline={true} // ios fix for centering it at the top-left corner 
-                onChangeText={(newValue) => { setTask((prevState) => ({ ...prevState, notes: newValue })) }}
-                value={task.notes}
-                underlineColorAndroid='transparent'
-                autoCapitalize='none'
-              />
-
-              <View style={{ flexDirection: "row" }}>
-
-                <View style={{ flexDirection: "column", flex: 1 }}>
-                  <Text style={styles.inputLabel}>Start After</Text>
-                  <Pressable
-                    onPress={() => {
-                      setStartDatePickerVisibility(true)
-                      setBackgroundOpacity(0.33)
-                    }}>
-                    <Text style={styles.dateText}>
-                      {formatDate(task.startDate)}
-                    </Text>
-                  </Pressable>
-                </View>
-
-                <View>
-                  <TouchableOpacity title="Show Date Picker">
-                    <DateTimePickerModal
-                      isVisible={isStartDatePickerVisible}
-                      mode="datetime"
-                      date={new Date(task.startDate)}
-                      maximumDate={new Date(task.endDate)}
-                      onConfirm={handleStartDatePickerConfirm}
-                      onCancel={() => {
-                        setStartDatePickerVisibility(false)
-                        setBackgroundOpacity(1.0)
-                      }}
-                    />
-                  </TouchableOpacity>
-                </View>
-
-                <View style={{ flexDirection: "column", flex: 1 }}>
-                  <Text style={styles.inputLabel}>Finish by</Text>
-                  <Pressable
-                    onPress={() => {
-                      setEndDatePickerVisibility(true)
-                      setBackgroundOpacity(0.33)
-                    }}>
-                    <Text style={styles.dateText}>
-                      {formatDate(task.endDate)}
-                    </Text>
-                  </Pressable>
-                </View>
-
-                <View>
-                  <TouchableOpacity title="Show Date Picker">
-                    <DateTimePickerModal
-                      isVisible={isEndDatePickerVisible}
-                      mode="datetime"
-                      date={new Date(task.endDate)}
-                      minimumDate={new Date(task.startDate)}
-                      onConfirm={handleEndDatePickerConfirm}
-                      onCancel={() => {
-                        setEndDatePickerVisibility(false)
-                        setBackgroundOpacity(1.0)
-                      }}
-                    />
-                  </TouchableOpacity>
-                </View>
-
-              </View>
-
-              <View style={{ flexDirection: "row" }}>
-                <View style={{ flexDirection: "column", flex: 1 }}>
-                  <Text style={styles.inputLabel}>Priority</Text>
-                  <InputSpinner
-                    skin={"clean"}
-                    height={48}
-                    width={150}
+                  <Text style={styles.inputLabel}>Notes</Text>
+                  <TextInput
                     style={[styles.input, {
-                      borderRadius: 15,
-                      shadowColor: "cornflowerblue"
+                      paddingTop: 10,
+                      height: 120,
+                      textAlignVertical: "top" // android fix for centering it at the top-left corner 
                     }]}
-                    shadow={false}
-                    max={10}
-                    min={0}
-                    step={1}
-                    // colorMax={"#f04048"}
-                    // colorMin={"#40c5f4"}
-                    value={task.priority?.toString()}
-                    onChange={(newValue) => { setTask((prevState) => ({ ...prevState, priority: +newValue })) }}
+                    multiline={true} // ios fix for centering it at the top-left corner 
+                    onChangeText={(newValue) => { setTask((prevState) => ({ ...prevState, notes: newValue })) }}
+                    value={task.notes}
+                    underlineColorAndroid='transparent'
+                    autoCapitalize='none'
                   />
-                  {/* <TextInput
+
+                  <View style={{ flexDirection: "row" }}>
+
+                    <View style={{ flexDirection: "column", flex: 1 }}>
+                      <Text style={styles.inputLabel}>Start After</Text>
+                      <Pressable
+                        onPress={() => {
+                          setStartDatePickerVisibility(true)
+                          setBackgroundOpacity(0.33)
+                        }}>
+                        <Text style={styles.dateText}>
+                          {formatDate(task.startDate)}
+                        </Text>
+                      </Pressable>
+                    </View>
+
+                    <View>
+                      <TouchableOpacity title="Show Date Picker">
+                        <DateTimePickerModal
+                          isVisible={isStartDatePickerVisible}
+                          mode="datetime"
+                          date={new Date(task.startDate)}
+                          maximumDate={new Date(task.endDate)}
+                          onConfirm={handleStartDatePickerConfirm}
+                          onCancel={() => {
+                            setStartDatePickerVisibility(false)
+                            setBackgroundOpacity(1.0)
+                          }}
+                        />
+                      </TouchableOpacity>
+                    </View>
+
+                    <View style={{ flexDirection: "column", flex: 1 }}>
+                      <Text style={styles.inputLabel}>Finish by</Text>
+                      <Pressable
+                        onPress={() => {
+                          setEndDatePickerVisibility(true)
+                          setBackgroundOpacity(0.33)
+                        }}>
+                        <Text style={styles.dateText}>
+                          {formatDate(task.endDate)}
+                        </Text>
+                      </Pressable>
+                    </View>
+
+                    <View>
+                      <TouchableOpacity title="Show Date Picker">
+                        <DateTimePickerModal
+                          isVisible={isEndDatePickerVisible}
+                          mode="datetime"
+                          date={new Date(task.endDate)}
+                          minimumDate={new Date(task.startDate)}
+                          onConfirm={handleEndDatePickerConfirm}
+                          onCancel={() => {
+                            setEndDatePickerVisibility(false)
+                            setBackgroundOpacity(1.0)
+                          }}
+                        />
+                      </TouchableOpacity>
+                    </View>
+
+                  </View>
+
+                  <View style={{ flexDirection: "row" }}>
+                    <View style={{ flexDirection: "column", flex: 1 }}>
+                      <Text style={styles.inputLabel}>Priority</Text>
+                      <InputSpinner
+                        skin={"clean"}
+                        height={48}
+                        width={150}
+                        style={[styles.input, {
+                          borderRadius: 15,
+                          shadowColor: "cornflowerblue"
+                        }]}
+                        shadow={false}
+                        max={10}
+                        min={0}
+                        step={1}
+                        // colorMax={"#f04048"}
+                        // colorMin={"#40c5f4"}
+                        value={task.priority?.toString()}
+                        onChange={(newValue) => { setTask((prevState) => ({ ...prevState, priority: +newValue })) }}
+                      />
+                      {/* <TextInput
                       style={styles.input}
                       onChangeText={(newValue) => { setTask((prevState) => ({ ...prevState, priority: +newValue })) }}
                       value={task.priority?.toString()}
@@ -594,31 +563,31 @@ export function TaskDetailScreen({ route, navigation }) {
                       autoCapitalize='none'
                       keyboardType="numeric"
                     /> */}
-                </View>
+                    </View>
 
-                <View style={{ flexDirection: "column", flex: 1 }}>
-                  <Text style={styles.inputLabel}>Effort</Text>
-                  <InputSpinner
-                    skin={"clean"}
-                    height={48}
-                    width={150}
-                    style={[styles.input, {
-                      borderRadius: 15,
-                      shadowColor: "cornflowerblue"
-                    }]}
-                    shadow={false}
-                    max={10080}
-                    min={10}
-                    step={5}
-                    longStep={30}
-                    speed={4}
-                    // colorMax={"#f04048"}
-                    // colorMin={"#40c5f4"}
-                    value={task.effort?.toString()}
-                    // value={formatEffort(task.effort)}
-                    onChange={(newValue) => { setTask((prevState) => ({ ...prevState, effort: +newValue })) }}
-                  />
-                  {/* <TextInput
+                    <View style={{ flexDirection: "column", flex: 1 }}>
+                      <Text style={styles.inputLabel}>Effort</Text>
+                      <InputSpinner
+                        skin={"clean"}
+                        height={48}
+                        width={150}
+                        style={[styles.input, {
+                          borderRadius: 15,
+                          shadowColor: "cornflowerblue"
+                        }]}
+                        shadow={false}
+                        max={10080}
+                        min={10}
+                        step={5}
+                        longStep={30}
+                        speed={4}
+                        // colorMax={"#f04048"}
+                        // colorMin={"#40c5f4"}
+                        value={task.effort?.toString()}
+                        // value={formatEffort(task.effort)}
+                        onChange={(newValue) => { setTask((prevState) => ({ ...prevState, effort: +newValue })) }}
+                      />
+                      {/* <TextInput
                       style={[styles.input]}
                       onChangeText={(newValue) => { setTask((prevState) => ({ ...prevState, effort: +newValue })) }}
                       value={task.effort?.toString()}
@@ -626,10 +595,10 @@ export function TaskDetailScreen({ route, navigation }) {
                       autoCapitalize='none'
                       keyboardType="numeric"
                     /> */}
-                </View>
-              </View>
+                    </View>
+                  </View>
 
-              {/* <Text style={styles.inputLabel}>Group</Text>
+                  {/* <Text style={styles.inputLabel}>Group</Text>
                 <TextInput
                   style={styles.input}
                   value={task.taskGroup}
@@ -637,8 +606,8 @@ export function TaskDetailScreen({ route, navigation }) {
                   autoCapitalize='none'
                 /> */}
 
-              <Text style={styles.inputLabel}>Groups</Text>
-              {/* <FlatList style={{ height: "5%", marginBottom: 15, marginLeft: "1%" }}
+                  <Text style={styles.inputLabel}>Groups</Text>
+                  {/* <FlatList style={{ height: "5%", marginBottom: 15, marginLeft: "1%" }}
                   data={taskGroupNames}
                   ListEmptyComponent={<Text style={[styles.listText, { alignSelf: "center" }]}>
                     Task has no groups.
@@ -657,33 +626,33 @@ export function TaskDetailScreen({ route, navigation }) {
                 /> */}
 
 
-              <View style={{ marginBottom: 15, alignItems: "flex-start", flexWrap: "wrap", flexDirection: "row" }}>
-                {
-                  taskGroupNames.map((item) =>
-                    <Pressable key={item.id}
-                      onPress={() => navigation.navigate('GroupDetail', { uid: uid, groupId: item.id })}
-                      onLongPress={() => confirmDelete(item.id, item.name)}
+                  <View style={{ marginBottom: 15, alignItems: "flex-start", flexWrap: "wrap", flexDirection: "row" }}>
+                    {
+                      taskGroupNames.map((item) =>
+                        <Pressable key={item.id}
+                          onPress={() => navigation.navigate('GroupDetail', { uid: uid, groupId: item.id })}
+                          onLongPress={() => confirmDelete(item.id, item.name)}
+                        >
+                          <Text style={styles.groupResourceText}>
+                            {item.name}
+                          </Text>
+                        </Pressable>
+                      )
+                    }
+                    <Pressable
+                      onPress={() => {
+                        setTaskGroupPickerVisible(true)
+                        setBackgroundOpacity(.33)
+                      }}
                     >
                       <Text style={styles.groupResourceText}>
-                        {item.name}
+                        +
                       </Text>
                     </Pressable>
-                  )
-                }
-                <Pressable
-                  onPress={() => {
-                    setTaskGroupPickerVisible(true)
-                    setBackgroundOpacity(.33)
-                  }}
-                >
-                  <Text style={styles.groupResourceText}>
-                    +
-                  </Text>
-                </Pressable>
 
 
 
-                {/* {
+                    {/* {
                     userGroupNames.map((item) =>
                       <Pressable key={item.id}
                         onPress={() => addTaskGroup(item.id)}
@@ -699,110 +668,105 @@ export function TaskDetailScreen({ route, navigation }) {
 
 
 
-              </View>
-
-
-              {/* modal for selecting groups  */}
-              <Modal
-                animationType="slide"
-                transparent={true}
-                visible={taskGroupPickerVisible}
-                onRequestClose={() => {
-                  setTaskGroupPickerVisible(false)
-                  setBackgroundOpacity(1.0)
-                }}>
-                <View style={styles.modalView}>
-                  <Text style={styles.pageTitleText}>Add Task to Groups</Text>
-
-                  <Text style={[styles.inputLabel, { paddingTop: 15, alignSelf: 'flex-start' }]}>Groups</Text>
-
-                  <View style={{ marginBottom: 15, alignItems: "flex-start", flexWrap: "wrap", flexDirection: "row" }}>
-
-                    {
-                      userGroupNames.map((item) =>
-                        <Pressable key={item.id}
-                          onPress={() => addTaskGroup(item.id)}
-                        >
-                          <Text style={styles.groupResourceText}>
-                            {item.name}
-                          </Text>
-                        </Pressable>
-                      )
-                    }
                   </View>
 
-                  <Pressable
-                    style={[styles.mainButton, styles.btnWarning, styles.btnNarrow]}
-                    onPress={() => {
+
+                  {/* modal for selecting groups  */}
+                  <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={taskGroupPickerVisible}
+                    onRequestClose={() => {
                       setTaskGroupPickerVisible(false)
                       setBackgroundOpacity(1.0)
                     }}>
-                    <Text style={[styles.buttonText]}>
-                      <FontAwesome
-                        style={[{ fontSize: 35 }]}
-                        name='arrow-circle-o-left'
-                        color='white'
-                      />
-                    </Text>
-                  </Pressable>
+                    <View style={styles.modalView}>
+                      <Text style={styles.pageTitleText}>Add Task to Groups</Text>
 
-                </View>
-              </Modal>
+                      <Text style={[styles.inputLabel, { paddingTop: 15, alignSelf: 'flex-start' }]}>Groups</Text>
 
+                      <View style={{ marginBottom: 15, alignItems: "flex-start", flexWrap: "wrap", flexDirection: "row" }}>
 
+                        {
+                          userGroupNames.map((item) =>
+                            <Pressable key={item.id}
+                              onPress={() => addTaskGroup(item.id)}
+                            >
+                              <Text style={styles.groupResourceText}>
+                                {item.name}
+                              </Text>
+                            </Pressable>
+                          )
+                        }
+                      </View>
 
+                      <Pressable
+                        style={[styles.mainButton, styles.btnWarning, styles.btnNarrow]}
+                        onPress={() => {
+                          setTaskGroupPickerVisible(false)
+                          setBackgroundOpacity(1.0)
+                        }}>
+                        <Text style={[styles.buttonText]}>
+                          <FontAwesome
+                            style={[{ fontSize: 35 }]}
+                            name='arrow-circle-o-left'
+                            color='white'
+                          />
+                        </Text>
+                      </Pressable>
 
-
-
-
-
-
-
-              <Text style={styles.inputLabel}>Resources</Text>
-              <TextInput
-                style={styles.input}
-                value={task.taskResources}
-                underlineColorAndroid='transparent'
-                autoCapitalize='none'
-              />
-
-
-
-              <View style={{ alignItems: "center" }}>
-                <Pressable style={[styles.secondaryButton]}
-                  onPress={async () => {
-                    await getUserPool()
-                    // console.log("USERPOOL at invoke reassign", userPool)
-                    setReassignVisible(true)
-                    setBackgroundOpacity(.33)
-                  }}
-                >
-                  <Text style={styles.secondaryButtonText}>
-                    Reassign Task
-                  </Text>
-                </Pressable>
-              </View>
-              {/* modal for reassigning task  */}
-              <Modal
-                animationType="slide"
-                transparent={true}
-                visible={reassignVisible}
-                onRequestClose={() => {
-                  setReassignVisible(false)
-                  setBackgroundOpacity(1.0)
-                }}>
-                <View style={styles.modalView}>
-                  <Text style={styles.pageTitleText}>Reassign Task</Text>
-
-                  <Text style={[styles.inputLabel, { paddingTop: 15, alignSelf: 'flex-start' }]}>Select user to reassign task</Text>
+                    </View>
+                  </Modal>
 
 
-                  {isUserPoolLoading ?
-                    (
-                      <ActivityIndicator size="large" color="cornflowerblue" />
-                    )
-                    :
-                    (
+
+
+
+
+
+
+
+
+                  <Text style={styles.inputLabel}>Resources</Text>
+                  <TextInput
+                    style={styles.input}
+                    value={task.taskResources}
+                    underlineColorAndroid='transparent'
+                    autoCapitalize='none'
+                  />
+
+
+
+                  <View style={{ alignItems: "center" }}>
+                    <Pressable style={[styles.secondaryButton]}
+                      onPress={async () => {
+                        // await getUserPool()
+                        // console.log("USERPOOL at invoke reassign", userPool)
+                        setReassignVisible(true)
+                        setBackgroundOpacity(.33)
+                      }}
+                    >
+                      <Text style={styles.secondaryButtonText}>
+                        Reassign Task
+                      </Text>
+                    </Pressable>
+                  </View>
+                  {/* modal for reassigning task  */}
+                  <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={reassignVisible}
+                    onRequestClose={() => {
+                      setReassignVisible(false)
+                      setBackgroundOpacity(1.0)
+                    }}>
+                    <View style={styles.modalView}>
+                      <Text style={styles.pageTitleText}>Reassign Task</Text>
+
+                      <Text style={[styles.inputLabel, { paddingTop: 15, alignSelf: 'flex-start' }]}>Select user to reassign task</Text>
+
+
+
                       <View style={{ marginBottom: 15, alignItems: "flex-start", flexWrap: "wrap", flexDirection: "row" }}>
 
                         {
@@ -819,50 +783,50 @@ export function TaskDetailScreen({ route, navigation }) {
                           )
                         }
                       </View>
-                    )}
 
-                  <Pressable
-                    style={[styles.mainButton, styles.btnWarning, styles.btnNarrow]}
-                    onPress={() => {
-                      setReassignVisible(false)
-                      setBackgroundOpacity(1.0)
-                    }}>
-                    <Text style={[styles.buttonText]}>
-                      <FontAwesome
-                        style={[{ fontSize: 35 }]}
-                        name='arrow-circle-o-left'
-                        color='white'
-                      />
-                    </Text>
-                  </Pressable>
 
+                      <Pressable
+                        style={[styles.mainButton, styles.btnWarning, styles.btnNarrow]}
+                        onPress={() => {
+                          setReassignVisible(false)
+                          setBackgroundOpacity(1.0)
+                        }}>
+                        <Text style={[styles.buttonText]}>
+                          <FontAwesome
+                            style={[{ fontSize: 35 }]}
+                            name='arrow-circle-o-left'
+                            color='white'
+                          />
+                        </Text>
+                      </Pressable>
+
+                    </View>
+                  </Modal>
+
+
+
+                  <View style={{ alignItems: "center" }}>
+                    <TouchableOpacity style={[styles.mainButton, styles.btnSuccess, { opacity: (!taskChanged()) ? 0.5 : 1.0 }]}
+                      disabled={!taskChanged()}
+                      onPress={async () => {
+                        await SaveTask().then(
+                          (result) => {
+                            if (result == 0) {
+                              navigation.goBack();
+                            }
+                          }
+                        )
+                      }}
+                    >
+                      <Text
+                        style={[styles.buttonText]}
+                      >Save
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
-              </Modal>
-
-
-
-              <View style={{ alignItems: "center" }}>
-                <TouchableOpacity style={[styles.mainButton, styles.btnSuccess, { opacity: (!taskChanged()) ? 0.5 : 1.0 }]}
-                  disabled={!taskChanged()}
-                  onPress={async () => {
-                    await SaveTask().then(
-                      (result) => {
-                        if (result == 0) {
-                          navigation.goBack();
-                        }
-                      }
-                    )
-                  }}
-                >
-                  <Text
-                    style={[styles.buttonText]}
-                  >Save
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </ScrollView>
-
+              </ScrollView>
+            )}
           <Footer auth={auth}
             navigation={navigation}
             uid={uid} />
