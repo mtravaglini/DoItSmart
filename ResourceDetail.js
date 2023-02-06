@@ -293,7 +293,8 @@ export function ResourceDetailScreen({ route, navigation }) {
                   {
                     resourceGroupNames.map((item) =>
                       <Pressable key={item.id}
-                        onPress={() => confirmDeleteGroupMembership(item.id, item.name)}
+                      onLongPress={() => confirmDeleteGroupMembership(item.id, item.name)}
+                      onPress={() => navigation.navigate('GroupDetail', { uid: uid, groupId: item.id })}
                       >
                         <Text style={styles.groupResourceText}>
                           {item.name}
