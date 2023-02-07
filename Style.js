@@ -195,7 +195,7 @@ module.exports = StyleSheet.create({
   },
   input: {
     height: 48,
-marginHorizontal: "1%",
+    marginHorizontal: "1%",
     // width: "95%",
     borderRadius: 15,
     overflow: 'hidden',
@@ -267,7 +267,7 @@ marginHorizontal: "1%",
   txtError: {
     color: "red",
   },
-  
+
   // Date ###################################
   dateText: {
     height: 48,
@@ -289,22 +289,17 @@ marginHorizontal: "1%",
     elevation: 5,
   },
 
-  // Groups or resources on secondary screens
-  // groupContainer: {
-  //   color: "cornflowerblue",
-  //   borderColor: "cornflowerblue",
-  //   borderRadius: 15,
-  //   margin: "1%",
-  //   // height: 48,
-  //   marginHorizontal: "5%",
-  //   flexDirection: 'row',
-  //   alignItems: 'center',
-  //   // paddingTop: 300,
-  // },
-  // groupButton: {
-  //   width: "19%",
-  //   marginRight: "1%",
-  // },
+  // Groups and Resource Tags ################################ 
+  tagContainer: {
+    backgroundColor: "white",
+    padding: "3%",
+    borderRadius: 15,
+    marginHorizontal: "1%",
+    marginBottom: 15,
+    alignItems: "flex-start",
+    flexWrap: "wrap",
+    flexDirection: "row"
+  },
   groupResourceText: {
     fontSize: 15,
     // fontWeight: "bold",

@@ -97,7 +97,7 @@ export function TaskDetailScreen({ route, navigation }) {
       var retrievedTaskGroupNames = await processTaskGroups(taskGroupsSnap)
       setTaskGroupNames(retrievedTaskGroupNames)
 
-      var userGroupsSnap = await getUserGroups(retrievedTaskGroupNames)
+      var userGroupsSnap = await getGroupUsers(retrievedTaskGroupNames)
       var retrievedUserGroupNames = await processUserGroups(userGroupsSnap)
 
       var filterGroupsResult = await filterGroups(retrievedTaskGroupNames, retrievedUserGroupNames)
@@ -107,12 +107,25 @@ export function TaskDetailScreen({ route, navigation }) {
       var userArray = await processGroups(retrievedUserGroupNames)
       var userNameArray = await processUsers(userArray)
 
+
+
       // get resource info
       var taskResourceSnaps = await getTaskResources()
-      console.log(taskResourceSnaps.docs.length)
       var retrievedTaskResourceNames = await processTaskResources(taskResourceSnaps)
       setTaskResourceNames(retrievedTaskResourceNames)
-      console.log(retrievedTaskResourceNames)
+      console.log("taskResources", retrievedTaskResourceNames)
+
+      var retrievedUserResourceNames = []
+      for (var group of retrievedUserGroupNames) {
+        var groupResourcesSnaps = await getGroupResources(group)
+        var retrievedUserResourceNamesX = await processGroupResources(groupResourcesSnaps)
+        retrievedUserResourceNames = retrievedUserResourceNames.concat(retrievedUserResourceNamesX)
+      }
+
+      var filterResourcesResult = await filterGroups(retrievedTaskResourceNames, retrievedUserResourceNames)
+      setUserResourceNames(filterResourcesResult)
+      console.log("groupResources", filterResourcesResult)
+
       /////////////////////////////////////////////////////////////////
     }
 
@@ -165,8 +178,6 @@ export function TaskDetailScreen({ route, navigation }) {
       }
     }
 
-
-
     async function getTaskGroupParents(taskGroupSnaps) {
       try {
         return Promise.all(taskGroupSnaps.map(async (taskGroup) => {
@@ -184,7 +195,7 @@ export function TaskDetailScreen({ route, navigation }) {
       }
     }
 
-    async function getUserGroups(savedTaskGroups) {
+    async function getGroupUsers(savedTaskGroups) {
       try {
         var querySnapshot = await getDocs(query(collectionGroup(db, 'GroupUsers'), where('userId', '==', uid)));
         return querySnapshot
@@ -280,6 +291,8 @@ export function TaskDetailScreen({ route, navigation }) {
       return userNameArray
     }
 
+
+    // get the resources assigned to this task
     async function getTaskResources() {
       try {
         var querySnapshot = await getDocs(query(collection(db, "Tasks", taskId, "TaskResources")));
@@ -317,12 +330,61 @@ export function TaskDetailScreen({ route, navigation }) {
     }
 
 
+    // get the resources available to assign to this task
+    async function getGroupResources(group) {
+      // console.log("Entered getGroupResources", group)
+      try {
+        // console.log("Get the all the group resources for", group.id)
+        var resourcesSnap = await getDocs(query(collection(db, "Groups", group.id, "GroupResources")))
+        return resourcesSnap
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+
+    async function processGroupResources(querySnapshot) {
+      // console.log("processTaskGroups", querySnapshot.docs.length)
+      try {
+        var retrievedGroupResourceNames = await getGroupResourceParents(querySnapshot.docs)
+        return retrievedGroupResourceNames
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    async function getGroupResourceParents(groupResourcesSnap) {
+      // console.log("enter getGroupResourceParents", groupResourcesSnap)
+
+      try {
+        return Promise.all(groupResourcesSnap.map(async (groupResource) => {
+          // console.log(groupResource.data())
+          const resourceId = groupResource.data().resourceId;
+          const parentDoc = await getDoc(doc(db, "Resources", resourceId))
+
+          return {
+            "id": parentDoc?.id,
+            "name": parentDoc?.data().name,
+          }
+        }))
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+
+
+
+
+
+
+
     getTaskInfo();
     // for (var x = 0; x<1000000000; x++){var i=x}
 
     setIsTaskDetailLoading(false)
 
-  }, [taskGroupUpdated])
+  }, [taskGroupUpdated, taskResourceUpdated])
 
 
   const reassignTask = async (userId, userName) => {
@@ -465,60 +527,60 @@ export function TaskDetailScreen({ route, navigation }) {
 
 
 
-    // add a resource 
-    const addResourceGroup = async (resourceId) => {
- 
-      var data = { groupId: groupId }
-      try {
-        addDoc(collection(db, "Tasks", taskId, "TaskResources"), data)
-        setTaskResourceUpdated(taskGroupUpdated + 1);
-        setTaskResourcePickerVisible(false)
-        setBackgroundOpacity(1.0)
-      } catch (error) {
-        console.error(error);
-      }
-  
-  
+  // add a resource 
+  const addTaskResource = async (resourceId) => {
+
+    var data = { resourceId: resourceId }
+    try {
+      addDoc(collection(db, "Tasks", taskId, "TaskResources"), data)
+      setTaskResourceUpdated(taskResourceUpdated + 1);
+      setTaskResourcePickerVisible(false)
+      setBackgroundOpacity(1.0)
+    } catch (error) {
+      console.error(error);
     }
-  
-    // confirm delete a resource membership
-    const confirmResourceDelete = (resourceId, resourceName) => {
-      Alert.alert("Remove resource " + resourceName + " from group.",
-        "Are you sure?",
-        [{
-          text: "Remove",
-          onPress: () => deleteTaskResource(resourceId),
-  
-        },
-        {
-          text: "Cancel"
-        }]
-      )
-      return
+
+
+  }
+
+  // confirm delete a resource membership
+  const confirmResourceDelete = (resourceId, resourceName) => {
+    Alert.alert("Remove resource " + resourceName + " from group.",
+      "Are you sure?",
+      [{
+        text: "Remove",
+        onPress: () => deleteTaskResource(resourceId),
+
+      },
+      {
+        text: "Cancel"
+      }]
+    )
+    return
+  }
+  // delete a group membership
+  const deleteTaskResource = async (resourceId) => {
+
+    // console.log("deleting task group", taskId, groupId)
+    try {
+      // await deleteDoc(doc(db, "Tasks", taskId, "TaskGroups", groupId));
+
+
+
+      const querySnapshot = await getDocs(query(collection(db, "Tasks", taskId, "TaskResources"), where('resourceId', '==', resourceId)));
+      // console.log(typeof querySnapshot)
+      querySnapshot.forEach((doc) => {
+        // console.log("deleting docref", doc.ref)
+        deleteDoc(doc.ref)
+        setTaskResourceUpdated(taskResourceUpdated + 1);
+      })
+
+
+    } catch (error) {
+      console.error(error);
     }
-    // delete a group membership
-    const deleteTaskResource = async (resourceId) => {
-  
-      // console.log("deleting task group", taskId, groupId)
-      try {
-        // await deleteDoc(doc(db, "Tasks", taskId, "TaskGroups", groupId));
-  
-  
-  
-        const querySnapshot = await getDocs(query(collection(db, "Tasks", taskId, "TaskResources"), where('resourceId', '==', resourceId)));
-        // console.log(typeof querySnapshot)
-        querySnapshot.forEach((doc) => {
-          // console.log("deleting docref", doc.ref)
-          deleteDoc(doc.ref)
-          setTaskResourceUpdated(taskGroupUpdated + 1);
-        })
-  
-  
-      } catch (error) {
-        console.error(error);
-      }
-    }
-  
+  }
+
   // console.log("END contents of taskgroupnames", taskGroupNames.length)
   // console.log("END contents of usergroupnames", userGroupNames.length)
 
@@ -693,7 +755,7 @@ export function TaskDetailScreen({ route, navigation }) {
 
                   {/* Groups display */}
                   <Text style={styles.inputLabel}>Groups</Text>
-                  <View style={{ marginBottom: 15, alignItems: "flex-start", flexWrap: "wrap", flexDirection: "row" }}>
+                  <View style={styles.tagContainer}>
                     {
                       taskGroupNames.map((item) =>
                         <Pressable key={item.id}
@@ -770,7 +832,7 @@ export function TaskDetailScreen({ route, navigation }) {
 
                   {/* Resources display */}
                   <Text style={styles.inputLabel}>Resources</Text>
-                  <View style={{ marginBottom: 15, alignItems: "flex-start", flexWrap: "wrap", flexDirection: "row" }}>
+                  <View style={styles.tagContainer}>
                     {
                       taskResourceNames.map((item) =>
                         <Pressable key={item.id}
