@@ -35,14 +35,21 @@ export function TaskDetailScreen({ route, navigation }) {
   const [createdByUser, setCreatedByUser] = useState('');
   const [origTask, setOrigTask] = useState({});
   const [task, setTask] = useState({});
+
   const [userGroupNames, setUserGroupNames] = useState([]);
   const [taskGroupNames, setTaskGroupNames] = useState([]);
   const [taskGroupUpdated, setTaskGroupUpdated] = useState(0);
+  const [userResourceNames, setUserResourceNames] = useState([]);
+  const [taskResourceNames, setTaskResourceNames] = useState([]);
+  const [taskResourceUpdated, setTaskResourceUpdated] = useState(0);
+
   // date picker variables
   const [isStartDatePickerVisible, setStartDatePickerVisibility] = useState(false);
   const [isEndDatePickerVisible, setEndDatePickerVisibility] = useState(false);
   // add task groups modal
   const [taskGroupPickerVisible, setTaskGroupPickerVisible] = useState(false);
+  // add task resources modal
+  const [taskResourcePickerVisible, setTaskResourcePickerVisible] = useState(false);
   // reassign task modal
   const [reassignVisible, setReassignVisible] = useState(false);
   // opacity
@@ -81,10 +88,11 @@ export function TaskDetailScreen({ route, navigation }) {
 
     async function getTaskInfo() {
 
+      /////////////////////// Promise Chaining //////////////////////
+
       var userSnap = await getUser()
       var taskSnap = await getTask()
 
-      // Promise Chaining
       var taskGroupsSnap = await getTaskGroups()
       var retrievedTaskGroupNames = await processTaskGroups(taskGroupsSnap)
       setTaskGroupNames(retrievedTaskGroupNames)
@@ -99,133 +107,139 @@ export function TaskDetailScreen({ route, navigation }) {
       var userArray = await processGroups(retrievedUserGroupNames)
       var userNameArray = await processUsers(userArray)
 
-      async function getUser() {
-        try {
-          const docSnap = await getDoc(doc(db, "Users", uid));
-          setUser(docSnap.data());
-          return docSnap;
-        } catch (error) {
-          console.error(error);
-        }
+      // get resource info
+      var taskResourceSnaps = await getTaskResources()
+      console.log(taskResourceSnaps.docs.length)
+      var retrievedTaskResourceNames = await processTaskResources(taskResourceSnaps)
+      setTaskResourceNames(retrievedTaskResourceNames)
+      console.log(retrievedTaskResourceNames)
+      /////////////////////////////////////////////////////////////////
+    }
+
+    async function getUser() {
+      try {
+        const docSnap = await getDoc(doc(db, "Users", uid));
+        setUser(docSnap.data());
+        return docSnap;
+      } catch (error) {
+        console.error(error);
       }
+    }
 
-      async function getTask() {
-        try {
-          // get the task doc
-          var docSnap = await getDoc(doc(db, "Tasks", taskId));
-          setOrigTask(docSnap.data());
-          setTask(docSnap.data());
+    async function getTask() {
+      try {
+        // get the task doc
+        var docSnap = await getDoc(doc(db, "Tasks", taskId));
+        setOrigTask(docSnap.data());
+        setTask(docSnap.data());
 
-          // get user doc for the task creator
-          var docSnap2 = await getDoc(doc(db, "Users", docSnap.data().creator));
-          setCreatedByUser(docSnap2.data().name + " (" + docSnap2.data().email + ")")
-        } catch (error) {
-          console.error(error);
-        }
+        // get user doc for the task creator
+        var docSnap2 = await getDoc(doc(db, "Users", docSnap.data().creator));
+        setCreatedByUser(docSnap2.data().name + " (" + docSnap2.data().email + ")")
+      } catch (error) {
+        console.error(error);
       }
+    }
 
-      async function getTaskGroups() {
-        // console.log("getTaskGroups")
-        // unsubscribe = onSnapshot(
-        // get groups subcollection for the task
-        try {
-          var querySnapshot = await getDocs(query(collection(db, "Tasks", taskId, "TaskGroups")));
-          return querySnapshot
-          // console.log("reached gettaskgroups2")
-          // console.log("Setting task groups", retrievedTaskGroupNames)
-        } catch (error) {
-          console.error(error);
-        }
+    async function getTaskGroups() {
+      // console.log("getTaskGroups")
+      // unsubscribe = onSnapshot(
+      // get groups subcollection for the task
+      try {
+        var querySnapshot = await getDocs(query(collection(db, "Tasks", taskId, "TaskGroups")));
+        return querySnapshot
+        // console.log("reached gettaskgroups2")
+        // console.log("Setting task groups", retrievedTaskGroupNames)
+      } catch (error) {
+        console.error(error);
       }
+    }
 
-      async function processTaskGroups(querySnapshot) {
-        // console.log("processTaskGroups", querySnapshot.docs.length)
-        try {
-          var retrievedTaskGroupNames = await getTaskGroupParents(querySnapshot.docs)
-          return retrievedTaskGroupNames
-        } catch (error) {
-          console.error(error);
-        }
+    async function processTaskGroups(querySnapshot) {
+      // console.log("processTaskGroups", querySnapshot.docs.length)
+      try {
+        var retrievedTaskGroupNames = await getTaskGroupParents(querySnapshot.docs)
+        return retrievedTaskGroupNames
+      } catch (error) {
+        console.error(error);
       }
+    }
 
 
 
-      async function getTaskGroupParents(taskGroupSnaps) {
-        try {
-          return Promise.all(taskGroupSnaps.map(async (taskGroup) => {
+    async function getTaskGroupParents(taskGroupSnaps) {
+      try {
+        return Promise.all(taskGroupSnaps.map(async (taskGroup) => {
 
-            const groupId = taskGroup.data().groupId;
-            const parentDoc = await getDoc(doc(db, "Groups", groupId))
+          const groupId = taskGroup.data().groupId;
+          const parentDoc = await getDoc(doc(db, "Groups", groupId))
 
-            return {
-              "id": parentDoc?.id,
-              "name": parentDoc?.data().name,
-            }
-          }))
-        } catch (error) {
-          console.error(error);
-        }
-      }
-
-      async function getUserGroups(savedTaskGroups) {
-        try {
-          var querySnapshot = await getDocs(query(collectionGroup(db, 'GroupUsers'), where('userId', '==', uid)));
-          return querySnapshot
-        } catch (error) {
-          console.error(error);
-        }
-      }
-
-      async function processUserGroups(querySnapshot) {
-        try {
-          var retrievedUserGroupNames = await getGroupUsersParents(querySnapshot.docs)
-          return retrievedUserGroupNames
-        } catch (error) {
-          console.error(error);
-        }
-      }
-
-      async function getGroupUsersParents(groupUsersSnaps) {
-        try {
-          return Promise.all(groupUsersSnaps.map(async (groupUser) => {
-            const docRef = groupUser.ref;
-            const parentCollectionRef = docRef.parent; // CollectionReference
-            const immediateParentDocumentRef = parentCollectionRef.parent; // DocumentReference
-            const parentDoc = await getDoc(immediateParentDocumentRef)
-
-            return {
-              "id": parentDoc?.id,
-              "name": parentDoc?.data().name,
-            }
-          }))
-        } catch (error) {
-          console.error(error);
-        }
-      }
-
-      async function filterGroups(savedTaskGroups, savedUserGroups) {
-        // check if task is already in a group, if so don't need to save it
-
-        const newUserGroupNames = [];
-
-        for (var userGroup of savedUserGroups) {
-          var alreadyInGroup = false;
-          for (var taskGroup of savedTaskGroups) {
-            // console.log("checking", taskGroup.name)
-            if (userGroup.id == taskGroup.id) {
-              // console.log("Task is in group", taskGroup.name)
-              alreadyInGroup = true;
-            }
+          return {
+            "id": parentDoc?.id,
+            "name": parentDoc?.data().name,
           }
+        }))
+      } catch (error) {
+        console.error(error);
+      }
+    }
 
-          if (!alreadyInGroup) {
-            newUserGroupNames.push(userGroup)
+    async function getUserGroups(savedTaskGroups) {
+      try {
+        var querySnapshot = await getDocs(query(collectionGroup(db, 'GroupUsers'), where('userId', '==', uid)));
+        return querySnapshot
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    async function processUserGroups(querySnapshot) {
+      try {
+        var retrievedUserGroupNames = await getGroupUsersParents(querySnapshot.docs)
+        return retrievedUserGroupNames
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    async function getGroupUsersParents(groupUsersSnaps) {
+      try {
+        return Promise.all(groupUsersSnaps.map(async (groupUser) => {
+          const docRef = groupUser.ref;
+          const parentCollectionRef = docRef.parent; // CollectionReference
+          const immediateParentDocumentRef = parentCollectionRef.parent; // DocumentReference
+          const parentDoc = await getDoc(immediateParentDocumentRef)
+
+          return {
+            "id": parentDoc?.id,
+            "name": parentDoc?.data().name,
+          }
+        }))
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    async function filterGroups(savedTaskGroups, savedUserGroups) {
+      // check if task is already in a group, if so don't need to save it
+
+      const newUserGroupNames = [];
+
+      for (var userGroup of savedUserGroups) {
+        var alreadyInGroup = false;
+        for (var taskGroup of savedTaskGroups) {
+          // console.log("checking", taskGroup.name)
+          if (userGroup.id == taskGroup.id) {
+            // console.log("Task is in group", taskGroup.name)
+            alreadyInGroup = true;
           }
         }
-
-        // console.log("contents of newusergroupnames", newUserGroupNames.length)
-        return newUserGroupNames
+        if (!alreadyInGroup) {
+          newUserGroupNames.push(userGroup)
+        }
       }
+      // console.log("contents of newusergroupnames", newUserGroupNames.length)
+      return newUserGroupNames
     }
 
     // get all the users in each groupid 
@@ -251,9 +265,7 @@ export function TaskDetailScreen({ route, navigation }) {
     // get user info for the userids retrieved above
     async function processUsers(userArray) {
       // console.log("processUsers", userArray)
-
       var userNameArray = []
-
       for (var userId of userArray) {
         // const querySnapshot = await getDocs(query(collection(db, "Users"), where("userId", "==", userId)));
         const userDoc = await getDoc(doc(db, "Users", userId));
@@ -261,15 +273,49 @@ export function TaskDetailScreen({ route, navigation }) {
           id: userId,
           userName: userDoc.data().name
         }
-
         userNameArray.push(data)
-
       }
-
       // console.log(userNameArray)
       setUserPool(userNameArray)
       return userNameArray
     }
+
+    async function getTaskResources() {
+      try {
+        var querySnapshot = await getDocs(query(collection(db, "Tasks", taskId, "TaskResources")));
+        return querySnapshot
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    async function processTaskResources(querySnapshot) {
+      // console.log("processTaskGroups", querySnapshot.docs.length)
+      try {
+        var retrievedTaskResourceNames = await getTaskResourceParents(querySnapshot.docs)
+        return retrievedTaskResourceNames
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    async function getTaskResourceParents(taskResourceSnaps) {
+      try {
+        return Promise.all(taskResourceSnaps.map(async (taskResource) => {
+
+          const resourceId = taskResource.data().resourceId;
+          const parentDoc = await getDoc(doc(db, "Resources", resourceId))
+
+          return {
+            "id": parentDoc?.id,
+            "name": parentDoc?.data().name,
+          }
+        }))
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
 
     getTaskInfo();
     // for (var x = 0; x<1000000000; x++){var i=x}
@@ -281,11 +327,11 @@ export function TaskDetailScreen({ route, navigation }) {
 
   const reassignTask = async (userId, userName) => {
     // add logic to reassign task to selected user
-    console.log("reassign task", taskId, "to user", userId)
+    // console.log("reassign task", taskId, "to user", userId)
 
     var newTask = { ...task, assignee: userId }
     setTask(newTask)
-    console.log("newTask", newTask)
+    // console.log("newTask", newTask)
 
     try {
       await setDoc(doc(db, "Tasks", taskId), newTask)
@@ -372,7 +418,7 @@ export function TaskDetailScreen({ route, navigation }) {
   }
 
   // confirm delete a group membership
-  const confirmDelete = (groupId, groupName) => {
+  const confirmGroupDelete = (groupId, groupName) => {
     Alert.alert("Remove task from group " + groupName,
       "Are you sure?",
       [{
@@ -410,6 +456,69 @@ export function TaskDetailScreen({ route, navigation }) {
   }
 
 
+
+
+
+
+
+
+
+
+
+    // add a resource 
+    const addResourceGroup = async (resourceId) => {
+ 
+      var data = { groupId: groupId }
+      try {
+        addDoc(collection(db, "Tasks", taskId, "TaskResources"), data)
+        setTaskResourceUpdated(taskGroupUpdated + 1);
+        setTaskResourcePickerVisible(false)
+        setBackgroundOpacity(1.0)
+      } catch (error) {
+        console.error(error);
+      }
+  
+  
+    }
+  
+    // confirm delete a resource membership
+    const confirmResourceDelete = (resourceId, resourceName) => {
+      Alert.alert("Remove resource " + resourceName + " from group.",
+        "Are you sure?",
+        [{
+          text: "Remove",
+          onPress: () => deleteTaskResource(resourceId),
+  
+        },
+        {
+          text: "Cancel"
+        }]
+      )
+      return
+    }
+    // delete a group membership
+    const deleteTaskResource = async (resourceId) => {
+  
+      // console.log("deleting task group", taskId, groupId)
+      try {
+        // await deleteDoc(doc(db, "Tasks", taskId, "TaskGroups", groupId));
+  
+  
+  
+        const querySnapshot = await getDocs(query(collection(db, "Tasks", taskId, "TaskResources"), where('resourceId', '==', resourceId)));
+        // console.log(typeof querySnapshot)
+        querySnapshot.forEach((doc) => {
+          // console.log("deleting docref", doc.ref)
+          deleteDoc(doc.ref)
+          setTaskResourceUpdated(taskGroupUpdated + 1);
+        })
+  
+  
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  
   // console.log("END contents of taskgroupnames", taskGroupNames.length)
   // console.log("END contents of usergroupnames", userGroupNames.length)
 
@@ -555,14 +664,6 @@ export function TaskDetailScreen({ route, navigation }) {
                         value={task.priority?.toString()}
                         onChange={(newValue) => { setTask((prevState) => ({ ...prevState, priority: +newValue })) }}
                       />
-                      {/* <TextInput
-                      style={styles.input}
-                      onChangeText={(newValue) => { setTask((prevState) => ({ ...prevState, priority: +newValue })) }}
-                      value={task.priority?.toString()}
-                      underlineColorAndroid='transparent'
-                      autoCapitalize='none'
-                      keyboardType="numeric"
-                    /> */}
                     </View>
 
                     <View style={{ flexDirection: "column", flex: 1 }}>
@@ -587,51 +688,17 @@ export function TaskDetailScreen({ route, navigation }) {
                         // value={formatEffort(task.effort)}
                         onChange={(newValue) => { setTask((prevState) => ({ ...prevState, effort: +newValue })) }}
                       />
-                      {/* <TextInput
-                      style={[styles.input]}
-                      onChangeText={(newValue) => { setTask((prevState) => ({ ...prevState, effort: +newValue })) }}
-                      value={task.effort?.toString()}
-                      underlineColorAndroid='transparent'
-                      autoCapitalize='none'
-                      keyboardType="numeric"
-                    /> */}
                     </View>
                   </View>
 
-                  {/* <Text style={styles.inputLabel}>Group</Text>
-                <TextInput
-                  style={styles.input}
-                  value={task.taskGroup}
-                  underlineColorAndroid='transparent'
-                  autoCapitalize='none'
-                /> */}
-
+                  {/* Groups display */}
                   <Text style={styles.inputLabel}>Groups</Text>
-                  {/* <FlatList style={{ height: "5%", marginBottom: 15, marginLeft: "1%" }}
-                  data={taskGroupNames}
-                  ListEmptyComponent={<Text style={[styles.listText, { alignSelf: "center" }]}>
-                    Task has no groups.
-                  </Text>}
-                  numColumns={5}
-                  renderItem={({ item }) => (
-                    <Pressable style={styles.groupButton}
-                      onPress={() => navigation.navigate('GroupDetail', { uid: uid, groupId: item.id })}
-                      onLongPress={() => confirmDelete(item.id, item.name)}
-                    >
-                      <Text style={styles.groupResourceText}>
-                        {item.name}
-                      </Text>
-                    </Pressable>
-                  )}
-                /> */}
-
-
                   <View style={{ marginBottom: 15, alignItems: "flex-start", flexWrap: "wrap", flexDirection: "row" }}>
                     {
                       taskGroupNames.map((item) =>
                         <Pressable key={item.id}
                           onPress={() => navigation.navigate('GroupDetail', { uid: uid, groupId: item.id })}
-                          onLongPress={() => confirmDelete(item.id, item.name)}
+                          onLongPress={() => confirmGroupDelete(item.id, item.name)}
                         >
                           <Text style={styles.groupResourceText}>
                             {item.name}
@@ -649,25 +716,6 @@ export function TaskDetailScreen({ route, navigation }) {
                         +
                       </Text>
                     </Pressable>
-
-
-
-                    {/* {
-                    userGroupNames.map((item) =>
-                      <Pressable key={item.id}
-                        onPress={() => addTaskGroup(item.id)}
-                      >
-                        <Text style={styles.groupResourceText}>
-                          {item.name}
-                        </Text>
-                      </Pressable>
-                    )
-                  } */}
-
-
-
-
-
                   </View>
 
 
@@ -720,23 +768,90 @@ export function TaskDetailScreen({ route, navigation }) {
 
 
 
-
-
-
-
-
-
-
+                  {/* Resources display */}
                   <Text style={styles.inputLabel}>Resources</Text>
-                  <TextInput
-                    style={styles.input}
-                    value={task.taskResources}
-                    underlineColorAndroid='transparent'
-                    autoCapitalize='none'
-                  />
+                  <View style={{ marginBottom: 15, alignItems: "flex-start", flexWrap: "wrap", flexDirection: "row" }}>
+                    {
+                      taskResourceNames.map((item) =>
+                        <Pressable key={item.id}
+                          onPress={() => navigation.navigate('ResourceDetail', { uid: uid, resourceId: item.id })}
+                          onLongPress={() => confirmResourceDelete(item.id, item.name)}
+                        >
+                          <Text style={styles.groupResourceText}>
+                            {item.name}
+                          </Text>
+                        </Pressable>
+                      )
+                    }
+                    <Pressable
+                      onPress={() => {
+                        setTaskResourcePickerVisible(true)
+                        setBackgroundOpacity(.33)
+                      }}
+                    >
+                      <Text style={styles.groupResourceText}>
+                        +
+                      </Text>
+                    </Pressable>
+                  </View>
+
+
+                  {/* modal for selecting resources  */}
+                  <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={taskResourcePickerVisible}
+                    onRequestClose={() => {
+                      setTaskResourcePickerVisible(false)
+                      setBackgroundOpacity(1.0)
+                    }}>
+                    <View style={styles.modalView}>
+                      <Text style={styles.pageTitleText}>Assign Resource to Task</Text>
+
+                      <Text style={[styles.inputLabel, { paddingTop: 15, alignSelf: 'flex-start' }]}>Resources</Text>
+
+                      <View style={{ marginBottom: 15, alignItems: "flex-start", flexWrap: "wrap", flexDirection: "row" }}>
+
+                        {
+                          userResourceNames.map((item) =>
+                            <Pressable key={item.id}
+                              onPress={() => addTaskResource(item.id)}
+                            >
+                              <Text style={styles.groupResourceText}>
+                                {item.name}
+                              </Text>
+                            </Pressable>
+                          )
+                        }
+                      </View>
+
+                      <Pressable
+                        style={[styles.mainButton, styles.btnWarning, styles.btnNarrow]}
+                        onPress={() => {
+                          setTaskResourcePickerVisible(false)
+                          setBackgroundOpacity(1.0)
+                        }}>
+                        <Text style={[styles.buttonText]}>
+                          <FontAwesome
+                            style={[{ fontSize: 35 }]}
+                            name='arrow-circle-o-left'
+                            color='white'
+                          />
+                        </Text>
+                      </Pressable>
+
+                    </View>
+                  </Modal>
 
 
 
+
+
+
+
+
+
+                  {/* Reassign Tasks */}
                   <View style={{ alignItems: "center" }}>
                     <Pressable style={[styles.secondaryButton]}
                       onPress={async () => {
