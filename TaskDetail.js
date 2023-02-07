@@ -762,7 +762,7 @@ export function TaskDetailScreen({ route, navigation }) {
                           onPress={() => navigation.navigate('GroupDetail', { uid: uid, groupId: item.id })}
                           onLongPress={() => confirmGroupDelete(item.id, item.name)}
                         >
-                          <Text style={styles.groupResourceText}>
+                          <Text style={styles.tagText}>
                             {item.name}
                           </Text>
                         </Pressable>
@@ -774,7 +774,7 @@ export function TaskDetailScreen({ route, navigation }) {
                         setBackgroundOpacity(.33)
                       }}
                     >
-                      <Text style={styles.groupResourceText}>
+                      <Text style={styles.tagText}>
                         +
                       </Text>
                     </Pressable>
@@ -802,7 +802,7 @@ export function TaskDetailScreen({ route, navigation }) {
                             <Pressable key={item.id}
                               onPress={() => addTaskGroup(item.id)}
                             >
-                              <Text style={styles.groupResourceText}>
+                              <Text style={styles.tagText}>
                                 {item.name}
                               </Text>
                             </Pressable>
@@ -839,7 +839,7 @@ export function TaskDetailScreen({ route, navigation }) {
                           onPress={() => navigation.navigate('ResourceDetail', { uid: uid, resourceId: item.id })}
                           onLongPress={() => confirmResourceDelete(item.id, item.name)}
                         >
-                          <Text style={styles.groupResourceText}>
+                          <Text style={styles.tagText}>
                             {item.name}
                           </Text>
                         </Pressable>
@@ -851,7 +851,7 @@ export function TaskDetailScreen({ route, navigation }) {
                         setBackgroundOpacity(.33)
                       }}
                     >
-                      <Text style={styles.groupResourceText}>
+                      <Text style={styles.tagText}>
                         +
                       </Text>
                     </Pressable>
@@ -879,7 +879,7 @@ export function TaskDetailScreen({ route, navigation }) {
                             <Pressable key={item.id}
                               onPress={() => addTaskResource(item.id)}
                             >
-                              <Text style={styles.groupResourceText}>
+                              <Text style={styles.tagText}>
                                 {item.name}
                               </Text>
                             </Pressable>
@@ -953,7 +953,7 @@ export function TaskDetailScreen({ route, navigation }) {
                                 reassignTask(item.id, item.userName)
                               }}
                             >
-                              <Text style={styles.groupResourceText}>
+                              <Text style={styles.tagText}>
                                 {item.userName}
                               </Text>
                             </Pressable>

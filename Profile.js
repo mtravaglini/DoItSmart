@@ -349,14 +349,14 @@ export function ProfileScreen({ route, navigation }) {
                     />
 
                     {(groupNames.length > 0) ? <Text style={styles.inputLabel}>Your groups</Text> : ''}
-                    <View style={{ marginBottom: 15, alignItems: "flex-start", flexWrap: "wrap", flexDirection: "row" }}>
+                    <View style={styles.tagContainer}>
                       {
                         groupNames.map((item) =>
                           <Pressable key={item.id}
                             onPress={() => navigation.navigate('GroupDetail', { uid: uid, groupId: item.id })}
                             onLongPress={() => confirmDeleteGroupMembership(item.id, item.name)}
                           >
-                            <Text style={styles.groupResourceText}>
+                            <Text style={styles.tagText}>
                               {item.name}
                             </Text>
                           </Pressable>
@@ -374,7 +374,7 @@ export function ProfileScreen({ route, navigation }) {
                             onLongPress={() => confirmDeleteGroupInvite(item.inviteId, item.groupName)}
 
                           >
-                            <Text style={styles.groupResourceText}>
+                            <Text style={styles.tagText}>
                               {item.groupName} (Invited by {item.inviterName})
                             </Text>
                           </Pressable>

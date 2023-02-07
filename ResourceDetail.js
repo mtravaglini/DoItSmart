@@ -291,19 +291,14 @@ export function ResourceDetailScreen({ route, navigation }) {
 
 
                 <Text style={styles.inputLabel}>Resource Groups</Text>
-
-                <View style={{
-                  backgroundColor: "white", padding: "3%", borderRadius: 15, marginHorizontal: "1%",
-                  marginBottom: 15, alignItems: "flex-start", flexWrap: "wrap", flexDirection: "row"
-                }}>
-
+                <View style={styles.tagContainer}>
                   {
                     groupResourceNames.map((item) =>
                       <Pressable key={item.id}
                         onLongPress={() => confirmDeleteGroupMembership(item.id, item.name)}
                         onPress={() => navigation.navigate('GroupDetail', { uid: uid, groupId: item.id })}
                       >
-                        <Text style={styles.groupResourceText}>
+                        <Text style={styles.tagText}>
                           {item.name}
                         </Text>
                       </Pressable>
@@ -315,7 +310,7 @@ export function ResourceDetailScreen({ route, navigation }) {
                       setBackgroundOpacity(.33)
                     }}
                   >
-                    <Text style={styles.groupResourceText}>
+                    <Text style={styles.tagText}>
                       +
                     </Text>
                   </Pressable>
@@ -343,7 +338,7 @@ export function ResourceDetailScreen({ route, navigation }) {
                           <Pressable key={item.id}
                             onPress={() => addGroupResource(item.id)}
                           >
-                            <Text style={styles.groupResourceText}>
+                            <Text style={styles.tagText}>
                               {item.name}
                             </Text>
                           </Pressable>

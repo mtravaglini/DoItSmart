@@ -298,15 +298,13 @@ export function GroupDetailScreen({ route, navigation }) {
 
 
                 <Text style={styles.inputLabel}>Group Members</Text>
-
-                <View style={{ marginBottom: 15, alignItems: "flex-start", flexWrap: "wrap", flexDirection: "row" }}>
-
+                <View style={styles.tagContainer}>
                   {
                     groupUserNames.map((item) =>
                       <Pressable key={item.uid}
                         onPress={() => confirmDeleteGroupMembership(item.uid, item.name)}
                       >
-                        <Text style={styles.groupResourceText}>
+                        <Text style={styles.tagText}>
                           {item.name}
                         </Text>
                       </Pressable>
@@ -318,7 +316,7 @@ export function GroupDetailScreen({ route, navigation }) {
                       setBackgroundOpacity(.33)
                     }}
                   >
-                    <Text style={styles.groupResourceText}>
+                    <Text style={styles.tagText}>
                       +
                     </Text>
                   </Pressable>

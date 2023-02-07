@@ -300,7 +300,7 @@ module.exports = StyleSheet.create({
     flexWrap: "wrap",
     flexDirection: "row"
   },
-  groupResourceText: {
+  tagText: {
     fontSize: 15,
     // fontWeight: "bold",
     // fontFamily: Platform.OS === "android" ? "sans-serif-thin" : "AppleSDGothicNeo-Thin",
