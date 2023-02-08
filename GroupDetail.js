@@ -5,7 +5,6 @@ import {
   KeyboardAvoidingView,
   Modal,
   Pressable,
-  SafeAreaView,
   ScrollView,
   Text,
   TextInput,
@@ -13,6 +12,9 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
+import {
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 import { FontAwesome } from '@expo/vector-icons';
 import { db, auth } from './firebase.config';
 import { doc, collection, query, addDoc, getDoc, getDocs, setDoc, deleteDoc, onSnapshot, where, orderBy, DocumentReference } from "firebase/firestore";
@@ -25,6 +27,7 @@ import { useTheme } from 'react-native-paper';
 
 export function GroupDetailScreen({ route, navigation }) {
 
+  const insets = useSafeAreaInsets();
   const uid = route.params.uid;
   const groupId = route.params.groupId;
 
@@ -255,7 +258,13 @@ export function GroupDetailScreen({ route, navigation }) {
   // console.log("REFRESHED", Date())
 
   return (
-    <SafeAreaView style={[styles.safeView, { opacity: backgroundOpacity }]}>
+    <View style={[styles.safeView, {
+      marginTop: insets.top,
+      paddingBottom: insets.bottom,
+      paddingLeft: insets.left,
+      paddingRight: insets.right,
+      opacity: backgroundOpacity
+    }]}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
@@ -412,6 +421,6 @@ export function GroupDetailScreen({ route, navigation }) {
           </View>
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   );
 }

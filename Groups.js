@@ -5,13 +5,15 @@ import {
     Keyboard,
     KeyboardAvoidingView,
     Pressable,
-    SafeAreaView,
-    Text,
+      Text,
     TextInput,
     TouchableOpacity,
     TouchableWithoutFeedback,
     View,
 } from 'react-native';
+import {
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 import { FontAwesome } from '@expo/vector-icons';
 import { db, auth } from './firebase.config';
 import { signOut } from "firebase/auth";
@@ -24,6 +26,7 @@ import { Title, Footer } from './Components.js'
 
 export function GroupsScreen({ route, navigation }) {
 
+  const insets = useSafeAreaInsets();
     const uid = route.params.uid;
     // const groupsRef = db.collection("groups");
 
@@ -110,7 +113,12 @@ export function GroupsScreen({ route, navigation }) {
     }
 
     return (
-        <SafeAreaView style={styles.safeView}>
+        <View style={[styles.safeView, {
+      marginTop: insets.top,
+      paddingBottom: insets.bottom,
+      paddingLeft: insets.left,
+      paddingRight: insets.right,
+    }]}>
             <KeyboardAvoidingView
                 style={{ flex: 1 }}
                 behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
@@ -182,6 +190,6 @@ export function GroupsScreen({ route, navigation }) {
                     </View>
                 </TouchableWithoutFeedback>
             </KeyboardAvoidingView>
-        </SafeAreaView>
+        </View>
     );
 }

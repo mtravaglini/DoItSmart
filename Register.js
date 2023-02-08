@@ -2,14 +2,15 @@ import React, { useState } from 'react';
 import {
   Keyboard,
   KeyboardAvoidingView,
-  SafeAreaView,
   Text,
   TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-// import { SafeAreaView } from 'react-native-safe-area-context';
+import {
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from './firebase.config';
 import { doc, getDoc, setDoc } from "firebase/firestore";
@@ -21,6 +22,8 @@ import { Title, Footer } from './Components.js'
 
 export function RegisterScreen({ route, navigation }) {
 
+  const insets = useSafeAreaInsets();
+  
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -76,7 +79,12 @@ export function RegisterScreen({ route, navigation }) {
 
 
   return (
-    <SafeAreaView style={[styles.safeView]}>
+    <View style={[styles.safeView, {
+      marginTop: insets.top,
+      paddingBottom: insets.bottom,
+      paddingLeft: insets.left,
+      paddingRight: insets.right,
+    }]}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
@@ -163,6 +171,6 @@ export function RegisterScreen({ route, navigation }) {
           </View>
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
-    </SafeAreaView >
+    </View >
   );
 }

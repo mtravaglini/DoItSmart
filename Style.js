@@ -8,14 +8,15 @@ module.exports = StyleSheet.create({
   // most pages will have safeview and container at top level
   safeView: {
     flex: 1,
-    marginTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
-    // paddingTop: 50,
+    // marginTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+    // paddingTop: 0,
+    // padding: 0,
     backgroundColor: "midnightblue",
     // paddingTop: 5,
   },
-  container: {
-    alignItems: 'center',
-  },
+  // container: {
+  //   alignItems: 'center',
+  // },
   // ########################################
 
   // main title screen text ########################################
@@ -26,7 +27,7 @@ module.exports = StyleSheet.create({
     paddingLeft: "10%",
     paddingRight: "10%",
     backgroundColor: "cornflowerblue",
-    // marginTop: "10%",
+    marginTop: 0,
     marginBottom: "5%",
     // marginHorizontal: "1%",
     // borderRadius: 5,
@@ -34,7 +35,7 @@ module.exports = StyleSheet.create({
   titleText: {
     fontSize: 35,
     fontWeight: "bold",
-    fontFamily: Platform.OS === "android" ? "sans-serif" : "AppleSDGothicNeo",
+    // fontFamily: Platform.OS === "android" ? "sans-serif" : "AppleSDGothicNeo",
     color: "white",
   },
   logo: {
@@ -51,7 +52,7 @@ module.exports = StyleSheet.create({
     // width: 'auto',
     fontSize: 25,
     fontWeight: "bold",
-    fontFamily: Platform.OS === "android" ? "sans-serif-thin" : "AppleSDGothicNeo-Thin",
+    // fontFamily: Platform.OS === "android" ? "sans-serif-thin" : "AppleSDGothicNeo-Thin",
     color: "cornflowerblue",
     marginTop: 5
     // marginBottom: 5
@@ -59,7 +60,7 @@ module.exports = StyleSheet.create({
   pageSubTitleText: {
     fontSize: 15,
     fontWeight: "bold",
-    fontFamily: Platform.OS === "android" ? "sans-serif-thin" : "AppleSDGothicNeo-Thin",
+    // fontFamily: Platform.OS === "android" ? "sans-serif-thin" : "AppleSDGothicNeo-Thin",
     color: "cornflowerblue",
     borderColor: "cornflowerblue",
     borderWidth: 1,
@@ -313,8 +314,6 @@ module.exports = StyleSheet.create({
   },
   tagText: {
     fontSize: 15,
-    // fontWeight: "bold",
-    // fontFamily: Platform.OS === "android" ? "sans-serif-thin" : "AppleSDGothicNeo-Thin",
     color: "white",
     backgroundColor: "cornflowerblue",
     borderColor: "white",

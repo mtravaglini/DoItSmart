@@ -6,7 +6,6 @@ import {
   KeyboardAvoidingView,
   Modal,
   Pressable,
-  SafeAreaView,
   ScrollView,
   Text,
   TextInput,
@@ -14,6 +13,9 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
+import {
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 import { FontAwesome } from '@expo/vector-icons';
 import { db, auth } from './firebase.config';
 import { signOut } from "firebase/auth";
@@ -28,6 +30,7 @@ import { Title, Footer } from './Components.js'
 
 export function TaskDetailScreen({ route, navigation }) {
 
+  const insets = useSafeAreaInsets();
   const uid = route.params.uid;
   const taskId = route.params.taskId;
 
@@ -587,8 +590,15 @@ export function TaskDetailScreen({ route, navigation }) {
   // console.log("============================================= render")
 
   return (
-    <SafeAreaView style={[styles.safeView, { flex: 1, opacity: backgroundOpacity }]}>
-      <KeyboardAvoidingView
+    <View style={[styles.safeView, {
+      marginTop: insets.top,
+      paddingBottom: insets.bottom,
+      paddingLeft: insets.left,
+      paddingRight: insets.right,
+      opacity: backgroundOpacity
+    }]}>
+      
+            <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         {/* <TouchableWithoutFeedback style={{flex: 1}} onPress={Keyboard.dismiss}> */}
@@ -1018,6 +1028,6 @@ export function TaskDetailScreen({ route, navigation }) {
         </View>
         {/* </TouchableWithoutFeedback> */}
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   );
 }

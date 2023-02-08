@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import {
   Keyboard,
   KeyboardAvoidingView,
-  SafeAreaView,
   StatusBar,
   Text,
   TextInput,
@@ -10,12 +9,17 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
+import {
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from './firebase.config';
+import { SwipeGesture } from './Swipe.js';
 
 // use custom style sheet
 const styles = require('./Style.js');
-import { SwipeGesture } from './Swipe.js';
+
+
 
 export function SigninScreen({ route, navigation }) {
 
@@ -26,6 +30,9 @@ export function SigninScreen({ route, navigation }) {
   // const [email, setEmail] = useState('');
   // const [password, setPassword] = useState('');
   const [screenMsg, setScreenMsg] = useState('');
+
+  const insets = useSafeAreaInsets();
+  console.log("insets", insets)
 
   // TODO CLEANUP: uncomment next section
   // clear password on screen load 
@@ -58,7 +65,12 @@ export function SigninScreen({ route, navigation }) {
   console.log('Height on: ', Platform.OS, StatusBar.currentHeight);
 
   return (
-    <SafeAreaView style={[styles.safeView]}>
+    <View style={[styles.safeView, {
+      marginTop: insets.top,
+      paddingBottom: insets.bottom,
+      paddingLeft: insets.left,
+      paddingRight: insets.right,
+    }]}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
@@ -135,7 +147,7 @@ export function SigninScreen({ route, navigation }) {
           </View>
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
-    </SafeAreaView >
+    </View >
   );
 
 
