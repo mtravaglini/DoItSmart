@@ -4,16 +4,25 @@ import {
   Platform
 } from 'react-native';
 
-const mainScreenColour = "midnightblue";
-const secondaryScreenColour = "cornflowerblue";
-const iconColour = "cornflowerblue";
+// Blue with green
+const headerBackgroundColour = "midnightblue";
+const headerColour = "cornflowerblue";
 
-const labelColour = "orange";
-const mainTextColour = "midnightblue";
+const mainScreenColour = "cornflowerblue";
+const secondaryScreenColour = "midnightblue";
+
+const labelColour = "midnightblue";
+
+const mainTextColour = "cornflowerblue";
+const inputTextColour = "cornflowerblue";
 const textBackgroundColour = "white";
 
 const listBackgroundColour = "lightgreen"
 const listTextColour = "darkgreen"
+
+const footerBackgroundColour = "midnightblue";
+const footerColour = "cornflowerblue";
+
 
 module.exports = StyleSheet.create({
   // most pages will have safeview and container at top level
@@ -54,6 +63,11 @@ module.exports = StyleSheet.create({
     height: 58,
   },
   // ########################################
+  
+  // header ###########################
+  header: {
+    backgroundColor: headerBackgroundColour,
+  },
 
   // page title screen text ########################################
   pageTitleContainer: {
@@ -64,7 +78,7 @@ module.exports = StyleSheet.create({
     fontSize: 25,
     fontWeight: "bold",
     // fontFamily: Platform.OS === "android" ? "sans-serif-thin" : "AppleSDGothicNeo-Thin",
-    color: secondaryScreenColour,
+    color: headerColour,
     marginTop: 5
     // marginBottom: 5
   },
@@ -72,8 +86,8 @@ module.exports = StyleSheet.create({
     fontSize: 15,
     fontWeight: "bold",
     // fontFamily: Platform.OS === "android" ? "sans-serif-thin" : "AppleSDGothicNeo-Thin",
-    color: secondaryScreenColour,
-    borderColor: secondaryScreenColour,
+    color: headerColour,
+    borderColor: headerColour,
     borderWidth: 1,
     borderRadius: 5,
     paddingHorizontal: 15,
@@ -84,7 +98,7 @@ module.exports = StyleSheet.create({
     fontSize: 30,
     marginLeft: "3%",
     marginRight: "5%",
-    color: iconColour,  
+    color: headerColour,  
   },
 // ########################################
 
@@ -147,8 +161,8 @@ module.exports = StyleSheet.create({
     // height: 35,
   },
   btnSuccess: {
-    backgroundColor: "green",
-    shadowColor: 'green',
+    backgroundColor: "darkgreen",
+    shadowColor: 'darkgreen',
   },
   btnWarning: {
     backgroundColor: "orange",
@@ -160,14 +174,12 @@ module.exports = StyleSheet.create({
   inputBtnFormContainer: {
     flexDirection: 'row',
     // height: 80,
-    marginLeft: 10,
-    marginRight: 10,
-    // marginTop: 15,
-    marginBottom: 15
+    marginHorizontal: "5%",
+    marginVertical: "2%"
   },
   inputShort: {
     height: 48,
-    width: "70%",
+    width: "80%",
     borderRadius: 15,
     overflow: 'hidden',
     paddingLeft: 10,
@@ -188,7 +200,7 @@ module.exports = StyleSheet.create({
   inputButton: {
     height: 48,
     borderRadius: 15,
-    width: "28%",
+    width: "18%",
     alignItems: 'center',
     backgroundColor: secondaryScreenColour,
     justifyContent: "center",
@@ -216,9 +228,9 @@ module.exports = StyleSheet.create({
   },
   inputLabel: {
     paddingLeft: 10,
-    fontSize: 10,
+    fontWeight: "bold",
     color: labelColour,
-    fontSize: 14,
+    fontSize: 15,
   },
   input: {
     height: 48,
@@ -232,7 +244,7 @@ module.exports = StyleSheet.create({
     marginBottom: 15,
     fontSize: 18,
     fontWeight: "bold",
-    color: mainScreenColour,
+    color: inputTextColour,
     backgroundColor: textBackgroundColour,
     alignContent: "center",
 
@@ -349,15 +361,17 @@ module.exports = StyleSheet.create({
   // footer
   footer: {
     flexDirection: "row",
-    justifyContent: 'space-evenly'
+    justifyContent: 'space-evenly',
+    backgroundColor: footerBackgroundColour,
+    paddingVertical: "1%"
   },
   footerIcon: {
     fontSize: 30,
-    color: iconColour,
+    color: footerColour,
     alignSelf: "center"
   },
   footerText: {
-    color: iconColour,
+    color: footerColour,
     alignSelf: "center"
   },
 
@@ -402,7 +416,7 @@ module.exports = StyleSheet.create({
     marginTop: "20%",
     marginBottom: "60%",
     // marginVertical: "50%",
-    backgroundColor: mainScreenColour,
+    backgroundColor: headerBackgroundColour,
     borderRadius: 20,
     borderColor: secondaryScreenColour,
     borderWidth: 1,

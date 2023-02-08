@@ -597,8 +597,8 @@ export function TaskDetailScreen({ route, navigation }) {
       paddingRight: insets.right,
       opacity: backgroundOpacity
     }]}>
-      
-            <KeyboardAvoidingView
+
+      <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         {/* <TouchableWithoutFeedback style={{flex: 1}} onPress={Keyboard.dismiss}> */}
@@ -722,12 +722,13 @@ export function TaskDetailScreen({ route, navigation }) {
                       <InputSpinner
                         skin={"clean"}
                         height={48}
-                        width={125}
-                        style={{
-                          borderRadius: 15,
-                          // shadowColor: "cornflowerblue",
-                          marginBottom: 15
-                        }}
+                        width={140}
+                        style={[styles.input,
+                          {
+                            borderRadius: 15,
+                            // shadowColor: "cornflowerblue",
+                            marginBottom: 15
+                          }]}
                         inputStyle={[
                           styles.input,
                           { marginBottom: 0 }
@@ -748,12 +749,13 @@ export function TaskDetailScreen({ route, navigation }) {
                       <InputSpinner
                         skin={"clean"}
                         height={48}
-                        width={125}
-                        style={{
+                        width={140}
+                        style={[styles.input,
+                        {
                           borderRadius: 15,
                           // shadowColor: "cornflowerblue",
                           marginBottom: 15
-                        }}
+                        }]}
                         inputStyle={[
                           styles.input,
                           { marginBottom: 0 }
@@ -778,8 +780,8 @@ export function TaskDetailScreen({ route, navigation }) {
                   <View style={styles.tagContainer}>
                     {
                       taskGroupNames.map((item) =>
-                      <Pressable key={item.id} style={styles.tagButton}
-                      onPress={() => navigation.navigate('GroupDetail', { uid: uid, groupId: item.id })}
+                        <Pressable key={item.id} style={styles.tagButton}
+                          onPress={() => navigation.navigate('GroupDetail', { uid: uid, groupId: item.id })}
                           onLongPress={() => confirmGroupDelete(item.id, item.name)}
                         >
                           <Text style={styles.tagText}>
@@ -819,7 +821,7 @@ export function TaskDetailScreen({ route, navigation }) {
 
                         {
                           userGroupNames.map((item) =>
-                          <Pressable key={item.id} style={styles.tagButton}
+                            <Pressable key={item.id} style={styles.tagButton}
                               onPress={() => addTaskGroup(item.id)}
                             >
                               <Text style={styles.tagText}>
@@ -840,7 +842,7 @@ export function TaskDetailScreen({ route, navigation }) {
                           <FontAwesome
                             style={[{ fontSize: 35 }]}
                             name='arrow-circle-o-left'
-                            // color='white'
+                          // color='white'
                           />
                         </Text>
                       </Pressable>
@@ -855,8 +857,8 @@ export function TaskDetailScreen({ route, navigation }) {
                   <View style={styles.tagContainer}>
                     {
                       taskResourceNames.map((item) =>
-                      <Pressable key={item.id} style={styles.tagButton}
-                      onPress={() => navigation.navigate('ResourceDetail', { uid: uid, resourceId: item.id })}
+                        <Pressable key={item.id} style={styles.tagButton}
+                          onPress={() => navigation.navigate('ResourceDetail', { uid: uid, resourceId: item.id })}
                           onLongPress={() => confirmResourceDelete(item.id, item.name)}
                         >
                           <Text style={styles.tagText}>
@@ -896,7 +898,7 @@ export function TaskDetailScreen({ route, navigation }) {
 
                         {
                           userResourceNames.map((item) =>
-                          <Pressable key={item.id} style={styles.tagButton}
+                            <Pressable key={item.id} style={styles.tagButton}
                               onPress={() => addTaskResource(item.id)}
                             >
                               <Text style={styles.tagText}>
@@ -917,7 +919,7 @@ export function TaskDetailScreen({ route, navigation }) {
                           <FontAwesome
                             style={[{ fontSize: 35 }]}
                             name='arrow-circle-o-left'
-                            // color='white'
+                          // color='white'
                           />
                         </Text>
                       </Pressable>
@@ -965,7 +967,7 @@ export function TaskDetailScreen({ route, navigation }) {
 
                         {
                           userPool.map((item) =>
-                          <Pressable key={item.id} style={styles.tagButton}
+                            <Pressable key={item.id} style={styles.tagButton}
                               onPress={() => {
                                 reassignTask(item.id, item.userName)
                               }}
@@ -989,7 +991,7 @@ export function TaskDetailScreen({ route, navigation }) {
                           <FontAwesome
                             style={[{ fontSize: 35 }]}
                             name='arrow-circle-o-left'
-                            // color='white'
+                          // color='white'
                           />
                         </Text>
                       </Pressable>

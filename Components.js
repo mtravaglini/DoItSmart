@@ -17,7 +17,7 @@ export function scheduleTasks(unscheduled_tasks) {
 
 export const Title = props => {
   return (
-    <View>
+    <View style={styles.header}>
       <View style={{ flexDirection: "row", justifyContent: "center" }}>
         <Pressable style={{ position: "absolute", left: "1%" }}
           onPress={() => props.navigation.goBack()}
