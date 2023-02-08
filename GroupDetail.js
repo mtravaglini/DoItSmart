@@ -310,7 +310,7 @@ export function GroupDetailScreen({ route, navigation }) {
                 <View style={styles.tagContainer}>
                   {
                     groupUserNames.map((item) =>
-                      <Pressable key={item.uid}
+                      <Pressable key={item.uid} style={styles.tagButton}
                         onPress={() => confirmDeleteGroupMembership(item.uid, item.name)}
                       >
                         <Text style={styles.tagText}>
@@ -319,7 +319,7 @@ export function GroupDetailScreen({ route, navigation }) {
                       </Pressable>
                     )
                   }
-                  <Pressable
+                  <Pressable style={styles.tagButton}
                     onPress={() => {
                       setInviteUserVisible(true)
                       setBackgroundOpacity(.33)
@@ -372,7 +372,7 @@ export function GroupDetailScreen({ route, navigation }) {
                           <FontAwesome
                             style={[{ fontSize: 35 }]}
                             name='arrow-circle-o-left'
-                            color='white'
+                            // color='white'
                           />
                         </Text>
                       </Pressable>

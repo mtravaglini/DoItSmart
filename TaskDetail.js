@@ -611,7 +611,7 @@ export function TaskDetailScreen({ route, navigation }) {
 
           {isTaskDetailLoading ?
             (
-              <ActivityIndicator size="large" color="cornflowerblue" />
+              <ActivityIndicator style={styles.standardText} size="large" />
             )
             :
             (
@@ -722,10 +722,10 @@ export function TaskDetailScreen({ route, navigation }) {
                       <InputSpinner
                         skin={"clean"}
                         height={48}
-                        width={150}
+                        width={125}
                         style={{
                           borderRadius: 15,
-                          shadowColor: "cornflowerblue",
+                          // shadowColor: "cornflowerblue",
                           marginBottom: 15
                         }}
                         inputStyle={[
@@ -748,10 +748,10 @@ export function TaskDetailScreen({ route, navigation }) {
                       <InputSpinner
                         skin={"clean"}
                         height={48}
-                        width={150}
+                        width={125}
                         style={{
                           borderRadius: 15,
-                          shadowColor: "cornflowerblue",
+                          // shadowColor: "cornflowerblue",
                           marginBottom: 15
                         }}
                         inputStyle={[
@@ -778,8 +778,8 @@ export function TaskDetailScreen({ route, navigation }) {
                   <View style={styles.tagContainer}>
                     {
                       taskGroupNames.map((item) =>
-                        <Pressable key={item.id}
-                          onPress={() => navigation.navigate('GroupDetail', { uid: uid, groupId: item.id })}
+                      <Pressable key={item.id} style={styles.tagButton}
+                      onPress={() => navigation.navigate('GroupDetail', { uid: uid, groupId: item.id })}
                           onLongPress={() => confirmGroupDelete(item.id, item.name)}
                         >
                           <Text style={styles.tagText}>
@@ -788,7 +788,7 @@ export function TaskDetailScreen({ route, navigation }) {
                         </Pressable>
                       )
                     }
-                    <Pressable
+                    <Pressable style={styles.tagButton}
                       onPress={() => {
                         setTaskGroupPickerVisible(true)
                         setBackgroundOpacity(.33)
@@ -819,7 +819,7 @@ export function TaskDetailScreen({ route, navigation }) {
 
                         {
                           userGroupNames.map((item) =>
-                            <Pressable key={item.id}
+                          <Pressable key={item.id} style={styles.tagButton}
                               onPress={() => addTaskGroup(item.id)}
                             >
                               <Text style={styles.tagText}>
@@ -840,7 +840,7 @@ export function TaskDetailScreen({ route, navigation }) {
                           <FontAwesome
                             style={[{ fontSize: 35 }]}
                             name='arrow-circle-o-left'
-                            color='white'
+                            // color='white'
                           />
                         </Text>
                       </Pressable>
@@ -855,8 +855,8 @@ export function TaskDetailScreen({ route, navigation }) {
                   <View style={styles.tagContainer}>
                     {
                       taskResourceNames.map((item) =>
-                        <Pressable key={item.id}
-                          onPress={() => navigation.navigate('ResourceDetail', { uid: uid, resourceId: item.id })}
+                      <Pressable key={item.id} style={styles.tagButton}
+                      onPress={() => navigation.navigate('ResourceDetail', { uid: uid, resourceId: item.id })}
                           onLongPress={() => confirmResourceDelete(item.id, item.name)}
                         >
                           <Text style={styles.tagText}>
@@ -865,7 +865,7 @@ export function TaskDetailScreen({ route, navigation }) {
                         </Pressable>
                       )
                     }
-                    <Pressable
+                    <Pressable style={styles.tagButton}
                       onPress={() => {
                         setTaskResourcePickerVisible(true)
                         setBackgroundOpacity(.33)
@@ -896,7 +896,7 @@ export function TaskDetailScreen({ route, navigation }) {
 
                         {
                           userResourceNames.map((item) =>
-                            <Pressable key={item.id}
+                          <Pressable key={item.id} style={styles.tagButton}
                               onPress={() => addTaskResource(item.id)}
                             >
                               <Text style={styles.tagText}>
@@ -917,7 +917,7 @@ export function TaskDetailScreen({ route, navigation }) {
                           <FontAwesome
                             style={[{ fontSize: 35 }]}
                             name='arrow-circle-o-left'
-                            color='white'
+                            // color='white'
                           />
                         </Text>
                       </Pressable>
@@ -965,7 +965,7 @@ export function TaskDetailScreen({ route, navigation }) {
 
                         {
                           userPool.map((item) =>
-                            <Pressable key={item.id}
+                          <Pressable key={item.id} style={styles.tagButton}
                               onPress={() => {
                                 reassignTask(item.id, item.userName)
                               }}
@@ -989,7 +989,7 @@ export function TaskDetailScreen({ route, navigation }) {
                           <FontAwesome
                             style={[{ fontSize: 35 }]}
                             name='arrow-circle-o-left'
-                            color='white'
+                            // color='white'
                           />
                         </Text>
                       </Pressable>

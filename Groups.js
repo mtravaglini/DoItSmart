@@ -154,8 +154,8 @@ export function GroupsScreen({ route, navigation }) {
                         </View>
                         {/* show acivity indicator when waiting to return to groups screen */}
                         {isLoading ? (
-                            <ActivityIndicator size="large" color="cornflowerblue" />
-                        ) : (
+                            <ActivityIndicator style={styles.standardText} size="large" />
+                            ) : (
                             <FlatList style={{ height: "73%", marginBottom: 15 }}
                                 data={groups}
                                 ListEmptyComponent={<Text style={[styles.listText, styles.txtWarning, { alignSelf: "center" }]}>

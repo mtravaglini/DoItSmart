@@ -4,6 +4,17 @@ import {
   Platform
 } from 'react-native';
 
+const mainScreenColour = "midnightblue";
+const secondaryScreenColour = "cornflowerblue";
+const iconColour = "cornflowerblue";
+
+const labelColour = "orange";
+const mainTextColour = "midnightblue";
+const textBackgroundColour = "white";
+
+const listBackgroundColour = "lightgreen"
+const listTextColour = "darkgreen"
+
 module.exports = StyleSheet.create({
   // most pages will have safeview and container at top level
   safeView: {
@@ -11,7 +22,7 @@ module.exports = StyleSheet.create({
     // marginTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
     // paddingTop: 0,
     // padding: 0,
-    backgroundColor: "midnightblue",
+    backgroundColor: mainScreenColour,
     // paddingTop: 5,
   },
   // container: {
@@ -26,7 +37,7 @@ module.exports = StyleSheet.create({
     paddingBottom: "20%",
     paddingLeft: "10%",
     paddingRight: "10%",
-    backgroundColor: "cornflowerblue",
+    backgroundColor: secondaryScreenColour,
     marginTop: 0,
     marginBottom: "5%",
     // marginHorizontal: "1%",
@@ -36,7 +47,7 @@ module.exports = StyleSheet.create({
     fontSize: 35,
     fontWeight: "bold",
     // fontFamily: Platform.OS === "android" ? "sans-serif" : "AppleSDGothicNeo",
-    color: "white",
+    color: mainTextColour,
   },
   logo: {
     width: 66,
@@ -53,7 +64,7 @@ module.exports = StyleSheet.create({
     fontSize: 25,
     fontWeight: "bold",
     // fontFamily: Platform.OS === "android" ? "sans-serif-thin" : "AppleSDGothicNeo-Thin",
-    color: "cornflowerblue",
+    color: secondaryScreenColour,
     marginTop: 5
     // marginBottom: 5
   },
@@ -61,15 +72,21 @@ module.exports = StyleSheet.create({
     fontSize: 15,
     fontWeight: "bold",
     // fontFamily: Platform.OS === "android" ? "sans-serif-thin" : "AppleSDGothicNeo-Thin",
-    color: "cornflowerblue",
-    borderColor: "cornflowerblue",
+    color: labelColour,
+    borderColor: labelColour,
     borderWidth: 1,
     borderRadius: 5,
     paddingHorizontal: 15,
     marginBottom: 10,
     alignSelf: "center"
   },
-  // ########################################
+  headerIcon: {
+    fontSize: 30,
+    marginLeft: "3%",
+    marginRight: "5%",
+    color: iconColour,  
+  },
+// ########################################
 
   // standard buttons ########################################
   mainButton: {
@@ -78,7 +95,7 @@ module.exports = StyleSheet.create({
     borderRadius: 15,
     marginTop: 10,
     marginBottom: 10,
-    backgroundColor: "cornflowerblue",
+    backgroundColor: secondaryScreenColour,
     justifyContent: "center",
 
     shadowColor: 'cornflowerblue',
@@ -93,7 +110,7 @@ module.exports = StyleSheet.create({
   buttonText: {
     textAlign: "center",
     textAlignVertical: "center",
-    color: "white",
+    color: mainTextColour,
     fontWeight: "bold",
     fontSize: 20
   },
@@ -103,10 +120,10 @@ module.exports = StyleSheet.create({
     borderRadius: 15,
     marginTop: 10,
     marginBottom: 10,
-    backgroundColor: "white",
+    backgroundColor: textBackgroundColour,
     justifyContent: "center",
     borderWidth: 1,
-    borderColor: "cornflowerblue",
+    borderColor: secondaryScreenColour,
 
     shadowColor: 'cornflowerblue',
     shadowOffset: {
@@ -120,7 +137,7 @@ module.exports = StyleSheet.create({
   secondaryButtonText: {
     textAlign: "center",
     textAlignVertical: "center",
-    color: "cornflowerblue",
+    color: secondaryScreenColour,
     // fontWeight: "bold",
     fontSize: 15,
   },
@@ -157,7 +174,7 @@ module.exports = StyleSheet.create({
     // marginLeft: 0,
     marginRight: "2%",
     fontSize: 18,
-    backgroundColor: "white",
+    backgroundColor: textBackgroundColour,
 
     shadowColor: 'cornflowerblue',
     shadowOffset: {
@@ -173,7 +190,7 @@ module.exports = StyleSheet.create({
     borderRadius: 15,
     width: "28%",
     alignItems: 'center',
-    backgroundColor: "cornflowerblue",
+    backgroundColor: secondaryScreenColour,
     justifyContent: "center",
 
     shadowColor: 'cornflowerblue',
@@ -200,7 +217,7 @@ module.exports = StyleSheet.create({
   inputLabel: {
     paddingLeft: 10,
     fontSize: 10,
-    color: "lightgrey",
+    color: labelColour,
     fontSize: 14,
   },
   input: {
@@ -215,8 +232,8 @@ module.exports = StyleSheet.create({
     marginBottom: 15,
     fontSize: 18,
     fontWeight: "bold",
-    color: "midnightblue",
-    backgroundColor: "white",
+    color: mainScreenColour,
+    backgroundColor: textBackgroundColour,
     alignContent: "center",
 
     shadowColor: 'cornflowerblue',
@@ -229,7 +246,7 @@ module.exports = StyleSheet.create({
     elevation: 5,
 
 
-    // borderColor: "cornflowerblue",
+    // borderColor: secondaryScreenColour,
     // borderBottomWidth: 4,
     // borderTopWidth: 1,
     // borderLeftWidth: 4,
@@ -241,7 +258,7 @@ module.exports = StyleSheet.create({
   // task list  ########################################
   listContainer: {
     // backgroundColor: "red",
-    backgroundColor: "cornflowerblue",
+    backgroundColor: listBackgroundColour,
     // padding: 15,
     borderRadius: 15,
     margin: "1%",
@@ -255,11 +272,12 @@ module.exports = StyleSheet.create({
     fontSize: 30,
     marginLeft: "3%",
     marginRight: "5%",
+    color: listTextColour,
   },
   listText: {
     fontWeight: "bold",
     fontSize: 18,
-    color: "white",
+    color: listTextColour,
     // marginRight: 22,
   },
   // ########################################
@@ -268,7 +286,7 @@ module.exports = StyleSheet.create({
   standardText: {
     fontWeight: "bold",
     fontSize: 18,
-    color: "white",
+    color: mainTextColour,
   },
   txtSuccess: {
     color: "green",
@@ -288,8 +306,9 @@ module.exports = StyleSheet.create({
     borderRadius: 15,
     paddingLeft: 10,
     marginBottom: 15,
-    fontSize: 18,
-    backgroundColor: "white",
+    // marginHorizontal: "5%",
+    fontSize: 16,
+    backgroundColor: textBackgroundColour,
 
     shadowColor: 'cornflowerblue',
     shadowOffset: {
@@ -303,7 +322,7 @@ module.exports = StyleSheet.create({
 
   // Groups and Resource Tags ################################ 
   tagContainer: {
-    backgroundColor: "white",
+    backgroundColor: textBackgroundColour,
     padding: "3%",
     borderRadius: 15,
     marginHorizontal: "1%",
@@ -314,15 +333,18 @@ module.exports = StyleSheet.create({
   },
   tagText: {
     fontSize: 15,
-    color: "white",
-    backgroundColor: "cornflowerblue",
-    borderColor: "white",
+    color: listTextColour,
+    backgroundColor: listBackgroundColour,
+    borderColor: listTextColour,
     borderWidth: 1,
     borderRadius: 5,
     paddingHorizontal: 15,
     // marginBottom: 10
-
   },
+  tagButton: {
+    padding: 2,
+  },
+  ////////////////////////////////////////////////
 
   // footer
   footer: {
@@ -331,24 +353,24 @@ module.exports = StyleSheet.create({
   },
   footerIcon: {
     fontSize: 30,
-    color: 'cornflowerblue',
+    color: iconColour,
     alignSelf: "center"
   },
   footerText: {
-    color: 'cornflowerblue',
+    color: iconColour,
     alignSelf: "center"
   },
 
   // OTHER ########################################
   textDisplay: {
-    color: "cornflowerblue",
+    color: secondaryScreenColour,
     width: "90%",
     height: 48,
     lineHeight: 48,
     marginBottom: 15,
     paddingLeft: "5%",
     fontSize: 18,
-    backgroundColor: "white",
+    backgroundColor: textBackgroundColour,
     borderRadius: 15,
   },
   closeBox: {
@@ -364,7 +386,7 @@ module.exports = StyleSheet.create({
   },
   closeText: {
     fontSize: 18,
-    color: "white",
+    color: mainTextColour,
     fontWeight: "bold",
   },
   // ########################################
@@ -380,9 +402,9 @@ module.exports = StyleSheet.create({
     marginTop: "20%",
     marginBottom: "60%",
     // marginVertical: "50%",
-    backgroundColor: 'midnightblue',
+    backgroundColor: mainScreenColour,
     borderRadius: 20,
-    borderColor: "cornflowerblue",
+    borderColor: secondaryScreenColour,
     borderWidth: 1,
     padding: 35,
     alignItems: 'center',

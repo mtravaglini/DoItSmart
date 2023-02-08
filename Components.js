@@ -24,7 +24,7 @@ export const Title = props => {
         >
           <Text style={[styles.pageTitleText]}>
             <FontAwesome
-              style={styles.listDelIcon}
+              style={styles.headerIcon}
               name='arrow-circle-o-left'
               // color='cornflowerblue'
             />

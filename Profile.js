@@ -341,8 +341,8 @@ export function ProfileScreen({ route, navigation }) {
 
                 {/* show acivity indicator when waiting to return to groups screen */}
                 {isLoading ? (
-                  <ActivityIndicator size="large" color="cornflowerblue" />
-                ) : (
+                  <ActivityIndicator style={styles.standardText} size="large" />
+                  ) : (
 
                   <View>
 
@@ -360,8 +360,8 @@ export function ProfileScreen({ route, navigation }) {
                     <View  style={(groupNames.length > 0) ? styles.tagContainer : ''}>
                       {
                         groupNames.map((item) =>
-                          <Pressable key={item.id}
-                            onPress={() => navigation.navigate('GroupDetail', { uid: uid, groupId: item.id })}
+                        <Pressable key={item.id} style={styles.tagButton}
+                        onPress={() => navigation.navigate('GroupDetail', { uid: uid, groupId: item.id })}
                             onLongPress={() => confirmDeleteGroupMembership(item.id, item.name)}
                           >
                             <Text style={styles.tagText}>

@@ -146,8 +146,8 @@ export function ResourcesScreen({ route, navigation }) {
                         </View>
                         {/* show acivity indicator when waiting to return to resources screen */}
                         {isLoading ? (
-                            <ActivityIndicator size="large" color="cornflowerblue" />
-                        ) : (
+                            <ActivityIndicator style={styles.standardText} size="large" />
+                            ) : (
                             <FlatList style={{ height: "73%", marginBottom: 15 }}
                                 data={resources}
                                 ListEmptyComponent={<Text style={[styles.listText, styles.txtWarning, { alignSelf: "center" }]}>
