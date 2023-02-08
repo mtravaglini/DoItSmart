@@ -46,61 +46,61 @@ export const Footer = props => {
   return (
     <View style={styles.footer}>
 
-      <View style={{ flexDirection: "column", alignItems: "center" }}>
-        <Pressable
+      {/* <View style={{ flexDirection: "column", alignItems: "center" }}> */}
+      <Pressable style={{paddingHorizontal: 10}}
           onPress={() => { props.navigation.navigate('Tasks', { uid: props.uid }) }}
         >
           <FontAwesome
             style={styles.footerIcon}
             name='tasks'
-            color='cornflowerblue'
+            // color='cornflowerblue'
           />
-        </Pressable>
         <Text style={styles.footerText}>Tasks</Text>
-      </View>
+        </Pressable>
+      {/* </View> */}
 
 
-      <View style={{ flexDirection: "column", alignItems: "center" }}>
-      <Pressable
+      {/* <View style={{ flexDirection: "column", alignItems: "center" }}> */}
+      <Pressable style={{paddingHorizontal: 10}}
         onPress={() => { props.navigation.navigate('Groups', { uid: props.uid }) }}
       >
         <FontAwesome
           style={styles.footerIcon}
           name='group'
-          color='cornflowerblue'
+          // color='cornflowerblue'
         />
-      </Pressable>
       <Text style={styles.footerText}>Groups</Text>
-      </View>
+      </Pressable>
+      {/* </View> */}
 
       <View style={{ flexDirection: "column", alignItems: "center" }}>
-      <Pressable
+      <Pressable style={{paddingHorizontal: 10}}
         onPress={() => { props.navigation.navigate('Resources', { uid: props.uid }) }}
       >
         <FontAwesome
           style={styles.footerIcon}
           name='car'
-          color='cornflowerblue'
+          // color='cornflowerblue'
         />
-      </Pressable>
       <Text style={styles.footerText}>Resources</Text>
+      </Pressable>
       </View>
 
       <View style={{ flexDirection: "column", alignItems: "center" }}>
-      <Pressable
+      <Pressable style={{paddingHorizontal: 10}}
         onPress={() => { props.navigation.navigate('Profile', { uid: props.uid }) }}
       >
         <FontAwesome
           style={styles.footerIcon}
           name='user'
-          color='cornflowerblue'
+          // color='cornflowerblue'
         />
-      </Pressable>
       <Text style={styles.footerText}>Profile</Text>
+      </Pressable>
       </View>
 
       <View style={{ flexDirection: "column", alignItems: "center" }}>
-      <Pressable
+      <Pressable style={{paddingHorizontal: 10}}
         onPress={() => {
           signOut(props.auth).then(() => {
             // Sign-out successful.
@@ -114,10 +114,10 @@ export const Footer = props => {
         <FontAwesome
           style={styles.footerIcon}
           name='sign-out'
-          color='cornflowerblue'
+          // color='cornflowerblue'
         />
-      </Pressable>
       <Text style={styles.footerText}>SignOut</Text>
+      </Pressable>
       </View>
 
     </View>

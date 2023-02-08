@@ -331,9 +331,12 @@ module.exports = StyleSheet.create({
   },
   footerIcon: {
     fontSize: 30,
+    color: 'cornflowerblue',
+    alignSelf: "center"
   },
   footerText: {
     color: 'cornflowerblue',
+    alignSelf: "center"
   },
 
   // OTHER ########################################
