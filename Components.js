@@ -22,11 +22,11 @@ export const Title = props => {
         <Pressable style={{ position: "absolute", left: "1%" }}
           onPress={() => props.navigation.goBack()}
         >
-          <Text>
+          <Text style={[styles.pageTitleText]}>
             <FontAwesome
               style={styles.listDelIcon}
               name='arrow-circle-o-left'
-              color='cornflowerblue'
+              // color='cornflowerblue'
             />
           </Text>
         </Pressable>

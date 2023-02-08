@@ -1,11 +1,17 @@
-import { StyleSheet, Platform } from 'react-native';
+import {
+  StatusBar,
+  StyleSheet,
+  Platform
+} from 'react-native';
 
 module.exports = StyleSheet.create({
   // most pages will have safeview and container at top level
   safeView: {
     flex: 1,
-    paddingTop: Platform.OS === "android" ? 50 : 0,
-    backgroundColor: "#151515"
+    marginTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+    // paddingTop: 50,
+    backgroundColor: "midnightblue",
+    // paddingTop: 5,
   },
   container: {
     alignItems: 'center',
@@ -46,7 +52,8 @@ module.exports = StyleSheet.create({
     fontSize: 25,
     fontWeight: "bold",
     fontFamily: Platform.OS === "android" ? "sans-serif-thin" : "AppleSDGothicNeo-Thin",
-    color: "cornflowerblue"
+    color: "cornflowerblue",
+    marginTop: 5
     // marginBottom: 5
   },
   pageSubTitleText: {
@@ -207,7 +214,7 @@ module.exports = StyleSheet.create({
     marginBottom: 15,
     fontSize: 18,
     fontWeight: "bold",
-    color: "#151515",
+    color: "midnightblue",
     backgroundColor: "white",
     alignContent: "center",
 
@@ -371,7 +378,7 @@ module.exports = StyleSheet.create({
     marginTop: "20%",
     marginBottom: "60%",
     // marginVertical: "50%",
-    backgroundColor: '#151515',
+    backgroundColor: 'midnightblue',
     borderRadius: 20,
     borderColor: "cornflowerblue",
     borderWidth: 1,

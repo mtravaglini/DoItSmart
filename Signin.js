@@ -3,6 +3,7 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   SafeAreaView,
+  StatusBar,
   Text,
   TextInput,
   TouchableOpacity,
@@ -50,10 +51,11 @@ export function SigninScreen({ route, navigation }) {
     // console.log("Signed in successfully.");
     // console.log("currentuser=", auth.currentUser);
     // console.log("uid=", auth.currentUser.uid);
-
     setScreenMsg("");
     return 0;
   }
+
+  console.log('Height on: ', Platform.OS, StatusBar.currentHeight);
 
   return (
     <SafeAreaView style={[styles.safeView]}>
