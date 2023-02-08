@@ -653,7 +653,7 @@ export function TaskDetailScreen({ route, navigation }) {
                           setStartDatePickerVisibility(true)
                           setBackgroundOpacity(0.33)
                         }}>
-                        <Text style={styles.dateText}>
+                        <Text style={[styles.input, styles.dateText]}>
                           {formatDate(task.startDate)}
                         </Text>
                       </Pressable>
@@ -676,13 +676,13 @@ export function TaskDetailScreen({ route, navigation }) {
                     </View>
 
                     <View style={{ flexDirection: "column", flex: 1 }}>
-                      <Text style={styles.inputLabel}>Finish by</Text>
+                      <Text style={styles.inputLabel}>Finish By</Text>
                       <Pressable
                         onPress={() => {
                           setEndDatePickerVisibility(true)
                           setBackgroundOpacity(0.33)
                         }}>
-                        <Text style={styles.dateText}>
+                        <Text style={[styles.input, styles.dateText]}>
                           {formatDate(task.endDate)}
                         </Text>
                       </Pressable>
@@ -713,10 +713,15 @@ export function TaskDetailScreen({ route, navigation }) {
                         skin={"clean"}
                         height={48}
                         width={150}
-                        style={[styles.input, {
+                        style={{
                           borderRadius: 15,
-                          shadowColor: "cornflowerblue"
-                        }]}
+                          shadowColor: "cornflowerblue",
+                          marginBottom: 15
+                        }}
+                        inputStyle={[
+                          styles.input,
+                          { marginBottom: 0 }
+                        ]}
                         shadow={false}
                         max={10}
                         min={0}
@@ -734,10 +739,15 @@ export function TaskDetailScreen({ route, navigation }) {
                         skin={"clean"}
                         height={48}
                         width={150}
-                        style={[styles.input, {
+                        style={{
                           borderRadius: 15,
-                          shadowColor: "cornflowerblue"
-                        }]}
+                          shadowColor: "cornflowerblue",
+                          marginBottom: 15
+                        }}
+                        inputStyle={[
+                          styles.input,
+                          { marginBottom: 0 }
+                        ]}
                         shadow={false}
                         max={10080}
                         min={10}
@@ -795,7 +805,7 @@ export function TaskDetailScreen({ route, navigation }) {
 
                       <Text style={[styles.inputLabel, { paddingTop: 15, alignSelf: 'flex-start' }]}>Groups</Text>
 
-                      <View style={{ marginBottom: 15, alignItems: "flex-start", flexWrap: "wrap", flexDirection: "row" }}>
+                      <View style={styles.tagContainer}>
 
                         {
                           userGroupNames.map((item) =>
@@ -872,7 +882,7 @@ export function TaskDetailScreen({ route, navigation }) {
 
                       <Text style={[styles.inputLabel, { paddingTop: 15, alignSelf: 'flex-start' }]}>Resources</Text>
 
-                      <View style={{ marginBottom: 15, alignItems: "flex-start", flexWrap: "wrap", flexDirection: "row" }}>
+                      <View style={styles.tagContainer}>
 
                         {
                           userResourceNames.map((item) =>
@@ -941,10 +951,7 @@ export function TaskDetailScreen({ route, navigation }) {
                       <Text style={styles.pageTitleText}>Reassign Task</Text>
 
                       <Text style={[styles.inputLabel, { paddingTop: 15, alignSelf: 'flex-start' }]}>Select user to reassign task</Text>
-
-
-
-                      <View style={{ marginBottom: 15, alignItems: "flex-start", flexWrap: "wrap", flexDirection: "row" }}>
+                      <View style={styles.tagContainer}>
 
                         {
                           userPool.map((item) =>

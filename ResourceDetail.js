@@ -330,8 +330,7 @@ export function ResourceDetailScreen({ route, navigation }) {
                     <Text style={styles.pageTitleText}>Add Resource to Groups</Text>
 
                     <Text style={[styles.inputLabel, { paddingTop: 15, alignSelf: 'flex-start' }]}>Groups</Text>
-
-                    <View style={{ marginBottom: 15, alignItems: "flex-start", flexWrap: "wrap", flexDirection: "row" }}>
+                    <View style={styles.tagContainer}>
 
                       {
                         userGroupNames.map((item) =>

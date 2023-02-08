@@ -53,10 +53,10 @@ export const Footer = props => {
           <FontAwesome
             style={styles.footerIcon}
             name='tasks'
-            color='black'
+            color='cornflowerblue'
           />
         </Pressable>
-        <Text>Tasks</Text>
+        <Text style={styles.footerText}>Tasks</Text>
       </View>
 
 
@@ -67,10 +67,10 @@ export const Footer = props => {
         <FontAwesome
           style={styles.footerIcon}
           name='group'
-          color='black'
+          color='cornflowerblue'
         />
       </Pressable>
-      <Text>Groups</Text>
+      <Text style={styles.footerText}>Groups</Text>
       </View>
 
       <View style={{ flexDirection: "column", alignItems: "center" }}>
@@ -80,10 +80,10 @@ export const Footer = props => {
         <FontAwesome
           style={styles.footerIcon}
           name='car'
-          color='black'
+          color='cornflowerblue'
         />
       </Pressable>
-      <Text>Resources</Text>
+      <Text style={styles.footerText}>Resources</Text>
       </View>
 
       <View style={{ flexDirection: "column", alignItems: "center" }}>
@@ -93,10 +93,10 @@ export const Footer = props => {
         <FontAwesome
           style={styles.footerIcon}
           name='user'
-          color='black'
+          color='cornflowerblue'
         />
       </Pressable>
-      <Text>Profile</Text>
+      <Text style={styles.footerText}>Profile</Text>
       </View>
 
       <View style={{ flexDirection: "column", alignItems: "center" }}>
@@ -114,10 +114,10 @@ export const Footer = props => {
         <FontAwesome
           style={styles.footerIcon}
           name='sign-out'
-          color='black'
+          color='cornflowerblue'
         />
       </Pressable>
-      <Text>SignOut</Text>
+      <Text style={styles.footerText}>SignOut</Text>
       </View>
 
     </View>

@@ -5,7 +5,7 @@ module.exports = StyleSheet.create({
   safeView: {
     flex: 1,
     paddingTop: Platform.OS === "android" ? 50 : 0,
-    backgroundColor: "#e5e5e5"
+    backgroundColor: "#151515"
   },
   container: {
     alignItems: 'center',
@@ -15,15 +15,15 @@ module.exports = StyleSheet.create({
   // main title screen text ########################################
   mainTitleContainer: {
     alignItems: 'center',
-    paddingTop: "15%",
-    paddingBottom: "15%",
+    paddingTop: "20%",
+    paddingBottom: "20%",
     paddingLeft: "10%",
     paddingRight: "10%",
     backgroundColor: "cornflowerblue",
-    marginTop: "10%",
-    marginBottom: "10%",
-    marginHorizontal: "1%",
-    borderRadius: 5,
+    // marginTop: "10%",
+    marginBottom: "5%",
+    // marginHorizontal: "1%",
+    // borderRadius: 5,
   },
   titleText: {
     fontSize: 35,
@@ -192,6 +192,8 @@ module.exports = StyleSheet.create({
   inputLabel: {
     paddingLeft: 10,
     fontSize: 10,
+    color: "lightgrey",
+    fontSize: 14,
   },
   input: {
     height: 48,
@@ -204,6 +206,8 @@ module.exports = StyleSheet.create({
     // marginRight: "2%",
     marginBottom: 15,
     fontSize: 18,
+    fontWeight: "bold",
+    color: "#151515",
     backgroundColor: "white",
     alignContent: "center",
 
@@ -321,8 +325,9 @@ module.exports = StyleSheet.create({
   },
   footerIcon: {
     fontSize: 30,
-    // marginLeft: "10%",
-    // marginRight: "10%",
+  },
+  footerText: {
+    color: 'cornflowerblue',
   },
 
   // OTHER ########################################
@@ -366,7 +371,7 @@ module.exports = StyleSheet.create({
     marginTop: "20%",
     marginBottom: "60%",
     // marginVertical: "50%",
-    backgroundColor: '#e5e5e5',
+    backgroundColor: '#151515',
     borderRadius: 20,
     borderColor: "cornflowerblue",
     borderWidth: 1,
