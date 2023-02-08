@@ -17,7 +17,7 @@ import {
 import { FontAwesome } from '@expo/vector-icons';
 import { db, auth } from './firebase.config';
 import { signOut } from "firebase/auth";
-import { doc, collection, query, getDoc, setDoc, addDoc, deleteDoc, onSnapshot, orderBy } from "firebase/firestore";
+import { doc, collection, query, getDoc, setDoc, addDoc, deleteDoc, onSnapshot, orderBy, where } from "firebase/firestore";
 
 // use custom style sheet
 const styles = require('./Style.js');
@@ -56,7 +56,7 @@ export function ResourcesScreen({ route, navigation }) {
             try {
                 unsubscribe = onSnapshot(
                     query(
-                        collection(db, "Resources"), orderBy('name')), (querySnapshot) => {
+                        collection(db, "Resources"), where("creator", "==", uid), orderBy('name')), (querySnapshot) => {
                             const retrievedResources = [];
                             querySnapshot.forEach((doc) => {
                                 resourceObj = doc.data();
