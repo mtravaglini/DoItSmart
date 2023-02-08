@@ -349,7 +349,7 @@ export function ProfileScreen({ route, navigation }) {
                     />
 
                     {(groupNames.length > 0) ? <Text style={styles.inputLabel}>Your groups</Text> : ''}
-                    <View style={styles.tagContainer}>
+                    <View  style={(groupNames.length > 0) ? styles.tagContainer : ''}>
                       {
                         groupNames.map((item) =>
                           <Pressable key={item.id}
@@ -365,7 +365,8 @@ export function ProfileScreen({ route, navigation }) {
                     </View>
 
                     {(invites.length > 0) ? <Text style={styles.inputLabel}>Your group invitations</Text> : ''}
-                    <View style={{ marginBottom: 15, alignItems: "flex-start", flexWrap: "wrap", flexDirection: "row" }}>
+                    {/* <View style={styles.tagContainer}> */}
+                    <View  style={(invites.length > 0) ? styles.tagContainer : ''}>
 
                       {
                         invites.map((item) =>
