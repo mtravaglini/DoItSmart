@@ -116,18 +116,31 @@ export function TaskDetailScreen({ route, navigation }) {
       var taskResourceSnaps = await getTaskResources()
       var retrievedTaskResourceNames = await processTaskResources(taskResourceSnaps)
       setTaskResourceNames(retrievedTaskResourceNames)
-      console.log("taskResources", retrievedTaskResourceNames)
-
+      // console.log("taskResources", retrievedTaskResourceNames)
+      console.log("######################################################################")
       var retrievedUserResourceNames = []
       for (var group of retrievedUserGroupNames) {
         var groupResourcesSnaps = await getGroupResources(group)
         var retrievedUserResourceNamesX = await processGroupResources(groupResourcesSnaps)
         retrievedUserResourceNames = retrievedUserResourceNames.concat(retrievedUserResourceNamesX)
+        // console.log("GROUP", group.name, retrievedUserResourceNamesX)
       }
+      // remove duplicate resources ///////////////////////////////
+      const map = new Map()
+      for (const groupObj of retrievedUserResourceNames) {
+        map.set(groupObj.id, groupObj)
+      }
+      retrievedUserResourceNames = []
+      for (var x of map.values()) {
+        retrievedUserResourceNames.push(x)
+      }
+      // console.log("retrievedUserResourceNames", retrievedUserResourceNames)
+      //////////////////////////////////////////////////
+
 
       var filterResourcesResult = await filterGroups(retrievedTaskResourceNames, retrievedUserResourceNames)
       setUserResourceNames(filterResourcesResult)
-      console.log("groupResources", filterResourcesResult)
+      // console.log("groupResources", filterResourcesResult)
 
       /////////////////////////////////////////////////////////////////
     }
@@ -724,11 +737,11 @@ export function TaskDetailScreen({ route, navigation }) {
                         height={48}
                         width={140}
                         style={[styles.input,
-                          {
-                            borderRadius: 15,
-                            // shadowColor: "cornflowerblue",
-                            marginBottom: 15
-                          }]}
+                        {
+                          borderRadius: 15,
+                          // shadowColor: "cornflowerblue",
+                          marginBottom: 15
+                        }]}
                         inputStyle={[
                           styles.input,
                           { marginBottom: 0 }
