@@ -32,7 +32,7 @@ export function SigninScreen({ route, navigation }) {
   const [screenMsg, setScreenMsg] = useState('');
 
   const insets = useSafeAreaInsets();
-  console.log("insets", insets)
+  // console.log("insets", insets)
 
   // TODO CLEANUP: uncomment next section
   // clear password on screen load 
@@ -62,7 +62,7 @@ export function SigninScreen({ route, navigation }) {
     return 0;
   }
 
-  console.log('Height on: ', Platform.OS, StatusBar.currentHeight);
+  // console.log('Height on: ', Platform.OS, StatusBar.currentHeight);
 
   return (
     <View style={[styles.safeView, {
