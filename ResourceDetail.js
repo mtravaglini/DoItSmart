@@ -261,15 +261,17 @@ export function ResourceDetailScreen({ route, navigation }) {
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View>
+        {/* <TouchableWithoutFeedback onPress={Keyboard.dismiss}> */}
+        <View style={{ flex: 1 }}>
+
 
             <Title
               title="Resource Details"
               name={user.name}
               navigation={navigation} />
 
-            <ScrollView style={{ height: "81%", marginBottom: 15 }}>
+            {/* <ScrollView style={{ height: "81%", marginBottom: 15 }}> */}
+            <ScrollView>
 
               <View style={styles.inputFormContainer}>
                 <Text style={styles.inputLabel}>Created by {createdByUser}</Text>
@@ -303,8 +305,8 @@ export function ResourceDetailScreen({ route, navigation }) {
                 <View style={styles.tagContainer}>
                   {
                     groupResourceNames.map((item) =>
-                    <Pressable key={item.id} style={styles.tagButton}
-                    onLongPress={() => confirmDeleteGroupMembership(item.id, item.name)}
+                      <Pressable key={item.id} style={styles.tagButton}
+                        onLongPress={() => confirmDeleteGroupMembership(item.id, item.name)}
                         onPress={() => navigation.navigate('GroupDetail', { uid: uid, groupId: item.id })}
                       >
                         <Text style={styles.tagText}>
@@ -364,7 +366,7 @@ export function ResourceDetailScreen({ route, navigation }) {
                         <FontAwesome
                           style={[{ fontSize: 35 }]}
                           name='arrow-circle-o-left'
-                          // color='white'
+                        // color='white'
                         />
                       </Text>
                     </Pressable>
@@ -399,7 +401,7 @@ export function ResourceDetailScreen({ route, navigation }) {
               uid={uid} />
 
           </View>
-        </TouchableWithoutFeedback>
+        {/* </TouchableWithoutFeedback> */}
       </KeyboardAvoidingView>
     </View>
   );

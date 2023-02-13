@@ -122,8 +122,9 @@ export function GroupsScreen({ route, navigation }) {
             <KeyboardAvoidingView
                 style={{ flex: 1 }}
                 behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-                <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                    <View>
+                {/* <TouchableWithoutFeedback onPress={Keyboard.dismiss}> */}
+                <View style={{ flex: 1 }}>
+
 
                         <Title
                             title="Groups"
@@ -188,7 +189,7 @@ export function GroupsScreen({ route, navigation }) {
                             uid={uid} />
 
                     </View>
-                </TouchableWithoutFeedback>
+                {/* </TouchableWithoutFeedback> */}
             </KeyboardAvoidingView>
         </View>
     );

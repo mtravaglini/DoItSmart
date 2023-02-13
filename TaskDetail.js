@@ -277,7 +277,7 @@ export function TaskDetailScreen({ route, navigation }) {
 
       for (var groupId of groupArray) {
         // console.log("Getting users for group", groupId)
-        querySnapshot = await getDocs(query(collection(db, "Groups", groupId.id, "GroupUsers")));
+        var querySnapshot = await getDocs(query(collection(db, "Groups", groupId.id, "GroupUsers")));
         querySnapshot.forEach((doc) => {
           // console.log("xxxxx",groupId, doc.data().userId, uid)
           if (doc.data().userId !== uid) {
@@ -628,7 +628,8 @@ export function TaskDetailScreen({ route, navigation }) {
             )
             :
             (
-              <ScrollView style={{ height: "81%", marginBottom: 15 }}>
+              // <ScrollView style={{ height: "81%", marginBottom: 15 }}>
+              <ScrollView>
 
                 <View style={styles.inputFormContainer}>
                   <Text style={styles.inputLabel}>Created by {createdByUser}</Text>

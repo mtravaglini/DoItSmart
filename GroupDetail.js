@@ -268,15 +268,16 @@ export function GroupDetailScreen({ route, navigation }) {
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View>
+        {/* <TouchableWithoutFeedback onPress={Keyboard.dismiss}> */}
+          <View style={{ flex: 1 }}>
 
             <Title
               title="Group Details"
               name={user.name}
               navigation={navigation} />
 
-            <ScrollView style={{ height: "81%", marginBottom: 15 }}>
+              {/* <ScrollView style={{ height: "81%", marginBottom: 15 }}> */}
+              <ScrollView>
 
               <View style={styles.inputFormContainer}>
                 <Text style={styles.inputLabel}>Created by {createdByUser}</Text>
@@ -419,7 +420,7 @@ export function GroupDetailScreen({ route, navigation }) {
               uid={uid} />
 
           </View>
-        </TouchableWithoutFeedback>
+        {/* </TouchableWithoutFeedback> */}
       </KeyboardAvoidingView>
     </View>
   );

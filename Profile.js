@@ -328,21 +328,23 @@ export function ProfileScreen({ route, navigation }) {
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View>
+        {/* <TouchableWithoutFeedback onPress={Keyboard.dismiss}> */}
+        <View style={{ flex: 1 }}>
+
 
             <Title
               title="Profile"
               name={user.name}
               navigation={navigation} />
 
-            <ScrollView style={{ height: "81%", marginBottom: 15 }}>
+            {/* <ScrollView style={{ height: "81%", marginBottom: 15 }}> */}
+            <ScrollView>
               <View style={styles.inputFormContainer}>
 
                 {/* show acivity indicator when waiting to return to groups screen */}
                 {isLoading ? (
                   <ActivityIndicator style={styles.standardText} size="large" />
-                  ) : (
+                ) : (
 
                   <View>
 
@@ -357,11 +359,11 @@ export function ProfileScreen({ route, navigation }) {
                     />
 
                     {(groupNames.length > 0) ? <Text style={styles.inputLabel}>Your groups</Text> : ''}
-                    <View  style={(groupNames.length > 0) ? styles.tagContainer : ''}>
+                    <View style={(groupNames.length > 0) ? styles.tagContainer : ''}>
                       {
                         groupNames.map((item) =>
-                        <Pressable key={item.id} style={styles.tagButton}
-                        onPress={() => navigation.navigate('GroupDetail', { uid: uid, groupId: item.id })}
+                          <Pressable key={item.id} style={styles.tagButton}
+                            onPress={() => navigation.navigate('GroupDetail', { uid: uid, groupId: item.id })}
                             onLongPress={() => confirmDeleteGroupMembership(item.id, item.name)}
                           >
                             <Text style={styles.tagText}>
@@ -374,7 +376,7 @@ export function ProfileScreen({ route, navigation }) {
 
                     {(invites.length > 0) ? <Text style={styles.inputLabel}>Your group invitations</Text> : ''}
                     {/* <View style={styles.tagContainer}> */}
-                    <View  style={(invites.length > 0) ? styles.tagContainer : ''}>
+                    <View style={(invites.length > 0) ? styles.tagContainer : ''}>
 
                       {
                         invites.map((item) =>
@@ -421,7 +423,7 @@ export function ProfileScreen({ route, navigation }) {
               uid={uid} />
 
           </View>
-        </TouchableWithoutFeedback>
+        {/* </TouchableWithoutFeedback> */}
       </KeyboardAvoidingView>
     </View>
   );

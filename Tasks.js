@@ -118,8 +118,9 @@ export function TasksScreen({ route, navigation }) {
             <KeyboardAvoidingView
                 style={{ flex: 1 }}
                 behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-                <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                    <View>
+                {/* <TouchableWithoutFeedback onPress={Keyboard.dismiss}> */}
+                <View style={{ flex: 1 }}>
+
 
                         <Title 
                         title="Tasks" 
@@ -184,7 +185,7 @@ export function TasksScreen({ route, navigation }) {
                         uid={uid}/>
 
                     </View>
-                </TouchableWithoutFeedback>
+                {/* </TouchableWithoutFeedback> */}
             </KeyboardAvoidingView>
         </View>
     );
