@@ -18,7 +18,7 @@ import {
 import { FontAwesome } from '@expo/vector-icons';
 import { db, auth } from './firebase.config';
 import { signOut } from "firebase/auth";
-import { doc, collection, query, getDoc, setDoc, addDoc, deleteDoc, onSnapshot, where, orderBy } from "firebase/firestore";
+import { doc, collection, query, getDoc, getDocs, setDoc, addDoc, deleteDoc, onSnapshot, where, orderBy } from "firebase/firestore";
 
 // use custom style sheet
 const styles = require('./Style.js');
@@ -126,6 +126,22 @@ export function TasksScreen({ route, navigation }) {
   // delete a task
   const deleteTask = async (taskId) => {
     try {
+
+      var querySnapshot;
+
+      // delete the tasks's TaskGroups subcollection
+      querySnapshot = await getDocs(collection(db, "Tasks", taskId, "TaskGroups"))
+      querySnapshot.forEach((doc) => {
+        deleteDoc(doc.ref)
+      })
+
+      // delete the task's TaskResources subcollection
+      querySnapshot = await getDocs(collection(db, "Tasks", taskId, "TaskResources"))
+      querySnapshot.forEach((doc) => {
+        deleteDoc(doc.ref)
+      })
+
+      // delete Tasks doc
       await deleteDoc(doc(db, "Tasks", taskId));
     } catch (error) {
       alert(error);

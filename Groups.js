@@ -18,7 +18,7 @@ import {
 import { FontAwesome } from '@expo/vector-icons';
 import { db, auth } from './firebase.config';
 import { signOut } from "firebase/auth";
-import { doc, collection, query, getDoc, setDoc, addDoc, deleteDoc, onSnapshot, where, orderBy } from "firebase/firestore";
+import { doc, collection, query, getDoc, setDoc, addDoc, deleteDoc, onSnapshot, where, orderBy, getDocs } from "firebase/firestore";
 
 // use custom style sheet
 const styles = require('./Style.js');
@@ -121,6 +121,21 @@ export function GroupsScreen({ route, navigation }) {
   // delete a group
   const deleteGroup = async (groupId) => {
     try {
+      var querySnapshot;
+
+      // delete the group's GroupUsers subcollection
+      querySnapshot = await getDocs(collection(db, "Groups", groupId, "GroupUsers"))
+      querySnapshot.forEach((doc) => {
+        deleteDoc(doc.ref)
+      })
+
+      // delete the group's GroupResources subcollection
+      querySnapshot = await getDocs(collection(db, "Groups", groupId, "GroupResources"))
+      querySnapshot.forEach((doc) => {
+        deleteDoc(doc.ref)
+      })
+
+      // delete the Group doc
       await deleteDoc(doc(db, "Groups", groupId));
     } catch (error) {
       alert(error);
