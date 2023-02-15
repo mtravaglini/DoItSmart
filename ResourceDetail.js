@@ -36,6 +36,7 @@ export function ResourceDetailScreen({ route, navigation }) {
   const [origResource, setOrigResource] = useState({});
   const [resource, setResource] = useState({});
   const [userGroupNames, setUserGroupNames] = useState([]);
+  const [userResourceNames, setUserResourceNames] = useState([]);
   const [groupResourceNames, setGroupResourceNames] = useState([]);
   const [groupResourcesUpdated, setGroupResourcesUpdated] = useState(0);
 
@@ -50,12 +51,12 @@ export function ResourceDetailScreen({ route, navigation }) {
       var userSnap = await getUser()
       var resoureceSnap = await getResource()
 
-      // promise chaining
-      var groupResourcesSnap = await getGroupResources()
+      // promise chaining //////////////////////////////////////////
+      var groupResourcesSnap = await getGroupResourcesByResource()
       var retrievedGroupResourceNames = await processGroupSubcollection(groupResourcesSnap)
       setGroupResourceNames(retrievedGroupResourceNames)
 
-      var userGroupsSnap = await getUserGroups(userSnap)
+      var userGroupsSnap = await getGroupUsersByUser(userSnap)
       var retrievedUserGroupNames = await processGroupSubcollection(userGroupsSnap)
 
       var filterGroupsResult = await filterGroups(retrievedGroupResourceNames, retrievedUserGroupNames)
@@ -86,7 +87,7 @@ export function ResourceDetailScreen({ route, navigation }) {
       }
 
       // get resource groups for this resource
-      async function getGroupResources() {
+      async function getGroupResourcesByResource() {
         // get groups subcollection for the resource
         try {
           var querySnapshot = await getDocs(query(collectionGroup(db, "GroupResources"), where("resourceId", "==", resourceId)));
@@ -96,11 +97,10 @@ export function ResourceDetailScreen({ route, navigation }) {
         }
       }
 
-      async function getUserGroups(userSnap) {
+      async function getGroupUsersByUser(userSnap) {
         try {
           var querySnapshot = await getDocs(query(collectionGroup(db, 'GroupUsers'), where('userId', '==', uid)));
           return querySnapshot
-          // console.log("Setting user groups", retrievedUserGroupNames)
         } catch (error) {
           console.error(error);
         }
@@ -108,7 +108,7 @@ export function ResourceDetailScreen({ route, navigation }) {
 
       async function processGroupSubcollection(querySnapshot) {
         try {
-          var retrievedGroupNames = await getGroupSubcollectionParents(querySnapshot.docs)
+          var retrievedGroupNames = await getGroupUsersParents(querySnapshot.docs)
           return retrievedGroupNames
         } catch (error) {
           console.error(error);
@@ -116,7 +116,7 @@ export function ResourceDetailScreen({ route, navigation }) {
       }
 
 
-      async function getGroupSubcollectionParents(groupUsersSnaps) {
+      async function getGroupUsersParents(groupUsersSnaps) {
         try {
           return Promise.all(groupUsersSnaps.map(async (groupUser) => {
             const docRef = groupUser.ref;

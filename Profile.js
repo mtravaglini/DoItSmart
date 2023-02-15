@@ -47,7 +47,8 @@ export function ProfileScreen({ route, navigation }) {
     async function getProfile() {
       var userSnap = await getUser()
 
-      var groupSnaps = await getGroupUsers(userSnap)
+      var groupSnaps = await getGroupUsers()
+      // console.log("groupSnaps", await groupSnaps)
       var retrievedGroupNames = await processGroupUsers(groupSnaps)
       await saveGroupNames(retrievedGroupNames)
 
@@ -63,7 +64,7 @@ export function ProfileScreen({ route, navigation }) {
         setOrigUser(docSnap.data());
         setUser(docSnap.data());
         setLoading(false);
-        console.log("userSnap", docSnap.data())
+        // console.log("userSnap", docSnap.data())
         return docSnap;
       } catch (error) {
         console.error(error);
@@ -71,12 +72,12 @@ export function ProfileScreen({ route, navigation }) {
     }
 
     // get all the groupuser subcollection of the groups collection for the user
-    async function getGroupUsers(userSnap) {
+    async function getGroupUsers() {
       try {
         // var querySnapshot;
         // unsubscribe = onSnapshot(
         querySnapshot = await
-          getDocs(query(collectionGroup(db, 'GroupUsers'), where('userId', '==', userSnap.id)))
+          getDocs(query(collectionGroup(db, 'GroupUsers'), where('userId', '==', uid)))
         //     , () => {
         //     });
         console.log("groupSnaps", typeof querySnapshot)

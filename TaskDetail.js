@@ -96,11 +96,11 @@ export function TaskDetailScreen({ route, navigation }) {
       var userSnap = await getUser()
       var taskSnap = await getTask()
 
-      var taskGroupsSnap = await getTaskGroups()
+      var taskGroupsSnap = await getTaskGroupsByTask()
       var retrievedTaskGroupNames = await processTaskGroups(taskGroupsSnap)
       setTaskGroupNames(retrievedTaskGroupNames)
 
-      var userGroupsSnap = await getGroupUsers(retrievedTaskGroupNames)
+      var userGroupsSnap = await getGroupUsersByUser(retrievedTaskGroupNames)
       var retrievedUserGroupNames = await processUserGroups(userGroupsSnap)
 
       var filterGroupsResult = await filterGroups(retrievedTaskGroupNames, retrievedUserGroupNames)
@@ -113,14 +113,14 @@ export function TaskDetailScreen({ route, navigation }) {
 
 
       // get resource info
-      var taskResourceSnaps = await getTaskResources()
+      var taskResourceSnaps = await getTaskResourcesByTask()
       var retrievedTaskResourceNames = await processTaskResources(taskResourceSnaps)
       setTaskResourceNames(retrievedTaskResourceNames)
       // console.log("taskResources", retrievedTaskResourceNames)
       console.log("######################################################################")
       var retrievedUserResourceNames = []
       for (var group of retrievedUserGroupNames) {
-        var groupResourcesSnaps = await getGroupResources(group)
+        var groupResourcesSnaps = await getGroupResourcesByGroup(group)
         var retrievedUserResourceNamesX = await processGroupResources(groupResourcesSnaps)
         retrievedUserResourceNames = retrievedUserResourceNames.concat(retrievedUserResourceNamesX)
         // console.log("GROUP", group.name, retrievedUserResourceNamesX)
@@ -170,8 +170,8 @@ export function TaskDetailScreen({ route, navigation }) {
       }
     }
 
-    async function getTaskGroups() {
-      // console.log("getTaskGroups")
+    async function getTaskGroupsByTask() {
+      // console.log("getTaskGroupsByTask")
       // unsubscribe = onSnapshot(
       // get groups subcollection for the task
       try {
@@ -211,7 +211,7 @@ export function TaskDetailScreen({ route, navigation }) {
       }
     }
 
-    async function getGroupUsers(savedTaskGroups) {
+    async function getGroupUsersByUser(savedTaskGroups) {
       try {
         var querySnapshot = await getDocs(query(collectionGroup(db, 'GroupUsers'), where('userId', '==', uid)));
         return querySnapshot
@@ -309,7 +309,7 @@ export function TaskDetailScreen({ route, navigation }) {
 
 
     // get the resources assigned to this task
-    async function getTaskResources() {
+    async function getTaskResourcesByTask() {
       try {
         var querySnapshot = await getDocs(query(collection(db, "Tasks", taskId, "TaskResources")));
         return querySnapshot
@@ -347,8 +347,8 @@ export function TaskDetailScreen({ route, navigation }) {
 
 
     // get the resources available to assign to this task
-    async function getGroupResources(group) {
-      // console.log("Entered getGroupResources", group)
+    async function getGroupResourcesByGroup(group) {
+      // console.log("Entered getGroupResourcesByGroup", group)
       try {
         // console.log("Get the all the group resources for", group.id)
         var resourcesSnap = await getDocs(query(collection(db, "Groups", group.id, "GroupResources")))
