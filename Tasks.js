@@ -36,6 +36,8 @@ export function TasksScreen({ route, navigation }) {
   const [newTaskName, setNewTaskName] = useState('');
   const [isLoading, setLoading] = useState(true);
 
+  const [lastDateDisplayed, setLastDateDisplayed] = useState(0);
+
   // get user 
   useEffect(() => {
     async function getUser() {
@@ -198,25 +200,46 @@ export function TasksScreen({ route, navigation }) {
               ListEmptyComponent={<Text style={[styles.listText, styles.txtSuccess, { alignSelf: "center" }]}>
                 All done! Add more tasks!
               </Text>}
-              renderItem={({ item }) => (
-                <View>
-                  <Pressable
-                    style={styles.listContainer}
-                    onPress={() => navigation.navigate('TaskDetail', { uid: uid, taskId: item.id })}
-                  >
-                    <FontAwesome
-                      style={styles.listDelIcon}
-                      name='trash-o'
-                      color='lightgrey'
-                      onPress={() => deleteTask(item.id)} />
-                    {/* <View > */}
-                    <Text style={styles.listText} >
-                      {item.name}
-                    </Text>
-                    {/* </View> */}
-                  </Pressable>
-                </View>
-              )}
+              renderItem={({ item, index }) => {
+                
+                // display task date only if different to last task 
+                var displayDate = true;
+                var curr, prev
+                if (index > 0) {
+                  curr = new Date(item.startDate).toString().slice(0, 10)
+                  prev = new Date(tasks[(index - 1)].startDate).toString().slice(0, 10)
+                  displayDate = (curr != prev)
+                }
+
+                return (
+                  <View>
+                    {(displayDate) ?
+                      (
+                        <Text style={styles.inputLabel}>{
+                          new Date(item.startDate).toString().slice(0, 10)
+                          }</Text>
+                      ) : (
+                        ''
+                      )}
+
+                    <Pressable
+                      style={styles.listContainer}
+                      onPress={() => navigation.navigate('TaskDetail', { uid: uid, taskId: item.id })}
+                    >
+                      <FontAwesome
+                        style={styles.listDelIcon}
+                        name='trash-o'
+                        color='lightgrey'
+                        onPress={() => deleteTask(item.id)} />
+                      {/* <View > */}
+                      <Text style={styles.listText} >
+                        {item.name}
+                      </Text>
+                      {/* </View> */}
+                    </Pressable>
+                  </View>
+                )
+              }}
             />
           )}
 
