@@ -5,6 +5,7 @@ import {
   FlatList,
   Keyboard,
   KeyboardAvoidingView,
+  Modal,
   Pressable,
   Text,
   TextInput,
@@ -15,7 +16,7 @@ import {
 import {
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
-import { FontAwesome } from '@expo/vector-icons';
+import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
 import { db, auth } from './firebase.config';
 import { signOut } from "firebase/auth";
 import { doc, collection, query, getDoc, getDocs, setDoc, addDoc, deleteDoc, onSnapshot, where, orderBy } from "firebase/firestore";
@@ -25,6 +26,7 @@ const styles = require('./Style.js');
 // use custom components
 import { Title, Footer } from './Components.js'
 import { ReloadInstructions } from 'react-native/Libraries/NewAppScreen';
+import { setStatusBarBackgroundColor } from 'expo-status-bar';
 
 export function TasksScreen({ route, navigation }) {
 
@@ -36,7 +38,13 @@ export function TasksScreen({ route, navigation }) {
   const [newTaskName, setNewTaskName] = useState('');
   const [isLoading, setLoading] = useState(true);
 
-  const [lastDateDisplayed, setLastDateDisplayed] = useState(0);
+  // menu modal
+  const [taskMenuVisible, setTaskMenuVisible] = useState(false);
+  const [taskDisplayLimit, setTaskDisplayLimit] = useState(0);
+  const [currTimeStamp, setCurrTimeStamp] = useState(Math.floor(Date.now()));
+
+  // opacity
+  const [backgroundOpacity, setBackgroundOpacity] = useState(1.0);
 
   // get user 
   useEffect(() => {
@@ -78,6 +86,28 @@ export function TasksScreen({ route, navigation }) {
       unsubscribe();
     };
   }, [])
+
+
+  // set the task display limit
+  const determineTaskDisplayLimit = (range) => {
+
+    switch (range) {
+      case 'All':
+        setTaskDisplayLimit(0);
+        break;
+      case 'Day':
+        setTaskDisplayLimit(currTimeStamp + 24 * 60 * 60 * 1000);
+        break;
+      case 'Week':
+        setTaskDisplayLimit(currTimeStamp + 24 * 60 * 60 * 1000 * 7);
+        break;
+      case 'Month':
+        setTaskDisplayLimit(currTimeStamp + 24 * 60 * 60 * 1000 * 31);
+        break;
+    }
+  }
+
+
 
   // add a task
   const checkAddTask = () => {
@@ -156,6 +186,7 @@ export function TasksScreen({ route, navigation }) {
       paddingBottom: insets.bottom,
       paddingLeft: insets.left,
       paddingRight: insets.right,
+      opacity: backgroundOpacity
     }]}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
@@ -163,6 +194,114 @@ export function TasksScreen({ route, navigation }) {
         {/* <TouchableWithoutFeedback onPress={Keyboard.dismiss}> */}
         <View style={{ flex: 1 }}>
 
+          {/* ///////////////////////////////////////////////////// */}
+          <Pressable style={{
+            position: "absolute",
+            right: 0,
+            zIndex: 3,
+            width: "10%",
+            // elevation: 3
+          }}
+            onPress={() => {
+              setTaskMenuVisible(true)
+              setBackgroundOpacity(.33)
+            }}
+          >
+            <Text style={{
+              color: "white", fontSize: 30,
+            }}>
+              <FontAwesome
+                style={styles.headerIcon}
+                name='bars'
+              />            </Text>
+          </Pressable>
+
+
+
+          {/* modal for menu  */}
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={taskMenuVisible}
+            onRequestClose={() => {
+              setTaskMenuVisible(false)
+              setBackgroundOpacity(1.0)
+            }}>
+            <View style={styles.modalMenuView}>
+
+              <Text style={[styles.pageTitleText, { marginBottom: "20%" }]}>Task View</Text>
+
+              <Pressable
+                style={[styles.mainButton, styles.menuButton]}
+                onPress={() => {
+                  determineTaskDisplayLimit('Day')
+                  setTaskMenuVisible(false)
+                  setBackgroundOpacity(1.0)
+                }}>
+                <Text style={[styles.buttonText]}>
+                  <FontAwesome5
+                    style={[styles.buttonText]}
+                    // icon={faCalendarDay}
+                    name='calendar-day'
+                  // color='white'
+                  /> Day
+                </Text>
+              </Pressable>
+
+              <Pressable
+                style={[styles.mainButton, styles.menuButton]}
+                onPress={() => {
+                  determineTaskDisplayLimit('Week')
+                  setTaskMenuVisible(false)
+                  setBackgroundOpacity(1.0)
+                }}>
+                <Text style={[styles.buttonText]}>
+                  <FontAwesome5
+                    style={[styles.buttonText]}
+                    // icon={faCalendarDay}
+                    name='calendar-week'
+                  // color='white'
+                  /> Week
+                </Text>
+              </Pressable>
+
+              <Pressable
+                style={[styles.mainButton, styles.menuButton]}
+                onPress={() => {
+                  determineTaskDisplayLimit('Month')
+                  setTaskMenuVisible(false)
+                  setBackgroundOpacity(1.0)
+                }}>
+                <Text style={[styles.buttonText]}>
+                  <FontAwesome5
+                    style={[styles.buttonText]}
+                    // icon={faCalendarDay}
+                    name='calendar'
+                  // color='white'
+                  /> Month
+                </Text>
+              </Pressable>
+
+              <Pressable
+                style={[styles.mainButton, styles.menuButton]}
+                onPress={() => {
+                  determineTaskDisplayLimit('All')
+                  setTaskMenuVisible(false)
+                  setBackgroundOpacity(1.0)
+                }}>
+                <Text style={[styles.buttonText]}>
+                  <FontAwesome
+                    style={[styles.buttonText]}
+                    // icon={faCalendarDay}
+                    name='tasks'
+                  // color='white'
+                  /> All
+                </Text>
+              </Pressable>
+
+            </View>
+          </Modal>
+          {/* ///////////////////////////////////////////////////// */}
 
           <Title
             title="Tasks"
@@ -203,6 +342,12 @@ export function TasksScreen({ route, navigation }) {
               </Text>}
               renderItem={({ item, index }) => {
 
+                // check if task date is within selected date range
+                var displayTask = true;
+                if (taskDisplayLimit > 0 && item.startDate > taskDisplayLimit) {
+                  displayTask = false;
+                }
+
                 // display task date only if different to last task 
                 var displayDate = true;
                 var curr, prev
@@ -214,7 +359,7 @@ export function TasksScreen({ route, navigation }) {
 
                 return (
                   <View>
-                    {(displayDate) ?
+                    {(displayDate && displayTask) ?
                       (
                         <Text style={styles.inputLabel}>{
                           new Date(item.startDate).toString().slice(0, 10)
@@ -223,21 +368,23 @@ export function TasksScreen({ route, navigation }) {
                         ''
                       )}
 
-                    <Pressable
-                      style={styles.listContainer}
-                      onPress={() => navigation.navigate('TaskDetail', { uid: uid, taskId: item.id })}
-                    >
-                      <FontAwesome
-                        style={styles.listDelIcon}
-                        name='trash-o'
-                        color='lightgrey'
-                        onPress={() => deleteTask(item.id)} />
-                      {/* <View > */}
-                      <Text style={styles.listText} >
-                        {item.name}
-                      </Text>
-                      {/* </View> */}
-                    </Pressable>
+                    {(displayTask) ?
+                      (<Pressable
+                        style={[styles.listContainer, {backgroundColor: (item.startDate < currTimeStamp ? "tomato" : "lightgreen")}]}
+                        onPress={() => navigation.navigate('TaskDetail', { uid: uid, taskId: item.id })}
+                      >
+                        <FontAwesome
+                          style={styles.listDelIcon}
+                          name='trash-o'
+                          color='lightgrey'
+                          onPress={() => deleteTask(item.id)} />
+                        {/* <View > */}
+                        <Text style={styles.listText} >
+                          {item.name}
+                        </Text>
+                        {/* </View> */}
+                      </Pressable>
+                      ) : ('')}
                   </View>
                 )
               }}

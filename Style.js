@@ -5,7 +5,7 @@ import {
 } from 'react-native';
 
 // Blue with green
-const headerBackgroundColour = "midnightblue";
+const headerBackgroundColour = "black";
 const headerColour = "cornflowerblue";
 
 const mainScreenColour = "cornflowerblue";
@@ -20,7 +20,7 @@ const textBackgroundColour = "white";
 const listBackgroundColour = "lightgreen"
 const listTextColour = "darkgreen"
 
-const footerBackgroundColour = "midnightblue";
+const footerBackgroundColour = "black";
 const footerColour = "cornflowerblue";
 
 
@@ -111,8 +111,7 @@ module.exports = StyleSheet.create({
     marginBottom: 10,
     backgroundColor: secondaryScreenColour,
     justifyContent: "center",
-
-    shadowColor: 'cornflowerblue',
+    shadowColor: mainScreenColour,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -138,8 +137,7 @@ module.exports = StyleSheet.create({
     justifyContent: "center",
     borderWidth: 1,
     borderColor: secondaryScreenColour,
-
-    shadowColor: 'cornflowerblue',
+    shadowColor: mainScreenColour,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -154,6 +152,13 @@ module.exports = StyleSheet.create({
     color: secondaryScreenColour,
     // fontWeight: "bold",
     fontSize: 15,
+  },
+  menuButton: {
+    width: "100%",
+    alignItems: "flex-start",
+    paddingLeft: "5%",
+    height: 30,
+    borderRadius: 5,
   },
   btnNarrow: {
     width: "25%",
@@ -187,8 +192,7 @@ module.exports = StyleSheet.create({
     marginRight: "2%",
     fontSize: 18,
     backgroundColor: textBackgroundColour,
-
-    shadowColor: 'cornflowerblue',
+    shadowColor: mainScreenColour,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -204,8 +208,7 @@ module.exports = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: secondaryScreenColour,
     justifyContent: "center",
-
-    shadowColor: 'cornflowerblue',
+    shadowColor: mainScreenColour,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -247,8 +250,7 @@ module.exports = StyleSheet.create({
     color: inputTextColour,
     backgroundColor: textBackgroundColour,
     alignContent: "center",
-
-    shadowColor: 'cornflowerblue',
+    shadowColor: mainScreenColour,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -321,8 +323,7 @@ module.exports = StyleSheet.create({
     // marginHorizontal: "5%",
     fontSize: 16,
     backgroundColor: textBackgroundColour,
-
-    shadowColor: 'cornflowerblue',
+    shadowColor: mainScreenColour,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -417,14 +418,34 @@ module.exports = StyleSheet.create({
     marginBottom: "60%",
     // marginVertical: "50%",
     backgroundColor: headerBackgroundColour,
-    borderRadius: 20,
+    borderRadius: 15,
     borderColor: secondaryScreenColour,
     borderWidth: 1,
     padding: 35,
     alignItems: 'center',
-
-
-    shadowColor: 'cornflowerblue',
+    shadowColor: mainScreenColour,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalMenuView: {
+    flex: 1,
+    // justifyContent: 'center',
+    alignItems: 'flex-start',
+    marginLeft: "45%",
+    marginBottom: "60%",
+    // marginVertical: "50%",
+    backgroundColor: headerBackgroundColour,
+    borderTopLeftRadius: 15,
+    borderBottomLeftRadius: 15,
+    borderColor: secondaryScreenColour,
+    borderWidth: 1,
+    padding: 35,
+    shadowColor: mainScreenColour,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -438,12 +459,12 @@ module.exports = StyleSheet.create({
   //   padding: 10,
   //   elevation: 2,
   // },
-  buttonOpen: {
-    backgroundColor: '#F194FF',
-  },
-  buttonClose: {
-    backgroundColor: '#2196F3',
-  },
+  // buttonOpen: {
+  //   backgroundColor: '#F194FF',
+  // },
+  // buttonClose: {
+  //   backgroundColor: '#2196F3',
+  // },
   // textStyle: {
   //   color: 'white',
   //   fontWeight: 'bold',
