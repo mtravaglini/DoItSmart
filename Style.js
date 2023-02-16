@@ -79,8 +79,8 @@ module.exports = StyleSheet.create({
     fontWeight: "bold",
     // fontFamily: Platform.OS === "android" ? "sans-serif-thin" : "AppleSDGothicNeo-Thin",
     color: headerColour,
-    marginTop: 5
-    // marginBottom: 5
+    marginTop: 5,
+    // marginBottom: 5,
   },
   pageSubTitleText: {
     fontSize: 15,
@@ -123,7 +123,7 @@ module.exports = StyleSheet.create({
   buttonText: {
     textAlign: "center",
     textAlignVertical: "center",
-    color: mainTextColour,
+    color: "white",
     fontWeight: "bold",
     fontSize: 20
   },

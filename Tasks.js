@@ -189,7 +189,7 @@ export function TasksScreen({ route, navigation }) {
   const completeTask = async (task) => {
 
     swipeableRef.current.close();
-    
+
     task.status = 'complete'
     task.completedDate = Math.floor(Date.now()) //serverTimestamp();
 
@@ -279,6 +279,7 @@ export function TasksScreen({ route, navigation }) {
             right: 0,
             zIndex: 3,
             width: "10%",
+            marginTop: "4%"
             // elevation: 3
           }}
             onPress={() => {
@@ -477,24 +478,30 @@ export function TasksScreen({ route, navigation }) {
                           renderRightActions={rightSwipeActions}
                           onSwipeableRightOpen={() => deleteTask(item.id)}
                           onSwipeableLeftOpen={() => completeTask(item)}
+                          friction={1}
                         >
 
                           <Pressable
-                            style={[styles.listContainer, 
-                              {
-                                // backgroundColor: (item.startDate < currTimeStamp && item.status != 'complete' ? "tomato" : "lightgreen") 
-                                backgroundColor: (item.status == 'complete' ? 'grey' : (item.startDate < currTimeStamp ? "tomato" : "lightgreen")) 
-                              }]}
+                            style={[styles.listContainer,
+                            {
+                              // backgroundColor: (item.startDate < currTimeStamp && item.status != 'complete' ? "tomato" : "lightgreen") 
+                              backgroundColor: (item.status == 'complete' ? 'grey' : (item.startDate < currTimeStamp ? "tomato" : "lightgreen"))
+                            }]}
                             onPress={() => navigation.navigate('TaskDetail', { uid: uid, taskId: item.id })}
                           >
-                            <Text style={[styles.listText]} >
+                            <Text style={[styles.listText,
+                            (item.status == 'complete' ? { color: "black" } : null)
+                            ]} >
                               {item.name}
                             </Text>
 
-                            {/* {item.status == 'complete' ? (
-                              <Text style={[styles.listText]} >
-                                (complete)
-                              </Text>) : (null)} */}
+                            {item.status == 'complete' ? (
+                              <Text style={[{ marginLeft: "5%",  color: "black" }]} >
+                                <FontAwesome
+                                  style={{ fontSize: 24 }}
+                                  name='check'
+                                />
+                              </Text>) : (null)}
                           </Pressable>
 
                         </Swipeable>

@@ -19,7 +19,7 @@ export const Title = props => {
   return (
     <View style={styles.header}>
       <View style={{ flexDirection: "row", justifyContent: "center" }}>
-        <Pressable style={{ position: "absolute", left: "1%" }}
+        <Pressable style={{ position: "absolute", left: "1%", marginTop: "3%" }}
           onPress={() => props.navigation.goBack()}
         >
           <Text style={[styles.pageTitleText]}>
