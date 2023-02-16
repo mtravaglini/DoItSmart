@@ -164,7 +164,8 @@ export function ResourcesScreen({ route, navigation }) {
           {isLoading ? (
             <ActivityIndicator style={styles.standardText} size="large" />
           ) : (
-            <FlatList style={{ height: "73%", marginBottom: 15 }}
+            // <FlatList style={{ height: "73%", marginBottom: 15 }}
+            <FlatList
               data={resources}
               ListEmptyComponent={<Text style={[styles.listText, styles.txtWarning, { alignSelf: "center" }]}>
                 No resources! Add some!

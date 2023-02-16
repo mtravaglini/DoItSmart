@@ -195,13 +195,14 @@ export function TasksScreen({ route, navigation }) {
           {isLoading ? (
             <ActivityIndicator style={styles.standardText} size="large" />
           ) : (
-            <FlatList style={{ height: "73%", marginBottom: 15 }}
+            // <FlatList style={{ height: "73%", marginBottom: 15 }}
+            <FlatList
               data={tasks}
               ListEmptyComponent={<Text style={[styles.listText, styles.txtSuccess, { alignSelf: "center" }]}>
                 All done! Add more tasks!
               </Text>}
               renderItem={({ item, index }) => {
-                
+
                 // display task date only if different to last task 
                 var displayDate = true;
                 var curr, prev
@@ -217,7 +218,7 @@ export function TasksScreen({ route, navigation }) {
                       (
                         <Text style={styles.inputLabel}>{
                           new Date(item.startDate).toString().slice(0, 10)
-                          }</Text>
+                        }</Text>
                       ) : (
                         ''
                       )}
