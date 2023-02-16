@@ -271,16 +271,29 @@ module.exports = StyleSheet.create({
 
   // task list  ########################################
   listContainer: {
-    // backgroundColor: "red",
     backgroundColor: listBackgroundColour,
-    // padding: 15,
-    borderRadius: 15,
-    margin: "1%",
+    // borderRadius: 15,
+    // margin: "1%",
     height: 48,
-    marginHorizontal: "5%",
+    // marginHorizontal: "5%",
     flexDirection: 'row',
     alignItems: 'center',
-    // paddingTop: 300,
+  },
+  leftSwipeContainer: {
+    justifyContent: "flex-start",
+    flex: 1,  
+    backgroundColor: "green",
+    height: 48,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  rightSwipeContainer: {
+    justifyContent: "flex-end",
+    flex: 1,  
+    backgroundColor: "red",
+    height: 48,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   listDelIcon: {
     fontSize: 30,
@@ -292,7 +305,7 @@ module.exports = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 18,
     color: listTextColour,
-    // marginRight: 22,
+    paddingLeft: "5%",
   },
   // ########################################
 
@@ -436,7 +449,7 @@ module.exports = StyleSheet.create({
     flex: 1,
     // justifyContent: 'center',
     alignItems: 'flex-start',
-    marginLeft: "45%",
+    marginLeft: "35%",
     marginBottom: "60%",
     // marginVertical: "50%",
     backgroundColor: headerBackgroundColour,

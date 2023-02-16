@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -7,6 +7,7 @@ import {
   KeyboardAvoidingView,
   Modal,
   Pressable,
+  Switch,
   Text,
   TextInput,
   TouchableOpacity,
@@ -17,6 +18,8 @@ import {
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
 import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
+import Swipeable from 'react-native-gesture-handler/Swipeable';
+
 import { db, auth } from './firebase.config';
 import { signOut } from "firebase/auth";
 import { doc, collection, query, getDoc, getDocs, setDoc, addDoc, deleteDoc, onSnapshot, where, orderBy } from "firebase/firestore";
@@ -37,11 +40,13 @@ export function TasksScreen({ route, navigation }) {
   const [tasks, setTasks] = useState([]);
   const [newTaskName, setNewTaskName] = useState('');
   const [isLoading, setLoading] = useState(true);
+  const swipeableRef = useRef(null);
 
   // menu modal
   const [taskMenuVisible, setTaskMenuVisible] = useState(false);
   const [taskDisplayLimit, setTaskDisplayLimit] = useState(0);
   const [currTimeStamp, setCurrTimeStamp] = useState(Math.floor(Date.now()));
+  const [includeCompleteTasks, setIncludeCompleteTasks] = useState(false);
 
   // opacity
   const [backgroundOpacity, setBackgroundOpacity] = useState(1.0);
@@ -180,6 +185,80 @@ export function TasksScreen({ route, navigation }) {
     }
   }
 
+  // complete a task
+  const completeTask = async (task) => {
+
+    swipeableRef.current.close();
+    
+    task.status = 'complete'
+    task.completedDate = Math.floor(Date.now()) //serverTimestamp();
+
+    try {
+      await setDoc(doc(db, "Tasks", task.id), task)
+    } catch (error) {
+      // const errorCode = error.code;
+      const errorMessage = error.message;
+      alert(errorMessage);
+      return 1;
+    }
+
+  }
+
+
+
+
+
+
+  /////////////////// Swipeable
+  const LeftSwipeActions = () => {
+    return (
+      <View
+        style={styles.leftSwipeContainer}
+      >
+        <Text style={{
+          color: "white", fontSize: 30,
+        }}>
+          <FontAwesome
+            style={{ color: "white", fontSize: 24 }}
+            name='calendar-check-o'
+          />
+        </Text>
+        <Text style={{ color: "white", fontsize: 12, paddingLeft: "1%" }}>
+          Complete Task
+        </Text>
+      </View>
+    );
+  };
+  const rightSwipeActions = () => {
+    return (
+      <View
+        style={styles.rightSwipeContainer}
+      >
+        <Text style={{ color: "white", fontsize: 12, paddingRight: "1%" }}>
+          Delete Task
+        </Text>
+        <Text style={{
+          color: "white", fontSize: 30,
+        }}>
+          <FontAwesome
+            style={{ color: "white", fontSize: 24 }}
+            name='trash-o'
+          />
+        </Text>
+      </View>
+    );
+  };
+  const swipeFromLeftOpen = (itemId) => {
+    alert('Swipe from left ' + itemId);
+  };
+  const swipeFromRightOpen = (itemId) => {
+    alert('Swipe from right ' + itemId);
+  };
+  /////////////////// Swipeable
+
+
+
+
   return (
     <View style={[styles.safeView, {
       marginTop: insets.top,
@@ -213,7 +292,8 @@ export function TasksScreen({ route, navigation }) {
               <FontAwesome
                 style={styles.headerIcon}
                 name='bars'
-              />            </Text>
+              />
+            </Text>
           </Pressable>
 
 
@@ -299,6 +379,17 @@ export function TasksScreen({ route, navigation }) {
                 </Text>
               </Pressable>
 
+              <View style={{ flexDirection: "row", marginTop: "15%" }}>
+                <Switch
+                  trackColor={{ false: 'grey', true: 'white' }}
+                  thumbColor={includeCompleteTasks ? 'cornflowerblue' : 'lightgrey'}
+                  ios_backgroundColor="grey"
+                  onValueChange={() => setIncludeCompleteTasks(previousState => !previousState)}
+                  value={includeCompleteTasks}
+                />
+                <Text style={styles.standardText}>Include Completed Tasks</Text>
+              </View>
+
             </View>
           </Modal>
           {/* ///////////////////////////////////////////////////// */}
@@ -337,14 +428,23 @@ export function TasksScreen({ route, navigation }) {
             // <FlatList style={{ height: "73%", marginBottom: 15 }}
             <FlatList
               data={tasks}
-              ListEmptyComponent={<Text style={[styles.listText, styles.txtSuccess, { alignSelf: "center" }]}>
-                All done! Add more tasks!
-              </Text>}
+              ListEmptyComponent={
+                <Text style={[styles.listText, styles.txtSuccess, { alignSelf: "center" }]}>
+                  All done! Add more tasks!
+                </Text>}
+              ItemSeparatorComponent={() =>
+                <View style={{
+                  flex: 1,
+                  height: 1,
+                  // backgroundColor: 'red',
+                }} />}
               renderItem={({ item, index }) => {
 
                 // check if task date is within selected date range
                 var displayTask = true;
-                if (taskDisplayLimit > 0 && item.startDate > taskDisplayLimit) {
+                if ((taskDisplayLimit > 0 && item.startDate > taskDisplayLimit)
+                  ||
+                  (!includeCompleteTasks && item.status == 'complete')) {
                   displayTask = false;
                 }
 
@@ -369,21 +469,36 @@ export function TasksScreen({ route, navigation }) {
                       )}
 
                     {(displayTask) ?
-                      (<Pressable
-                        style={[styles.listContainer, {backgroundColor: (item.startDate < currTimeStamp ? "tomato" : "lightgreen")}]}
-                        onPress={() => navigation.navigate('TaskDetail', { uid: uid, taskId: item.id })}
-                      >
-                        <FontAwesome
-                          style={styles.listDelIcon}
-                          name='trash-o'
-                          color='lightgrey'
-                          onPress={() => deleteTask(item.id)} />
-                        {/* <View > */}
-                        <Text style={styles.listText} >
-                          {item.name}
-                        </Text>
-                        {/* </View> */}
-                      </Pressable>
+                      (
+
+                        <Swipeable
+                          ref={swipeableRef}
+                          renderLeftActions={LeftSwipeActions}
+                          renderRightActions={rightSwipeActions}
+                          onSwipeableRightOpen={() => deleteTask(item.id)}
+                          onSwipeableLeftOpen={() => completeTask(item)}
+                        >
+
+                          <Pressable
+                            style={[styles.listContainer, 
+                              {
+                                // backgroundColor: (item.startDate < currTimeStamp && item.status != 'complete' ? "tomato" : "lightgreen") 
+                                backgroundColor: (item.status == 'complete' ? 'grey' : (item.startDate < currTimeStamp ? "tomato" : "lightgreen")) 
+                              }]}
+                            onPress={() => navigation.navigate('TaskDetail', { uid: uid, taskId: item.id })}
+                          >
+                            <Text style={[styles.listText]} >
+                              {item.name}
+                            </Text>
+
+                            {/* {item.status == 'complete' ? (
+                              <Text style={[styles.listText]} >
+                                (complete)
+                              </Text>) : (null)} */}
+                          </Pressable>
+
+                        </Swipeable>
+
                       ) : ('')}
                   </View>
                 )
