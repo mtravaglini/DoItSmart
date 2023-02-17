@@ -186,9 +186,9 @@ export function TasksScreen({ route, navigation }) {
   }
 
   // complete a task
-  const completeTask = async (task) => {
+  const completeTask = async (task, index) => {
 
-    swipeableRef.current.close();
+    swipeableRef.current[index].close();
 
     task.status = 'complete'
     task.completedDate = Math.floor(Date.now()) //serverTimestamp();
@@ -441,7 +441,9 @@ export function TasksScreen({ route, navigation }) {
                 }} />}
               renderItem={({ item, index }) => {
 
-                // check if task date is within selected date range
+                // check if task should be displayed
+                // - date is within selected date range
+                // - matches completed flag setting
                 var displayTask = true;
                 if ((taskDisplayLimit > 0 && item.startDate > taskDisplayLimit)
                   ||
@@ -473,11 +475,11 @@ export function TasksScreen({ route, navigation }) {
                       (
 
                         <Swipeable
-                          ref={swipeableRef}
+                          ref={ref => swipeableRef.current[index] = ref}
                           renderLeftActions={LeftSwipeActions}
                           renderRightActions={rightSwipeActions}
                           onSwipeableRightOpen={() => deleteTask(item.id)}
-                          onSwipeableLeftOpen={() => completeTask(item)}
+                          onSwipeableLeftOpen={() => completeTask(item, index)}
                           friction={1}
                         >
 
