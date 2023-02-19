@@ -335,7 +335,7 @@ export function GroupDetailScreen({ route, navigation }) {
 
 
 
-                {/* modal for selecting groups  */}
+                {/* modal for inviting user to group */}
                 <Modal
                   animationType="slide"
                   transparent={true}
@@ -344,7 +344,7 @@ export function GroupDetailScreen({ route, navigation }) {
                     setInviteUserVisible(false)
                     setBackgroundOpacity(1.0)
                   }}>
-                  <View style={styles.modalView}>
+                  <View style={[styles.modalView, {marginBottom: "20%"}]}>
                     <Text style={styles.pageTitleText}>Invite User to Group</Text>
                     {/* <View style={{ marginBottom: 15, alignItems: "flex-start", flexWrap: "wrap", flexDirection: "row" }}> */}
                     <View style={styles.inputFormContainer}>

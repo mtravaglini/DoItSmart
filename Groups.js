@@ -136,10 +136,17 @@ export function GroupsScreen({ route, navigation }) {
         deleteDoc(doc.ref)
       })
 
+      // // delete any outstanding invitations to the group
+      querySnapshot = await getDocs(query(collection(db, "GroupInvites"), where("groupId", "==", groupId)))
+      console.log(querySnapshot)
+      querySnapshot.forEach((doc) => {
+        deleteDoc(doc.ref)
+      })
+
       // delete the Group doc
       await deleteDoc(doc(db, "Groups", groupId));
     } catch (error) {
-      alert(error);
+      console.log(error);
     }
   }
 
