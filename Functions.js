@@ -4,12 +4,55 @@ import { db, auth } from './firebase.config';
 
 
 export function scheduleTasks(unscheduled_tasks) {
-
   var scheduled_tasks = unscheduled_tasks;
-
   return scheduled_tasks;
 }
 
+
+// complete a task
+export const completeTask = async (taskObj, index) => {
+console.log(taskObj)
+  // if (index) {
+    // swipeableRef[index].close();
+  // }
+
+  taskObj.status = 'complete'
+  taskObj.completedDate = Math.floor(Date.now()) //serverTimestamp();
+
+  try {
+    await setDoc(doc(db, "Tasks", taskObj.id), taskObj)
+  } catch (error) {
+    // const errorCode = error.code;
+    const errorMessage = error.message;
+    console.log(errorMessage);
+    return 1;
+  }
+
+}
+// delete a task
+export const deleteTask = async (taskId) => {
+  try {
+
+    var querySnapshot;
+
+    // delete the tasks's TaskGroups subcollection
+    querySnapshot = await getDocs(collection(db, "Tasks", taskId, "TaskGroups"))
+    querySnapshot.forEach((doc) => {
+      deleteDoc(doc.ref)
+    })
+
+    // delete the task's TaskResources subcollection
+    querySnapshot = await getDocs(collection(db, "Tasks", taskId, "TaskResources"))
+    querySnapshot.forEach((doc) => {
+      deleteDoc(doc.ref)
+    })
+
+    // delete Tasks doc
+    await deleteDoc(doc(db, "Tasks", taskId));
+  } catch (error) {
+    alert(error);
+  }
+}
 
 
 // delete a group

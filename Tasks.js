@@ -28,8 +28,7 @@ import { doc, collection, query, getDoc, getDocs, setDoc, addDoc, deleteDoc, onS
 const styles = require('./Style.js');
 // use custom components
 import { Title, Footer } from './Components.js'
-import { ReloadInstructions } from 'react-native/Libraries/NewAppScreen';
-import { setStatusBarBackgroundColor } from 'expo-status-bar';
+import { completeTask, deleteTask } from './Functions.js'
 
 export function TasksScreen({ route, navigation }) {
 
@@ -155,54 +154,14 @@ export function TasksScreen({ route, navigation }) {
       addDoc(collection(db, "Tasks"), data)
       setNewTaskName('');
     } catch (error) {
-      alert(error);
+      console.log(error);
     }
   }
 
 
-  // delete a task
-  const deleteTask = async (taskId) => {
-    try {
 
-      var querySnapshot;
 
-      // delete the tasks's TaskGroups subcollection
-      querySnapshot = await getDocs(collection(db, "Tasks", taskId, "TaskGroups"))
-      querySnapshot.forEach((doc) => {
-        deleteDoc(doc.ref)
-      })
 
-      // delete the task's TaskResources subcollection
-      querySnapshot = await getDocs(collection(db, "Tasks", taskId, "TaskResources"))
-      querySnapshot.forEach((doc) => {
-        deleteDoc(doc.ref)
-      })
-
-      // delete Tasks doc
-      await deleteDoc(doc(db, "Tasks", taskId));
-    } catch (error) {
-      alert(error);
-    }
-  }
-
-  // complete a task
-  const completeTask = async (task, index) => {
-
-     swipeableRef[index].close();
-
-    task.status = 'complete'
-    task.completedDate = Math.floor(Date.now()) //serverTimestamp();
-
-    try {
-      await setDoc(doc(db, "Tasks", task.id), task)
-    } catch (error) {
-      // const errorCode = error.code;
-      const errorMessage = error.message;
-      alert(errorMessage);
-      return 1;
-    }
-
-  }
 
 
 
@@ -430,7 +389,7 @@ export function TasksScreen({ route, navigation }) {
             <FlatList
               data={tasks}
               ListEmptyComponent={
-                <Text style={[styles.listText, styles.txtSuccess, { alignSelf: "center" }]}>
+                <Text style={[styles.listText, { alignSelf: "center" }]}>
                   All done! Add more tasks!
                 </Text>}
               ItemSeparatorComponent={() =>
@@ -479,7 +438,10 @@ export function TasksScreen({ route, navigation }) {
                           renderLeftActions={LeftSwipeActions}
                           renderRightActions={rightSwipeActions}
                           onSwipeableRightOpen={() => deleteTask(item.id)}
-                          onSwipeableLeftOpen={() => completeTask(item, index)}
+                          onSwipeableLeftOpen={() => {
+                            completeTask(item, index)
+                            swipeableRef[index].close();
+                          }}
                           friction={1}
                         >
 
@@ -498,7 +460,7 @@ export function TasksScreen({ route, navigation }) {
                             </Text>
 
                             {item.status == 'complete' ? (
-                              <Text style={[{ marginLeft: "5%",  color: "black" }]} >
+                              <Text style={[{ marginLeft: "5%", color: "black" }]} >
                                 <FontAwesome
                                   style={{ fontSize: 24 }}
                                   name='check'

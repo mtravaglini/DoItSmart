@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import {
   ActivityIndicator,
   Alert,
-  Keyboard,
   KeyboardAvoidingView,
   Modal,
   Pressable,
@@ -10,16 +9,15 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   View,
 } from 'react-native';
 import {
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
-import { FontAwesome } from '@expo/vector-icons';
+import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
 import { db, auth } from './firebase.config';
-import { signOut } from "firebase/auth";
 import { doc, collection, collectionGroup, query, getDoc, getDocs, setDoc, addDoc, deleteDoc, onSnapshot, where, orderBy } from "firebase/firestore";
+
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import InputSpinner from "react-native-input-spinner";
 
@@ -27,6 +25,7 @@ import InputSpinner from "react-native-input-spinner";
 const styles = require('./Style.js');
 // use custom components
 import { Title, Footer } from './Components.js'
+import { completeTask, deleteTask } from './Functions.js'
 
 export function TaskDetailScreen({ route, navigation }) {
 
@@ -416,7 +415,7 @@ export function TaskDetailScreen({ route, navigation }) {
     } catch (error) {
       // const errorCode = error.code;
       const errorMessage = error.message;
-      alert(errorMessage);
+      console.log(errorMessage);
       return 1;
     }
 
@@ -468,7 +467,7 @@ export function TaskDetailScreen({ route, navigation }) {
     } catch (error) {
       // const errorCode = error.code;
       const errorMessage = error.message;
-      alert(errorMessage);
+      console.log(errorMessage);
       return 1;
     }
 
@@ -634,6 +633,167 @@ export function TaskDetailScreen({ route, navigation }) {
                 <View style={styles.inputFormContainer}>
                   <Text style={styles.inputLabel}>Created by {createdByUser}</Text>
                   <Text style={styles.inputLabel}>Created on {new Date(task.createdDate).toString().slice(0, 24)}</Text>
+
+
+
+
+
+
+
+
+
+
+
+                  <View style={{ flexDirection: "row" }}>
+
+                    {/* spacer */}
+                    <View style={{ flex: 3 }}>
+                    </View>
+
+                    {/* delete task button */}
+                    <TouchableOpacity style={[styles.mainButton, styles.btnDanger, styles.btnNarrow, { flex: 1 }]}
+                      // disabled={!groupChanged()}
+                      onPress={() => {
+                        deleteTask(taskId)
+                        navigation.goBack()
+                      }}
+                    >
+                      <Text
+                        style={[styles.buttonText]}
+                      >
+                        <FontAwesome
+                          style={{ color: "white", fontSize: 24 }}
+                          name='trash-o'
+                        />
+                      </Text>
+                    </TouchableOpacity>
+
+                    {/* save task button */}
+                    <TouchableOpacity style={[styles.mainButton, styles.btnSuccess, { flex: 2 }, { opacity: (!taskChanged()) ? 0.5 : 1.0 }]}
+                      disabled={!taskChanged()}
+                      onPress={async () => {
+                        await SaveTask().then(
+                          (result) => {
+                            if (result == 0) {
+                              navigation.goBack();
+                            }
+                          }
+                        )
+                      }}
+                    >
+                      <Text
+                        style={[styles.buttonText]}
+                      >
+                        <FontAwesome5
+                          style={{ color: "white", fontSize: 24 }}
+                          name='save'
+                        /> Save
+                      </Text>
+                    </TouchableOpacity>
+
+                  </View>
+
+
+                  <View style={{ flexDirection: "row" }}>
+
+                    {/* reassign button */}
+                    <Pressable style={[styles.mainButton, styles.btnSuccess, { flex: 1 }]}
+                      onPress={async () => {
+                        // await getUserPool()
+                        // console.log("USERPOOL at invoke reassign", userPool)
+                        setReassignVisible(true)
+                        setBackgroundOpacity(.33)
+                      }}
+                    >
+                      <Text style={styles.buttonText}>
+                        <FontAwesome
+                          style={{ color: "white", fontSize: 24 }}
+                          name='user'
+                        /> Reassign Task
+                      </Text>
+                    </Pressable>
+                    {/* modal for reassigning task  */}
+                    <Modal
+                      animationType="slide"
+                      transparent={true}
+                      visible={reassignVisible}
+                      onRequestClose={() => {
+                        setReassignVisible(false)
+                        setBackgroundOpacity(1.0)
+                      }}>
+                      <View style={styles.modalView}>
+                        <Text style={styles.pageTitleText}>Reassign Task</Text>
+
+                        <Text style={[styles.inputLabel, { paddingTop: 15, alignSelf: 'flex-start' }]}>Select user to reassign task</Text>
+                        <View style={styles.tagContainer}>
+
+                          {
+                            userPool.map((item) =>
+                              <Pressable key={item.id} style={styles.tagButton}
+                                onPress={() => {
+                                  reassignTask(item.id, item.userName)
+                                }}
+                              >
+                                <Text style={styles.tagText}>
+                                  {item.userName}
+                                </Text>
+                              </Pressable>
+                            )
+                          }
+                        </View>
+
+
+                        <Pressable
+                          style={[styles.mainButton, styles.btnWarning, styles.btnNarrow]}
+                          onPress={() => {
+                            setReassignVisible(false)
+                            setBackgroundOpacity(1.0)
+                          }}>
+                          <Text style={[styles.buttonText]}>
+                            <FontAwesome
+                              style={[{ fontSize: 35 }]}
+                              name='arrow-circle-o-left'
+                            // color='white'
+                            />
+                          </Text>
+                        </Pressable>
+
+                      </View>
+                    </Modal>
+
+                    {/* comlete task button */}
+                    <Pressable style={[styles.mainButton, styles.btnSuccess, { flex: 1 }]}
+                      onPress={() => {
+                        var taskObj = task;
+                        taskObj.id = taskId;
+                        completeTask(taskObj);
+                        navigation.goBack();
+                      }
+                      }
+                    >
+                      <Text style={styles.buttonText}>
+                        <FontAwesome
+                          style={{ color: "white", fontSize: 24 }}
+                          name='check'
+                        /> Complete Task
+                      </Text>
+                    </Pressable>
+
+                  </View>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
                   <Text style={[styles.inputLabel, { paddingTop: 15 }]}>Name</Text>
                   <TextInput
@@ -941,100 +1101,8 @@ export function TaskDetailScreen({ route, navigation }) {
                     </View>
                   </Modal>
 
-
-
-
-
-
-
-
-
-                  {/* Reassign Tasks */}
-                  <View style={{ alignItems: "center" }}>
-                    <Pressable style={[styles.secondaryButton]}
-                      onPress={async () => {
-                        // await getUserPool()
-                        // console.log("USERPOOL at invoke reassign", userPool)
-                        setReassignVisible(true)
-                        setBackgroundOpacity(.33)
-                      }}
-                    >
-                      <Text style={styles.secondaryButtonText}>
-                        Reassign Task
-                      </Text>
-                    </Pressable>
-                  </View>
-                  {/* modal for reassigning task  */}
-                  <Modal
-                    animationType="slide"
-                    transparent={true}
-                    visible={reassignVisible}
-                    onRequestClose={() => {
-                      setReassignVisible(false)
-                      setBackgroundOpacity(1.0)
-                    }}>
-                    <View style={styles.modalView}>
-                      <Text style={styles.pageTitleText}>Reassign Task</Text>
-
-                      <Text style={[styles.inputLabel, { paddingTop: 15, alignSelf: 'flex-start' }]}>Select user to reassign task</Text>
-                      <View style={styles.tagContainer}>
-
-                        {
-                          userPool.map((item) =>
-                            <Pressable key={item.id} style={styles.tagButton}
-                              onPress={() => {
-                                reassignTask(item.id, item.userName)
-                              }}
-                            >
-                              <Text style={styles.tagText}>
-                                {item.userName}
-                              </Text>
-                            </Pressable>
-                          )
-                        }
-                      </View>
-
-
-                      <Pressable
-                        style={[styles.mainButton, styles.btnWarning, styles.btnNarrow]}
-                        onPress={() => {
-                          setReassignVisible(false)
-                          setBackgroundOpacity(1.0)
-                        }}>
-                        <Text style={[styles.buttonText]}>
-                          <FontAwesome
-                            style={[{ fontSize: 35 }]}
-                            name='arrow-circle-o-left'
-                          // color='white'
-                          />
-                        </Text>
-                      </Pressable>
-
-                    </View>
-                  </Modal>
-
-
-
-                  <View style={{ alignItems: "center" }}>
-                    <TouchableOpacity style={[styles.mainButton, styles.btnSuccess, { opacity: (!taskChanged()) ? 0.5 : 1.0 }]}
-                      disabled={!taskChanged()}
-                      onPress={async () => {
-                        await SaveTask().then(
-                          (result) => {
-                            if (result == 0) {
-                              navigation.goBack();
-                            }
-                          }
-                        )
-                      }}
-                    >
-                      <Text
-                        style={[styles.buttonText]}
-                      >Save
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
                 </View>
+
               </ScrollView>
             )}
           <Footer auth={auth}
