@@ -9,13 +9,12 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   View,
 } from 'react-native';
 import {
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
-import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
+import { FontAwesome } from '@expo/vector-icons';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 
 import { db, auth } from './firebase.config';
@@ -25,6 +24,7 @@ import { doc, collection, query, getDoc, setDoc, addDoc, deleteDoc, onSnapshot, 
 const styles = require('./Style.js');
 // use custom components
 import { Title, Footer } from './Components.js'
+import { deleteResource } from './Functions.js'
 
 export function ResourcesScreen({ route, navigation }) {
 
@@ -112,40 +112,28 @@ export function ResourcesScreen({ route, navigation }) {
     }
   }
 
-  // delete a resource
-  const deleteResource = async (resourceId) => {
-    try {
-      await deleteDoc(doc(db, "Resources", resourceId));
-    } catch (error) {
-      alert(error);
-    }
-  }
+  /////////////////// Swipeable
+  const rightSwipeActions = () => {
+    return (
+      <View
+        style={styles.rightSwipeContainer}
+      >
+        <Text style={{ color: "white", fontsize: 12, paddingRight: "1%" }}>
+          Delete Resource
+        </Text>
+        <Text style={{
+          color: "white", fontSize: 30,
+        }}>
+          <FontAwesome
+            style={{ color: "white", fontSize: 24 }}
+            name='trash-o'
+          />
+        </Text>
+      </View>
+    );
+  };
+  /////////////////// Swipeable
 
-
-
-      /////////////////// Swipeable
-      const rightSwipeActions = () => {
-        return (
-          <View
-            style={styles.rightSwipeContainer}
-          >
-            <Text style={{ color: "white", fontsize: 12, paddingRight: "1%" }}>
-              Delete Resource
-            </Text>
-            <Text style={{
-              color: "white", fontSize: 30,
-            }}>
-              <FontAwesome
-                style={{ color: "white", fontSize: 24 }}
-                name='trash-o'
-              />
-            </Text>
-          </View>
-        );
-      };
-      /////////////////// Swipeable
-
-      
   return (
     <View style={[styles.safeView, {
       marginTop: insets.top,
@@ -196,33 +184,39 @@ export function ResourcesScreen({ route, navigation }) {
               ListEmptyComponent={<Text style={[styles.listText, styles.txtWarning, { alignSelf: "center" }]}>
                 No resources! Add some!
               </Text>}
+              ItemSeparatorComponent={() =>
+                <View style={{
+                  flex: 1,
+                  height: 1,
+                  // backgroundColor: 'red',
+                }} />}
               renderItem={({ item }) => (
                 <View>
 
-<Swipeable
-                          // ref={ref => swipeableRef.current[index] = ref}
-                          // renderLeftActions={LeftSwipeActions}
-                          renderRightActions={rightSwipeActions}
-                          onSwipeableRightOpen={() => deleteResource(item.id)}
-                          // onSwipeableLeftOpen={() => completeTask(item, index)}
-                          friction={1}
-                        >
-                          
-                  <Pressable
-                    style={styles.listContainer}
-                    onPress={() => navigation.navigate('ResourceDetail', { uid: uid, resourceId: item.id })}
+                  <Swipeable
+                    // ref={ref => swipeableRef.current[index] = ref}
+                    // renderLeftActions={LeftSwipeActions}
+                    renderRightActions={rightSwipeActions}
+                    onSwipeableRightOpen={() => deleteResource(item.id)}
+                    // onSwipeableLeftOpen={() => completeTask(item, index)}
+                    friction={1}
                   >
-                    {/* <FontAwesome
+
+                    <Pressable
+                      style={styles.listContainer}
+                      onPress={() => navigation.navigate('ResourceDetail', { uid: uid, resourceId: item.id })}
+                    >
+                      {/* <FontAwesome
                       style={styles.listDelIcon}
                       name='trash-o'
                       color='lightgrey'
                       onPress={() => deleteResource(item.id)} /> */}
-                    {/* <View > */}
-                    <Text style={styles.listText} >
-                      {item.name}
-                    </Text>
-                    {/* </View> */}
-                  </Pressable>
+                      {/* <View > */}
+                      <Text style={styles.listText} >
+                        {item.name}
+                      </Text>
+                      {/* </View> */}
+                    </Pressable>
                   </Swipeable>
                 </View>
               )}

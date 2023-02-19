@@ -9,13 +9,12 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   View,
 } from 'react-native';
 import {
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
-import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
+import { FontAwesome } from '@expo/vector-icons';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 
 import { db, auth } from './firebase.config';
@@ -25,6 +24,7 @@ import { doc, collection, query, getDoc, setDoc, addDoc, deleteDoc, onSnapshot, 
 const styles = require('./Style.js');
 // use custom components
 import { Title, Footer } from './Components.js'
+import { deleteGroup } from './Functions.js'
 
 export function GroupsScreen({ route, navigation }) {
 
@@ -119,61 +119,27 @@ export function GroupsScreen({ route, navigation }) {
     }
   }
 
-  // delete a group
-  const deleteGroup = async (groupId) => {
-    try {
-      var querySnapshot;
-
-      // delete the group's GroupUsers subcollection
-      querySnapshot = await getDocs(collection(db, "Groups", groupId, "GroupUsers"))
-      querySnapshot.forEach((doc) => {
-        deleteDoc(doc.ref)
-      })
-
-      // delete the group's GroupResources subcollection
-      querySnapshot = await getDocs(collection(db, "Groups", groupId, "GroupResources"))
-      querySnapshot.forEach((doc) => {
-        deleteDoc(doc.ref)
-      })
-
-      // // delete any outstanding invitations to the group
-      querySnapshot = await getDocs(query(collection(db, "GroupInvites"), where("groupId", "==", groupId)))
-      console.log(querySnapshot)
-      querySnapshot.forEach((doc) => {
-        deleteDoc(doc.ref)
-      })
-
-      // delete the Group doc
-      await deleteDoc(doc(db, "Groups", groupId));
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-
-    /////////////////// Swipeable
-    const rightSwipeActions = () => {
-      return (
-        <View
-          style={styles.rightSwipeContainer}
-        >
-          <Text style={{ color: "white", fontsize: 12, paddingRight: "1%" }}>
-            Delete Group
-          </Text>
-          <Text style={{
-            color: "white", fontSize: 30,
-          }}>
-            <FontAwesome
-              style={{ color: "white", fontSize: 24 }}
-              name='trash-o'
-            />
-          </Text>
-        </View>
-      );
-    };
-    /////////////////// Swipeable
-
-    
+  /////////////////// Swipeable
+  const rightSwipeActions = () => {
+    return (
+      <View
+        style={styles.rightSwipeContainer}
+      >
+        <Text style={{ color: "white", fontsize: 12, paddingRight: "1%" }}>
+          Delete Group
+        </Text>
+        <Text style={{
+          color: "white", fontSize: 30,
+        }}>
+          <FontAwesome
+            style={{ color: "white", fontSize: 24 }}
+            name='trash-o'
+          />
+        </Text>
+      </View>
+    );
+  };
+  /////////////////// Swipeable
 
   return (
     <View style={[styles.safeView, {
@@ -225,34 +191,39 @@ export function GroupsScreen({ route, navigation }) {
               ListEmptyComponent={<Text style={[styles.listText, styles.txtWarning, { alignSelf: "center" }]}>
                 No groups! Add some!
               </Text>}
+              ItemSeparatorComponent={() =>
+                <View style={{
+                  flex: 1,
+                  height: 1,
+                  // backgroundColor: 'red',
+                }} />}
               renderItem={({ item }) => (
                 <View>
 
-                          
-<Swipeable
-                          // ref={ref => swipeableRef.current[index] = ref}
-                          // renderLeftActions={LeftSwipeActions}
-                          renderRightActions={rightSwipeActions}
-                          onSwipeableRightOpen={() => deleteGroup(item.id)}
-                          // onSwipeableLeftOpen={() => completeTask(item, index)}
-                          friction={1}
-                        >
-                  
-                  <Pressable
-                    style={styles.listContainer}
-                    onPress={() => navigation.navigate('GroupDetail', { uid: uid, groupId: item.id })}
+                  <Swipeable
+                    // ref={ref => swipeableRef.current[index] = ref}
+                    // renderLeftActions={LeftSwipeActions}
+                    renderRightActions={rightSwipeActions}
+                    onSwipeableRightOpen={() => deleteGroup(item.id)}
+                    // onSwipeableLeftOpen={() => completeTask(item, index)}
+                    friction={1}
                   >
-                    {/* <FontAwesome
+
+                    <Pressable
+                      style={styles.listContainer}
+                      onPress={() => navigation.navigate('GroupDetail', { uid: uid, groupId: item.id })}
+                    >
+                      {/* <FontAwesome
                       style={styles.listDelIcon}
                       name='trash-o'
                       color='lightgrey'
                       onPress={() => deleteGroup(item.id)} /> */}
-                    {/* <View > */}
-                    <Text style={styles.listText} >
-                      {item.name}
-                    </Text>
-                    {/* </View> */}
-                  </Pressable>
+                      {/* <View > */}
+                      <Text style={styles.listText} >
+                        {item.name}
+                      </Text>
+                      {/* </View> */}
+                    </Pressable>
                   </Swipeable>
                 </View>
               )}
