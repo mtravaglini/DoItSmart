@@ -128,7 +128,7 @@ export function SigninScreen({ route, navigation }) {
                 >
                   <Text
                     style={styles.buttonText}
-                  >Signin
+                  >Sign in
                   </Text>
                 </TouchableOpacity>
 
