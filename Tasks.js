@@ -145,8 +145,8 @@ export function TasksScreen({ route, navigation }) {
         name: newTaskName,
         creator: uid,
         assignee: uid,
-        startDate: timestamp,
-        endDate: timestamp + (24 * 60 * 60 * 1000),
+        startDate: timestamp + (24 * 60 * 60 * 1000),
+        endDate: timestamp + (24*2 * 60 * 60 * 1000),
         priority: 1,
         effort: 30,
         createdDate: timestamp
