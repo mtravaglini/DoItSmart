@@ -397,6 +397,8 @@ export function TaskDetailScreen({ route, navigation }) {
     getTaskInfo();
     // for (var x = 0; x<1000000000; x++){var i=x}
 
+
+
     setIsTaskDetailLoading(false)
 
   }, [taskGroupUpdated, taskResourceUpdated])
@@ -628,13 +630,14 @@ export function TaskDetailScreen({ route, navigation }) {
             :
             (
               // <ScrollView style={{ height: "81%", marginBottom: 15 }}>
-              <ScrollView>
+              <ScrollView style={{opacity: (task.status == 'complete' ? .50 : backgroundOpacity)}}>
 
                 <View style={styles.inputFormContainer}>
                   <Text style={styles.inputLabel}>Created by {createdByUser}</Text>
                   <Text style={styles.inputLabel}>Created on {new Date(task.createdDate).toString().slice(0, 24)}</Text>
-
-
+                  {task.status == 'complete' ? (
+                    <Text style={styles.inputLabel}>Completed on {new Date(task.completedDate).toString().slice(0, 24)}</Text>
+                  ) : (null)}
 
 
 
@@ -694,105 +697,95 @@ export function TaskDetailScreen({ route, navigation }) {
                   </View>
 
 
-                  <View style={{ flexDirection: "row" }}>
+                  {task.status != 'complete' ? (
+                    <View style={{ flexDirection: "row" }}>
 
-                    {/* reassign button */}
-                    <Pressable style={[styles.mainButton, styles.btnSuccess, { flex: 1 }]}
-                      onPress={async () => {
-                        // await getUserPool()
-                        // console.log("USERPOOL at invoke reassign", userPool)
-                        setReassignVisible(true)
-                        setBackgroundOpacity(.33)
-                      }}
-                    >
-                      <Text style={styles.buttonText}>
-                        <FontAwesome
-                          style={{ color: "white", fontSize: 24 }}
-                          name='user'
-                        /> Reassign Task
-                      </Text>
-                    </Pressable>
-                    {/* modal for reassigning task  */}
-                    <Modal
-                      animationType="slide"
-                      transparent={true}
-                      visible={reassignVisible}
-                      onRequestClose={() => {
-                        setReassignVisible(false)
-                        setBackgroundOpacity(1.0)
-                      }}>
-                      <View style={styles.modalView}>
-                        <Text style={styles.pageTitleText}>Reassign Task</Text>
+                      {/* reassign button */}
+                      <Pressable style={[styles.mainButton, styles.btnSuccess, { flex: 1 }]}
+                        onPress={async () => {
+                          // await getUserPool()
+                          // console.log("USERPOOL at invoke reassign", userPool)
+                          setReassignVisible(true)
+                          setBackgroundOpacity(.33)
+                        }}
+                      >
+                        <Text style={styles.buttonText}>
+                          <FontAwesome
+                            style={{ color: "white", fontSize: 24 }}
+                            name='user'
+                          /> Reassign
+                        </Text>
+                      </Pressable>
+                      {/* modal for reassigning task  */}
+                      <Modal
+                        animationType="slide"
+                        transparent={true}
+                        visible={reassignVisible}
+                        onRequestClose={() => {
+                          setReassignVisible(false)
+                          setBackgroundOpacity(1.0)
+                        }}>
+                        <View style={styles.modalView}>
+                          <Text style={styles.pageTitleText}>Reassign Task</Text>
 
-                        <Text style={[styles.inputLabel, { paddingTop: 15, alignSelf: 'flex-start' }]}>Select user to reassign task</Text>
-                        <View style={styles.tagContainer}>
+                          <Text style={[styles.inputLabel, { paddingTop: 15, alignSelf: 'flex-start' }]}>Select user to reassign task</Text>
+                          <View style={styles.tagContainer}>
 
-                          {
-                            userPool.map((item) =>
-                              <Pressable key={item.id} style={styles.tagButton}
-                                onPress={() => {
-                                  reassignTask(item.id, item.userName)
-                                }}
-                              >
-                                <Text style={styles.tagText}>
-                                  {item.userName}
-                                </Text>
-                              </Pressable>
-                            )
-                          }
+                            {
+                              userPool.map((item) =>
+                                <Pressable key={item.id} style={styles.tagButton}
+                                  onPress={() => {
+                                    reassignTask(item.id, item.userName)
+                                  }}
+                                >
+                                  <Text style={styles.tagText}>
+                                    {item.userName}
+                                  </Text>
+                                </Pressable>
+                              )
+                            }
+                          </View>
+
+
+                          <Pressable
+                            style={[styles.mainButton, styles.btnWarning, styles.btnNarrow]}
+                            onPress={() => {
+                              setReassignVisible(false)
+                              setBackgroundOpacity(1.0)
+                            }}>
+                            <Text style={[styles.buttonText]}>
+                              <FontAwesome
+                                style={[{ fontSize: 35 }]}
+                                name='arrow-circle-o-left'
+                              // color='white'
+                              />
+                            </Text>
+                          </Pressable>
+
                         </View>
+                      </Modal>
 
+                      {/* comlete task button */}
+                      <Pressable style={[styles.mainButton, styles.btnSuccess, { flex: 1 }]}
+                        onPress={() => {
+                          var taskObj = task;
+                          taskObj.id = taskId;
+                          completeTask(taskObj);
+                          navigation.goBack();
+                        }
+                        }
+                      >
+                        <Text style={styles.buttonText}>
+                          <FontAwesome
+                            style={{ color: "white", fontSize: 24 }}
+                            name='check'
+                          /> Complete
+                        </Text>
+                      </Pressable>
 
-                        <Pressable
-                          style={[styles.mainButton, styles.btnWarning, styles.btnNarrow]}
-                          onPress={() => {
-                            setReassignVisible(false)
-                            setBackgroundOpacity(1.0)
-                          }}>
-                          <Text style={[styles.buttonText]}>
-                            <FontAwesome
-                              style={[{ fontSize: 35 }]}
-                              name='arrow-circle-o-left'
-                            // color='white'
-                            />
-                          </Text>
-                        </Pressable>
+                    </View>
 
-                      </View>
-                    </Modal>
-
-                    {/* comlete task button */}
-                    <Pressable style={[styles.mainButton, styles.btnSuccess, { flex: 1 }]}
-                      onPress={() => {
-                        var taskObj = task;
-                        taskObj.id = taskId;
-                        completeTask(taskObj);
-                        navigation.goBack();
-                      }
-                      }
-                    >
-                      <Text style={styles.buttonText}>
-                        <FontAwesome
-                          style={{ color: "white", fontSize: 24 }}
-                          name='check'
-                        /> Complete Task
-                      </Text>
-                    </Pressable>
-
-                  </View>
-
-
-
-
-
-
-
-
-
-
-
-
-
+                  ) : (null)}
 
 
                   <Text style={[styles.inputLabel, { paddingTop: 15 }]}>Name</Text>
@@ -802,6 +795,7 @@ export function TaskDetailScreen({ route, navigation }) {
                     value={task.name}
                     underlineColorAndroid='transparent'
                     autoCapitalize='none'
+                    editable={task.status == 'complete' ? (false) : (true)}
                   />
 
                   {/* <TextInput
@@ -826,6 +820,7 @@ export function TaskDetailScreen({ route, navigation }) {
                     value={task.notes}
                     underlineColorAndroid='transparent'
                     autoCapitalize='none'
+                    editable={task.status == 'complete' ? (false) : (true)}
                   />
 
                   <View style={{ flexDirection: "row" }}>
@@ -833,6 +828,7 @@ export function TaskDetailScreen({ route, navigation }) {
                     <View style={{ flexDirection: "column", flex: 1 }}>
                       <Text style={styles.inputLabel}>Start After</Text>
                       <Pressable
+                        disabled={task.status == 'complete' ? (true) : (false)}
                         onPress={() => {
                           setStartDatePickerVisibility(true)
                           setBackgroundOpacity(0.33)
@@ -862,6 +858,7 @@ export function TaskDetailScreen({ route, navigation }) {
                     <View style={{ flexDirection: "column", flex: 1 }}>
                       <Text style={styles.inputLabel}>Finish By</Text>
                       <Pressable
+                        disabled={task.status == 'complete' ? (true) : (false)}
                         onPress={() => {
                           setEndDatePickerVisibility(true)
                           setBackgroundOpacity(0.33)
@@ -894,6 +891,8 @@ export function TaskDetailScreen({ route, navigation }) {
                     <View style={{ flexDirection: "column", flex: 1 }}>
                       <Text style={styles.inputLabel}>Priority</Text>
                       <InputSpinner
+                        disabled={task.status == 'complete' ? (true) : (false)}
+                        editable={task.status == 'complete' ? (false) : (true)}
                         skin={"clean"}
                         height={48}
                         width={140}
@@ -921,6 +920,8 @@ export function TaskDetailScreen({ route, navigation }) {
                     <View style={{ flexDirection: "column", flex: 1 }}>
                       <Text style={styles.inputLabel}>Effort</Text>
                       <InputSpinner
+                        disabled={task.status == 'complete' ? (true) : (false)}
+                        editable={task.status == 'complete' ? (false) : (true)}
                         skin={"clean"}
                         height={48}
                         width={140}
@@ -965,6 +966,7 @@ export function TaskDetailScreen({ route, navigation }) {
                       )
                     }
                     <Pressable style={styles.tagButton}
+                      disabled={task.status == 'complete' ? (true) : (false)}
                       onPress={() => {
                         setTaskGroupPickerVisible(true)
                         setBackgroundOpacity(.33)
@@ -1042,6 +1044,8 @@ export function TaskDetailScreen({ route, navigation }) {
                       )
                     }
                     <Pressable style={styles.tagButton}
+                      disabled={task.status == 'complete' ? (true) : (false)}
+
                       onPress={() => {
                         setTaskResourcePickerVisible(true)
                         setBackgroundOpacity(.33)
