@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
   Alert,
-  Keyboard,
   KeyboardAvoidingView,
   Modal,
   Pressable,
@@ -9,13 +8,12 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   View,
 } from 'react-native';
 import {
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
-import { FontAwesome } from '@expo/vector-icons';
+import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
 import { db, auth } from './firebase.config';
 import { doc, collection, query, addDoc, getDoc, getDocs, setDoc, deleteDoc, onSnapshot, where, orderBy, DocumentReference, collectionGroup, documentId } from "firebase/firestore";
 
@@ -23,7 +21,7 @@ import { doc, collection, query, addDoc, getDoc, getDocs, setDoc, deleteDoc, onS
 const styles = require('./Style.js');
 // use custom components
 import { Title, Footer } from './Components.js'
-import { useTheme } from 'react-native-paper';
+import { deleteGroup, deleteResource } from './Functions.js'
 
 export function ResourceDetailScreen({ route, navigation }) {
 
@@ -36,7 +34,6 @@ export function ResourceDetailScreen({ route, navigation }) {
   const [origResource, setOrigResource] = useState({});
   const [resource, setResource] = useState({});
   const [userGroupNames, setUserGroupNames] = useState([]);
-  const [userResourceNames, setUserResourceNames] = useState([]);
   const [groupResourceNames, setGroupResourceNames] = useState([]);
   const [groupResourcesUpdated, setGroupResourcesUpdated] = useState(0);
 
@@ -44,6 +41,7 @@ export function ResourceDetailScreen({ route, navigation }) {
   const [groupResourcePickerVisible, setGroupResourcePickerVisible] = useState(false);
   const [backgroundOpacity, setBackgroundOpacity] = useState(1.0);
 
+  // get resource and related info
   useEffect(() => {
 
     async function getResoureceInfo() {
@@ -62,6 +60,7 @@ export function ResourceDetailScreen({ route, navigation }) {
       var filterGroupsResult = await filterGroups(retrievedGroupResourceNames, retrievedUserGroupNames)
       setUserGroupNames(filterGroupsResult)
 
+      // get user 
       async function getUser() {
         try {
           const docSnap = await getDoc(doc(db, "Users", uid));
@@ -264,143 +263,164 @@ export function ResourceDetailScreen({ route, navigation }) {
         {/* <TouchableWithoutFeedback onPress={Keyboard.dismiss}> */}
         <View style={{ flex: 1 }}>
 
+          <Title
+            title="Resource Details"
+            name={user.name}
+            navigation={navigation} />
 
-            <Title
-              title="Resource Details"
-              name={user.name}
-              navigation={navigation} />
+          {/* <ScrollView style={{ height: "81%", marginBottom: 15 }}> */}
+          <ScrollView>
 
-            {/* <ScrollView style={{ height: "81%", marginBottom: 15 }}> */}
-            <ScrollView>
+            <View style={styles.inputFormContainer}>
+              <Text style={styles.inputLabel}>Created by {createdByUser}</Text>
+              <Text style={styles.inputLabel}>Created on {new Date(resource.createdDate).toString().slice(0, 24)}</Text>
 
-              <View style={styles.inputFormContainer}>
-                <Text style={styles.inputLabel}>Created by {createdByUser}</Text>
-                <Text style={styles.inputLabel}>Created on {new Date(resource.createdDate).toString().slice(0, 24)}</Text>
-
-                <Text style={[styles.inputLabel, { paddingTop: 15 }]}>Name</Text>
-                <TextInput
-                  style={styles.input}
-                  onChangeText={(newValue) => { setResource((prevState) => ({ ...prevState, name: newValue })) }}
-                  value={resource.name}
-                  underlineColorAndroid='transparent'
-                  autoCapitalize='none'
-                />
-
-                <Text style={styles.inputLabel}>Notes</Text>
-                <TextInput
-                  style={[styles.input, {
-                    paddingTop: 10,
-                    height: 120,
-                    textAlignVertical: "top" // android fix for centering it at the top-left corner 
-                  }]}
-                  multiline={true} // ios fix for centering it at the top-left corner 
-                  onChangeText={(newValue) => { setResource((prevState) => ({ ...prevState, notes: newValue })) }}
-                  value={resource.notes}
-                  underlineColorAndroid='transparent'
-                  autoCapitalize='none'
-                />
-
-
-                <Text style={styles.inputLabel}>Resource Groups</Text>
-                <View style={styles.tagContainer}>
-                  {
-                    groupResourceNames.map((item) =>
-                      <Pressable key={item.id} style={styles.tagButton}
-                        onLongPress={() => confirmDeleteGroupMembership(item.id, item.name)}
-                        onPress={() => navigation.navigate('GroupDetail', { uid: uid, groupId: item.id })}
-                      >
-                        <Text style={styles.tagText}>
-                          {item.name}
-                        </Text>
-                      </Pressable>
-                    )
-                  }
-                  <Pressable style={styles.tagButton}
-                    onPress={() => {
-                      setGroupResourcePickerVisible(true)
-                      setBackgroundOpacity(.33)
-                    }}
+              <View style={{ flexDirection: "row" }}>
+                <View style={{ flex: 3 }}></View>
+                <TouchableOpacity style={[styles.mainButton, styles.btnDanger, styles.btnNarrow, { flex: 1 }]}
+                  // disabled={!groupChanged()}
+                  onPress={() => {
+                    deleteResource(resourceId)
+                    navigation.goBack()
+                  }}
+                >
+                  <Text
+                    style={[styles.buttonText]}
                   >
-                    <Text style={styles.tagText}>
-                      +
+                    <FontAwesome
+                      style={{ color: "white", fontSize: 24 }}
+                      name='trash-o'
+                    />
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[styles.mainButton, styles.btnSuccess, { flex: 2 }, { opacity: (!resourceChanged()) ? 0.5 : 1.0 }]}
+                  disabled={!resourceChanged()}
+                  onPress={async () => {
+                    await SaveResource().then(
+                      (result) => {
+                        if (result == 0) {
+                          navigation.goBack();
+                        }
+                      }
+                    )
+                  }}
+                >
+                  <Text
+                    style={[styles.buttonText]}
+                  >
+                    <FontAwesome5
+                      style={{ color: "white", fontSize: 24 }}
+                      name='save'
+                    /> Save
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              <Text style={[styles.inputLabel, { paddingTop: 15 }]}>Name</Text>
+              <TextInput
+                style={styles.input}
+                onChangeText={(newValue) => { setResource((prevState) => ({ ...prevState, name: newValue })) }}
+                value={resource.name}
+                underlineColorAndroid='transparent'
+                autoCapitalize='none'
+              />
+
+              <Text style={styles.inputLabel}>Notes</Text>
+              <TextInput
+                style={[styles.input, {
+                  paddingTop: 10,
+                  height: 120,
+                  textAlignVertical: "top" // android fix for centering it at the top-left corner 
+                }]}
+                multiline={true} // ios fix for centering it at the top-left corner 
+                onChangeText={(newValue) => { setResource((prevState) => ({ ...prevState, notes: newValue })) }}
+                value={resource.notes}
+                underlineColorAndroid='transparent'
+                autoCapitalize='none'
+              />
+
+
+              <Text style={styles.inputLabel}>Resource Groups</Text>
+              <View style={styles.tagContainer}>
+                {
+                  groupResourceNames.map((item) =>
+                    <Pressable key={item.id} style={styles.tagButton}
+                      onLongPress={() => confirmDeleteGroupMembership(item.id, item.name)}
+                      onPress={() => navigation.navigate('GroupDetail', { uid: uid, groupId: item.id })}
+                    >
+                      <Text style={styles.tagText}>
+                        {item.name}
+                      </Text>
+                    </Pressable>
+                  )
+                }
+                <Pressable style={styles.tagButton}
+                  onPress={() => {
+                    setGroupResourcePickerVisible(true)
+                    setBackgroundOpacity(.33)
+                  }}
+                >
+                  <Text style={styles.tagText}>
+                    +
+                  </Text>
+                </Pressable>
+
+              </View>
+
+              {/* modal for selecting groups  */}
+              <Modal
+                animationType="slide"
+                transparent={true}
+                visible={groupResourcePickerVisible}
+                onRequestClose={() => {
+                  setGroupResourcePickerVisible(false)
+                  setBackgroundOpacity(1.0)
+                }}>
+                <View style={styles.modalView}>
+                  <Text style={styles.pageTitleText}>Add Resource to Groups</Text>
+
+                  <Text style={[styles.inputLabel, { paddingTop: 15, alignSelf: 'flex-start' }]}>Groups</Text>
+                  <View style={styles.tagContainer}>
+
+                    {
+                      userGroupNames.map((item) =>
+                        <Pressable key={item.id} style={styles.tagButton}
+                          onPress={() => addGroupResource(item.id)}
+                        >
+                          <Text style={styles.tagText}>
+                            {item.name}
+                          </Text>
+                        </Pressable>
+                      )
+                    }
+                  </View>
+
+                  <Pressable
+                    style={[styles.mainButton, styles.btnWarning, styles.btnNarrow]}
+                    onPress={() => {
+                      setGroupResourcePickerVisible(false)
+                      setBackgroundOpacity(1.0)
+                    }}>
+                    <Text style={[styles.buttonText]}>
+                      <FontAwesome
+                        style={[{ fontSize: 35 }]}
+                        name='arrow-circle-o-left'
+                      // color='white'
+                      />
                     </Text>
                   </Pressable>
 
                 </View>
+              </Modal>
 
-                {/* modal for selecting groups  */}
-                <Modal
-                  animationType="slide"
-                  transparent={true}
-                  visible={groupResourcePickerVisible}
-                  onRequestClose={() => {
-                    setGroupResourcePickerVisible(false)
-                    setBackgroundOpacity(1.0)
-                  }}>
-                  <View style={styles.modalView}>
-                    <Text style={styles.pageTitleText}>Add Resource to Groups</Text>
+            </View>
+          </ScrollView>
 
-                    <Text style={[styles.inputLabel, { paddingTop: 15, alignSelf: 'flex-start' }]}>Groups</Text>
-                    <View style={styles.tagContainer}>
+          <Footer auth={auth}
+            navigation={navigation}
+            uid={uid} />
 
-                      {
-                        userGroupNames.map((item) =>
-                          <Pressable key={item.id} style={styles.tagButton}
-                            onPress={() => addGroupResource(item.id)}
-                          >
-                            <Text style={styles.tagText}>
-                              {item.name}
-                            </Text>
-                          </Pressable>
-                        )
-                      }
-                    </View>
-
-                    <Pressable
-                      style={[styles.mainButton, styles.btnWarning, styles.btnNarrow]}
-                      onPress={() => {
-                        setGroupResourcePickerVisible(false)
-                        setBackgroundOpacity(1.0)
-                      }}>
-                      <Text style={[styles.buttonText]}>
-                        <FontAwesome
-                          style={[{ fontSize: 35 }]}
-                          name='arrow-circle-o-left'
-                        // color='white'
-                        />
-                      </Text>
-                    </Pressable>
-
-                  </View>
-                </Modal>
-
-                <View style={{ alignItems: "center" }}>
-                  <TouchableOpacity style={[styles.mainButton, styles.btnSuccess, { opacity: (!resourceChanged()) ? 0.5 : 1.0 }]}
-                    disabled={!resourceChanged()}
-                    onPress={async () => {
-                      await SaveResource().then(
-                        (result) => {
-                          if (result == 0) {
-                            navigation.goBack();
-                          }
-                        }
-                      )
-                    }}
-                  >
-                    <Text
-                      style={[styles.buttonText]}
-                    >Save
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </ScrollView>
-
-            <Footer auth={auth}
-              navigation={navigation}
-              uid={uid} />
-
-          </View>
+        </View>
         {/* </TouchableWithoutFeedback> */}
       </KeyboardAvoidingView>
     </View>

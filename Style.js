@@ -173,6 +173,10 @@ module.exports = StyleSheet.create({
     backgroundColor: "orange",
     shadowColor: 'orange',
   },
+  btnDanger: {
+    backgroundColor: "red",
+    shadowColor: 'red',
+  },
   // ########################################
 
   // input + button form ########################################
