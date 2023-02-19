@@ -188,7 +188,7 @@ export function TasksScreen({ route, navigation }) {
   // complete a task
   const completeTask = async (task, index) => {
 
-    swipeableRef.current[index].close();
+     swipeableRef[index].close();
 
     task.status = 'complete'
     task.completedDate = Math.floor(Date.now()) //serverTimestamp();
@@ -475,7 +475,7 @@ export function TasksScreen({ route, navigation }) {
                       (
 
                         <Swipeable
-                          ref={ref => swipeableRef.current[index] = ref}
+                          ref={ref => swipeableRef[index] = ref}
                           renderLeftActions={LeftSwipeActions}
                           renderRightActions={rightSwipeActions}
                           onSwipeableRightOpen={() => deleteTask(item.id)}
