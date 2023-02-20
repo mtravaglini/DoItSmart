@@ -272,8 +272,8 @@ export function ResourceDetailScreen({ route, navigation }) {
           <ScrollView>
 
             <View style={styles.inputFormContainer}>
-              <Text style={styles.inputLabel}>Created by {createdByUser}</Text>
-              <Text style={styles.inputLabel}>Created on {new Date(resource.createdDate).toString().slice(0, 24)}</Text>
+              <Text style={styles.textLabel}>Created by {createdByUser}</Text>
+              <Text style={styles.textLabel}>Created on {new Date(resource.createdDate).toString().slice(0, 24)}</Text>
 
               <View style={{ flexDirection: "row" }}>
                 <View style={{ flex: 3 }}></View>
@@ -316,7 +316,7 @@ export function ResourceDetailScreen({ route, navigation }) {
                 </TouchableOpacity>
               </View>
 
-              <Text style={[styles.inputLabel, { paddingTop: 15 }]}>Name</Text>
+              <Text style={[styles.textLabel, { paddingTop: 15 }]}>Name</Text>
               <TextInput
                 style={styles.input}
                 onChangeText={(newValue) => { setResource((prevState) => ({ ...prevState, name: newValue })) }}
@@ -325,7 +325,7 @@ export function ResourceDetailScreen({ route, navigation }) {
                 autoCapitalize='none'
               />
 
-              <Text style={styles.inputLabel}>Notes</Text>
+              <Text style={styles.textLabel}>Notes</Text>
               <TextInput
                 style={[styles.input, {
                   paddingTop: 10,
@@ -340,7 +340,7 @@ export function ResourceDetailScreen({ route, navigation }) {
               />
 
 
-              <Text style={styles.inputLabel}>Resource Groups</Text>
+              <Text style={styles.textLabel}>Resource Groups</Text>
               <View style={styles.tagContainer}>
                 {
                   groupResourceNames.map((item) =>
@@ -379,7 +379,7 @@ export function ResourceDetailScreen({ route, navigation }) {
                 <View style={styles.modalView}>
                   <Text style={styles.pageTitleText}>Add Resource to Groups</Text>
 
-                  <Text style={[styles.inputLabel, { paddingTop: 15, alignSelf: 'flex-start' }]}>Groups</Text>
+                  <Text style={[styles.textLabel, { paddingTop: 15, alignSelf: 'flex-start' }]}>Groups</Text>
                   <View style={styles.tagContainer}>
 
                     {

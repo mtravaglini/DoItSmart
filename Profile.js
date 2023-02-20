@@ -350,7 +350,7 @@ export function ProfileScreen({ route, navigation }) {
                   <View>
 
 
-                    <Text style={styles.inputLabel}>Email</Text>
+                    <Text style={styles.textLabel}>Email</Text>
                     <TextInput
                       style={styles.input}
                       onChangeText={(newValue) => { setUser((prevState) => ({ ...prevState, email: newValue })) }}
@@ -359,7 +359,7 @@ export function ProfileScreen({ route, navigation }) {
                       autoCapitalize='none'
                     />
 
-                    {(groupNames.length > 0) ? <Text style={styles.inputLabel}>Your groups</Text> : ''}
+                    {(groupNames.length > 0) ? <Text style={styles.textLabel}>Your groups</Text> : ''}
                     <View style={(groupNames.length > 0) ? styles.tagContainer : ''}>
                       {
                         groupNames.map((item) =>
@@ -375,7 +375,7 @@ export function ProfileScreen({ route, navigation }) {
                       }
                     </View>
 
-                    {(invites.length > 0) ? <Text style={styles.inputLabel}>Your group invitations</Text> : ''}
+                    {(invites.length > 0) ? <Text style={styles.textLabel}>Your group invitations</Text> : ''}
                     {/* <View style={styles.tagContainer}> */}
                     <View style={(invites.length > 0) ? styles.tagContainer : ''}>
 

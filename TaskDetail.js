@@ -633,10 +633,10 @@ export function TaskDetailScreen({ route, navigation }) {
               <ScrollView style={{opacity: (task.status == 'complete' ? .50 : backgroundOpacity)}}>
 
                 <View style={styles.inputFormContainer}>
-                  <Text style={styles.inputLabel}>Created by {createdByUser}</Text>
-                  <Text style={styles.inputLabel}>Created on {new Date(task.createdDate).toString().slice(0, 24)}</Text>
+                  <Text style={styles.textLabel}>Created by {createdByUser}</Text>
+                  <Text style={styles.textLabel}>Created on {new Date(task.createdDate).toString().slice(0, 24)}</Text>
                   {task.status == 'complete' ? (
-                    <Text style={styles.inputLabel}>Completed on {new Date(task.completedDate).toString().slice(0, 24)}</Text>
+                    <Text style={styles.textLabel}>Completed on {new Date(task.completedDate).toString().slice(0, 24)}</Text>
                   ) : (null)}
 
 
@@ -728,7 +728,7 @@ export function TaskDetailScreen({ route, navigation }) {
                         <View style={styles.modalView}>
                           <Text style={styles.pageTitleText}>Reassign Task</Text>
 
-                          <Text style={[styles.inputLabel, { paddingTop: 15, alignSelf: 'flex-start' }]}>Select user to reassign task</Text>
+                          <Text style={[styles.textLabel, { paddingTop: 15, alignSelf: 'flex-start' }]}>Select user to reassign task</Text>
                           <View style={styles.tagContainer}>
 
                             {
@@ -788,7 +788,7 @@ export function TaskDetailScreen({ route, navigation }) {
                   ) : (null)}
 
 
-                  <Text style={[styles.inputLabel, { paddingTop: 15 }]}>Name</Text>
+                  <Text style={[styles.textLabel, { paddingTop: 15 }]}>Name</Text>
                   <TextInput
                     style={styles.input}
                     onChangeText={(newValue) => { setTask((prevState) => ({ ...prevState, name: newValue })) }}
@@ -808,7 +808,7 @@ export function TaskDetailScreen({ route, navigation }) {
                   autoCapitalize='none'
                 /> */}
 
-                  <Text style={styles.inputLabel}>Notes</Text>
+                  <Text style={styles.textLabel}>Notes</Text>
                   <TextInput
                     style={[styles.input, {
                       paddingTop: 10,
@@ -826,7 +826,7 @@ export function TaskDetailScreen({ route, navigation }) {
                   <View style={{ flexDirection: "row" }}>
 
                     <View style={{ flexDirection: "column", flex: 1 }}>
-                      <Text style={styles.inputLabel}>Start After</Text>
+                      <Text style={styles.textLabel}>Start After</Text>
                       <Pressable
                         disabled={task.status == 'complete' ? (true) : (false)}
                         onPress={() => {
@@ -856,7 +856,7 @@ export function TaskDetailScreen({ route, navigation }) {
                     </View>
 
                     <View style={{ flexDirection: "column", flex: 1 }}>
-                      <Text style={styles.inputLabel}>Finish By</Text>
+                      <Text style={styles.textLabel}>Finish By</Text>
                       <Pressable
                         disabled={task.status == 'complete' ? (true) : (false)}
                         onPress={() => {
@@ -889,7 +889,7 @@ export function TaskDetailScreen({ route, navigation }) {
 
                   <View style={{ flexDirection: "row" }}>
                     <View style={{ flexDirection: "column", flex: 1 }}>
-                      <Text style={styles.inputLabel}>Priority</Text>
+                      <Text style={styles.textLabel}>Priority</Text>
                       <InputSpinner
                         disabled={task.status == 'complete' ? (true) : (false)}
                         editable={task.status == 'complete' ? (false) : (true)}
@@ -918,7 +918,7 @@ export function TaskDetailScreen({ route, navigation }) {
                     </View>
 
                     <View style={{ flexDirection: "column", flex: 1 }}>
-                      <Text style={styles.inputLabel}>Effort</Text>
+                      <Text style={styles.textLabel}>Effort</Text>
                       <InputSpinner
                         disabled={task.status == 'complete' ? (true) : (false)}
                         editable={task.status == 'complete' ? (false) : (true)}
@@ -951,7 +951,7 @@ export function TaskDetailScreen({ route, navigation }) {
                   </View>
 
                   {/* Groups display */}
-                  <Text style={styles.inputLabel}>Groups</Text>
+                  <Text style={styles.textLabel}>Groups</Text>
                   <View style={styles.tagContainer}>
                     {
                       taskGroupNames.map((item) =>
@@ -991,7 +991,7 @@ export function TaskDetailScreen({ route, navigation }) {
                     <View style={styles.modalView}>
                       <Text style={styles.pageTitleText}>Add Task to Groups</Text>
 
-                      <Text style={[styles.inputLabel, { paddingTop: 15, alignSelf: 'flex-start' }]}>Groups</Text>
+                      <Text style={[styles.textLabel, { paddingTop: 15, alignSelf: 'flex-start' }]}>Groups</Text>
 
                       <View style={styles.tagContainer}>
 
@@ -1029,7 +1029,7 @@ export function TaskDetailScreen({ route, navigation }) {
 
 
                   {/* Resources display */}
-                  <Text style={styles.inputLabel}>Resources</Text>
+                  <Text style={styles.textLabel}>Resources</Text>
                   <View style={styles.tagContainer}>
                     {
                       taskResourceNames.map((item) =>
@@ -1070,7 +1070,7 @@ export function TaskDetailScreen({ route, navigation }) {
                     <View style={styles.modalView}>
                       <Text style={styles.pageTitleText}>Assign Resource to Task</Text>
 
-                      <Text style={[styles.inputLabel, { paddingTop: 15, alignSelf: 'flex-start' }]}>Resources</Text>
+                      <Text style={[styles.textLabel, { paddingTop: 15, alignSelf: 'flex-start' }]}>Resources</Text>
 
                       <View style={styles.tagContainer}>
 

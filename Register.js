@@ -97,7 +97,7 @@ export function RegisterScreen({ route, navigation }) {
               navigation={navigation} />
 
             <View style={styles.inputFormContainer}>
-              <Text style={styles.inputLabel}>Name</Text>
+              <Text style={styles.textLabel}>Name</Text>
               <TextInput
                 // display icon in the textinput box
                 // left={<TextInput.Icon name="account" />}
@@ -107,7 +107,7 @@ export function RegisterScreen({ route, navigation }) {
                 autoCapitalize="none"
               />
 
-              <Text style={styles.inputLabel}>Email</Text>
+              <Text style={styles.textLabel}>Email</Text>
               <TextInput
                 // display icon in the textinput box
                 // left={<TextInput.Icon name="account" />}
@@ -117,7 +117,7 @@ export function RegisterScreen({ route, navigation }) {
                 autoCapitalize="none"
               />
 
-              <Text style={styles.inputLabel}>Password</Text>
+              <Text style={styles.textLabel}>Password</Text>
               <TextInput
                 // display icon in the textinput box
                 // left={<TextInput.Icon name="form-textbox-password" />}
@@ -128,7 +128,7 @@ export function RegisterScreen({ route, navigation }) {
                 secureTextEntry={true}
               />
 
-              <Text style={styles.inputLabel}>Confirm Password</Text>
+              <Text style={styles.textLabel}>Confirm Password</Text>
               <TextInput
                 // display icon in the textinput box
                 // left={<TextInput.Icon name="form-textbox-password" />}

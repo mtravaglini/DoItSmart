@@ -423,7 +423,7 @@ export function TasksScreen({ route, navigation }) {
                   <View>
                     {(displayDate && displayTask) ?
                       (
-                        <Text style={styles.inputLabel}>{
+                        <Text style={styles.textLabel}>{
                           new Date(item.startDate).toString().slice(0, 10)
                         }</Text>
                       ) : (

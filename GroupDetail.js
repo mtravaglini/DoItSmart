@@ -276,8 +276,8 @@ export function GroupDetailScreen({ route, navigation }) {
           <ScrollView>
 
             <View style={styles.inputFormContainer}>
-              <Text style={styles.inputLabel}>Created by {createdByUser}</Text>
-              <Text style={styles.inputLabel}>Created on {new Date(group.createdDate).toString().slice(0, 24)}</Text>
+              <Text style={styles.textLabel}>Created by {createdByUser}</Text>
+              <Text style={styles.textLabel}>Created on {new Date(group.createdDate).toString().slice(0, 24)}</Text>
 
               <View style={{ flexDirection: "row" }}>
                 <View style={{ flex: 3 }}></View>
@@ -320,7 +320,7 @@ export function GroupDetailScreen({ route, navigation }) {
                 </TouchableOpacity>
               </View>
 
-              <Text style={[styles.inputLabel, { paddingTop: 15 }]}>Name</Text>
+              <Text style={[styles.textLabel, { paddingTop: 15 }]}>Name</Text>
               <TextInput
                 style={styles.input}
                 onChangeText={(newValue) => { setGroup((prevState) => ({ ...prevState, name: newValue })) }}
@@ -329,7 +329,7 @@ export function GroupDetailScreen({ route, navigation }) {
                 autoCapitalize='none'
               />
 
-              <Text style={styles.inputLabel}>Notes</Text>
+              <Text style={styles.textLabel}>Notes</Text>
               <TextInput
                 style={[styles.input, {
                   paddingTop: 10,
@@ -344,7 +344,7 @@ export function GroupDetailScreen({ route, navigation }) {
               />
 
 
-              <Text style={styles.inputLabel}>Group Members</Text>
+              <Text style={styles.textLabel}>Group Members</Text>
               <View style={styles.tagContainer}>
                 {
                   groupUserNames.map((item) =>
@@ -387,7 +387,7 @@ export function GroupDetailScreen({ route, navigation }) {
                   <View style={styles.inputFormContainer}>
 
 
-                    <Text style={[styles.inputLabel, { paddingTop: 15 }]}>Email</Text>
+                    <Text style={[styles.textLabel, { paddingTop: 15 }]}>Email</Text>
                     <TextInput style={[styles.input, { width: 250 }]}
                       onChangeText={(newValue) => { setEmailInvite(newValue) }}
                       value={emailInvite}

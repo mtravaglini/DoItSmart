@@ -233,7 +233,7 @@ module.exports = StyleSheet.create({
     // marginTop: 15,
     // marginBottom: 15,
   },
-  inputLabel: {
+  textLabel: {
     paddingLeft: 10,
     fontWeight: "bold",
     color: labelColour,
