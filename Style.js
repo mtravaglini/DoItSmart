@@ -1,27 +1,110 @@
 import {
+  Appearance,
   StatusBar,
   StyleSheet,
   Platform
 } from 'react-native';
 
+const colorScheme = Appearance.getColorScheme();
+console.log("COLOR SCHEME",colorScheme)
+
 // Blue with green
-const headerBackgroundColour = "black";
-const headerColour = "cornflowerblue";
+const originalBlueGreenColourObj = {
+  headerBackgroundColour: "black",
+  headerColour: "cornflowerblue",
 
-const mainScreenColour = "cornflowerblue";
-const secondaryScreenColour = "midnightblue";
+  mainScreenColour: "cornflowerblue",
+  secondaryScreenColour: "midnightblue",
 
-const labelColour = "midnightblue";
+  labelColour: "midnightblue",
 
-const mainTextColour = "cornflowerblue";
-const inputTextColour = "cornflowerblue";
-const textBackgroundColour = "white";
+  mainTextColour: "cornflowerblue",
+  inputTextColour: "cornflowerblue",
+  textBackgroundColour: "white",
 
-const listBackgroundColour = "lightgreen"
-const listTextColour = "darkgreen"
+  listBackgroundColour: "lightgreen",
+  listTextColour: "darkgreen",
 
-const footerBackgroundColour = "black";
-const footerColour = "cornflowerblue";
+  footerBackgroundColour: "black",
+  footerColour: "cornflowerblue",
+
+  successColour: "darkgreen",
+  warningColour: "orange",
+  errorColour: "red"
+}
+
+
+const RoseCelesteScheme = {
+  "RoseRed": "#c33c54",
+  "IndigoDye": "#254e70",
+  "Cerulean": "#37718e",
+  "NonPhotoBlue": "#8ee3ef",
+  "Celeste": "#aef3e7"
+}
+const RoseCelesteLight = {
+
+  headerBackgroundColour: RoseCelesteScheme.IndigoDye,
+  headerColour: RoseCelesteScheme.NonPhotoBlue,
+
+  mainScreenColour: RoseCelesteScheme.NonPhotoBlue,
+  secondaryScreenColour: RoseCelesteScheme.IndigoDye,
+
+  labelColour: RoseCelesteScheme.RoseRed,
+
+  mainTextColour: RoseCelesteScheme.Cerulean,
+  inputTextColour: RoseCelesteScheme.Cerulean,
+  textBackgroundColour: RoseCelesteScheme.Celeste,
+
+  listBackgroundColour: "lightgreen",
+  listTextColour: "darkgreen",
+
+  footerBackgroundColour: RoseCelesteScheme.IndigoDye,
+  footerColour: RoseCelesteScheme.NonPhotoBlue,
+
+  successColour: "darkgreen",
+  warningColour: "orange",
+  errorColour: RoseCelesteScheme.RoseRed
+}
+const RoseCelesteDark = {
+
+  headerBackgroundColour: RoseCelesteScheme.Cerulean,
+  headerColour: RoseCelesteScheme.Celeste,
+
+  mainScreenColour: RoseCelesteScheme.IndigoDye,
+  secondaryScreenColour: RoseCelesteScheme.NonPhotoBlue,
+
+  labelColour: RoseCelesteScheme.RoseRed,
+
+  mainTextColour: RoseCelesteScheme.NonPhotoBlue,
+  inputTextColour: RoseCelesteScheme.NonPhotoBlue,
+  textBackgroundColour: "white",
+
+  listBackgroundColour: "lightgreen",
+  listTextColour: "darkgreen",
+
+  footerBackgroundColour: RoseCelesteScheme.Cerulean,
+  footerColour: RoseCelesteScheme.Celeste,
+
+  successColour: "darkgreen",
+  warningColour: "orange",
+  errorColour: RoseCelesteScheme.RoseRed
+}
+
+var colourObj = {};
+
+if (colorScheme == "dark") {
+
+  colourObj = RoseCelesteDark
+
+
+} else {
+
+  colourObj = RoseCelesteLight
+
+}
+
+console.log("COLOR OBJ", colourObj)
+
 
 
 module.exports = StyleSheet.create({
@@ -31,7 +114,7 @@ module.exports = StyleSheet.create({
     // marginTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
     // paddingTop: 0,
     // padding: 0,
-    backgroundColor: mainScreenColour,
+    backgroundColor: colourObj.mainScreenColour,
     // paddingTop: 5,
   },
   // container: {
@@ -46,7 +129,7 @@ module.exports = StyleSheet.create({
     paddingBottom: "20%",
     paddingLeft: "10%",
     paddingRight: "10%",
-    backgroundColor: secondaryScreenColour,
+    backgroundColor: colourObj.secondaryScreenColour,
     marginTop: 0,
     marginBottom: "5%",
     // marginHorizontal: "1%",
@@ -56,17 +139,17 @@ module.exports = StyleSheet.create({
     fontSize: 35,
     fontWeight: "bold",
     // fontFamily: Platform.OS === "android" ? "sans-serif" : "AppleSDGothicNeo",
-    color: mainTextColour,
+    color: colourObj.mainTextColour,
   },
   logo: {
     width: 66,
     height: 58,
   },
   // ########################################
-  
+
   // header ###########################
   header: {
-    backgroundColor: headerBackgroundColour,
+    backgroundColor: colourObj.headerBackgroundColour,
   },
 
   // page title screen text ########################################
@@ -78,7 +161,7 @@ module.exports = StyleSheet.create({
     fontSize: 25,
     fontWeight: "bold",
     // fontFamily: Platform.OS === "android" ? "sans-serif-thin" : "AppleSDGothicNeo-Thin",
-    color: headerColour,
+    color: colourObj.headerColour,
     marginTop: 5,
     // marginBottom: 5,
   },
@@ -86,8 +169,8 @@ module.exports = StyleSheet.create({
     fontSize: 15,
     fontWeight: "bold",
     // fontFamily: Platform.OS === "android" ? "sans-serif-thin" : "AppleSDGothicNeo-Thin",
-    color: headerColour,
-    borderColor: headerColour,
+    color: colourObj.headerColour,
+    borderColor: colourObj.headerColour,
     borderWidth: 1,
     borderRadius: 5,
     paddingHorizontal: 15,
@@ -98,9 +181,9 @@ module.exports = StyleSheet.create({
     fontSize: 30,
     marginLeft: "3%",
     marginRight: "5%",
-    color: headerColour,  
+    color: colourObj.headerColour,
   },
-// ########################################
+  // ########################################
 
   // standard buttons ########################################
   mainButton: {
@@ -109,9 +192,9 @@ module.exports = StyleSheet.create({
     borderRadius: 15,
     marginTop: 10,
     marginBottom: 10,
-    backgroundColor: secondaryScreenColour,
+    backgroundColor: colourObj.secondaryScreenColour,
     justifyContent: "center",
-    shadowColor: mainScreenColour,
+    shadowColor: colourObj.mainScreenColour,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -133,11 +216,11 @@ module.exports = StyleSheet.create({
     borderRadius: 15,
     marginTop: 10,
     marginBottom: 10,
-    backgroundColor: textBackgroundColour,
+    backgroundColor: colourObj.textBackgroundColour,
     justifyContent: "center",
     borderWidth: 1,
-    borderColor: secondaryScreenColour,
-    shadowColor: mainScreenColour,
+    borderColor: colourObj.secondaryScreenColour,
+    shadowColor: colourObj.mainScreenColour,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -149,7 +232,7 @@ module.exports = StyleSheet.create({
   secondaryButtonText: {
     textAlign: "center",
     textAlignVertical: "center",
-    color: secondaryScreenColour,
+    color: colourObj.secondaryScreenColour,
     // fontWeight: "bold",
     fontSize: 15,
   },
@@ -166,16 +249,16 @@ module.exports = StyleSheet.create({
     // height: 35,
   },
   btnSuccess: {
-    backgroundColor: "darkgreen",
-    shadowColor: 'darkgreen',
+    backgroundColor: colourObj.successColour,
+    shadowColor: colourObj.successColour,
   },
   btnWarning: {
-    backgroundColor: "orange",
-    shadowColor: 'orange',
+    backgroundColor: colourObj.warningColour,
+    shadowColor: colourObj.warningColour,
   },
   btnDanger: {
-    backgroundColor: "red",
-    shadowColor: 'red',
+    backgroundColor: colourObj.errorColour,
+    shadowColor: colourObj.errorColour,
   },
   // ########################################
 
@@ -195,8 +278,8 @@ module.exports = StyleSheet.create({
     // marginLeft: 0,
     marginRight: "2%",
     fontSize: 18,
-    backgroundColor: textBackgroundColour,
-    shadowColor: mainScreenColour,
+    backgroundColor: colourObj.textBackgroundColour,
+    shadowColor: colourObj.mainScreenColour,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -210,9 +293,9 @@ module.exports = StyleSheet.create({
     borderRadius: 15,
     width: "18%",
     alignItems: 'center',
-    backgroundColor: secondaryScreenColour,
+    backgroundColor: colourObj.secondaryScreenColour,
     justifyContent: "center",
-    shadowColor: mainScreenColour,
+    shadowColor: colourObj.mainScreenColour,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -236,7 +319,7 @@ module.exports = StyleSheet.create({
   textLabel: {
     paddingLeft: 10,
     fontWeight: "bold",
-    color: labelColour,
+    color: colourObj.labelColour,
     fontSize: 15,
   },
   input: {
@@ -251,10 +334,10 @@ module.exports = StyleSheet.create({
     marginBottom: 15,
     fontSize: 18,
     fontWeight: "bold",
-    color: inputTextColour,
-    backgroundColor: textBackgroundColour,
+    color: colourObj.inputTextColour,
+    backgroundColor: colourObj.textBackgroundColour,
     alignContent: "center",
-    shadowColor: mainScreenColour,
+    shadowColor: colourObj.mainScreenColour,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -264,7 +347,7 @@ module.exports = StyleSheet.create({
     elevation: 5,
 
 
-    // borderColor: secondaryScreenColour,
+    // borderColor: colourObj.secondaryScreenColour,
     // borderBottomWidth: 4,
     // borderTopWidth: 1,
     // borderLeftWidth: 4,
@@ -275,7 +358,7 @@ module.exports = StyleSheet.create({
 
   // task list  ########################################
   listContainer: {
-    backgroundColor: listBackgroundColour,
+    backgroundColor: colourObj.listBackgroundColour,
     // borderRadius: 15,
     // margin: "1%",
     height: 48,
@@ -285,7 +368,7 @@ module.exports = StyleSheet.create({
   },
   leftSwipeContainer: {
     justifyContent: "flex-start",
-    flex: 1,  
+    flex: 1,
     backgroundColor: "green",
     height: 48,
     flexDirection: 'row',
@@ -293,7 +376,7 @@ module.exports = StyleSheet.create({
   },
   rightSwipeContainer: {
     justifyContent: "flex-end",
-    flex: 1,  
+    flex: 1,
     backgroundColor: "red",
     height: 48,
     flexDirection: 'row',
@@ -303,12 +386,12 @@ module.exports = StyleSheet.create({
     fontSize: 30,
     marginLeft: "3%",
     marginRight: "5%",
-    color: listTextColour,
+    color: colourObj.listTextColour,
   },
   listText: {
     fontWeight: "bold",
     fontSize: 18,
-    color: listTextColour,
+    color: colourObj.listTextColour,
     paddingLeft: "5%",
   },
   // ########################################
@@ -317,16 +400,16 @@ module.exports = StyleSheet.create({
   standardText: {
     fontWeight: "bold",
     fontSize: 18,
-    color: mainTextColour,
+    color: colourObj.mainTextColour,
   },
   txtSuccess: {
-    color: "green",
+    color: colourObj.successColour,
   },
   txtWarning: {
-    color: "orange",
+    color: colourObj.warningColour,
   },
   txtError: {
-    color: "red",
+    color: colourObj.errorColour,
   },
 
   // Date ###################################
@@ -339,8 +422,8 @@ module.exports = StyleSheet.create({
     marginBottom: 15,
     // marginHorizontal: "5%",
     fontSize: 16,
-    backgroundColor: textBackgroundColour,
-    shadowColor: mainScreenColour,
+    backgroundColor: colourObj.textBackgroundColour,
+    shadowColor: colourObj.mainScreenColour,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -352,7 +435,7 @@ module.exports = StyleSheet.create({
 
   // Groups and Resource Tags ################################ 
   tagContainer: {
-    backgroundColor: textBackgroundColour,
+    backgroundColor: colourObj.textBackgroundColour,
     padding: "3%",
     borderRadius: 15,
     marginHorizontal: "1%",
@@ -363,9 +446,9 @@ module.exports = StyleSheet.create({
   },
   tagText: {
     fontSize: 15,
-    color: listTextColour,
-    backgroundColor: listBackgroundColour,
-    borderColor: listTextColour,
+    color: colourObj.listTextColour,
+    backgroundColor: colourObj.listBackgroundColour,
+    borderColor: colourObj.listTextColour,
     borderWidth: 1,
     borderRadius: 5,
     paddingHorizontal: 15,
@@ -380,29 +463,29 @@ module.exports = StyleSheet.create({
   footer: {
     flexDirection: "row",
     justifyContent: 'space-evenly',
-    backgroundColor: footerBackgroundColour,
+    backgroundColor: colourObj.footerBackgroundColour,
     paddingVertical: "1%"
   },
   footerIcon: {
     fontSize: 30,
-    color: footerColour,
+    color: colourObj.footerColour,
     alignSelf: "center"
   },
   footerText: {
-    color: footerColour,
+    color: colourObj.footerColour,
     alignSelf: "center"
   },
 
   // OTHER ########################################
   textDisplay: {
-    color: secondaryScreenColour,
+    color: colourObj.secondaryScreenColour,
     width: "90%",
     height: 48,
     lineHeight: 48,
     marginBottom: 15,
     paddingLeft: "5%",
     fontSize: 18,
-    backgroundColor: textBackgroundColour,
+    backgroundColor: colourObj.textBackgroundColour,
     borderRadius: 15,
   },
   closeBox: {
@@ -418,7 +501,7 @@ module.exports = StyleSheet.create({
   },
   closeText: {
     fontSize: 18,
-    color: mainTextColour,
+    color: colourObj.mainTextColour,
     fontWeight: "bold",
   },
   // ########################################
@@ -434,13 +517,13 @@ module.exports = StyleSheet.create({
     marginTop: "20%",
     marginBottom: "60%",
     // marginVertical: "50%",
-    backgroundColor: headerBackgroundColour,
+    backgroundColor: colourObj.headerBackgroundColour,
     borderRadius: 15,
-    borderColor: secondaryScreenColour,
+    borderColor: colourObj.secondaryScreenColour,
     borderWidth: 1,
     padding: 35,
     alignItems: 'center',
-    shadowColor: mainScreenColour,
+    shadowColor: colourObj.mainScreenColour,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -456,13 +539,13 @@ module.exports = StyleSheet.create({
     marginLeft: "35%",
     marginBottom: "60%",
     // marginVertical: "50%",
-    backgroundColor: headerBackgroundColour,
+    backgroundColor: colourObj.headerBackgroundColour,
     borderTopLeftRadius: 15,
     borderBottomLeftRadius: 15,
-    borderColor: secondaryScreenColour,
+    borderColor: colourObj.secondaryScreenColour,
     borderWidth: 1,
     padding: 35,
-    shadowColor: mainScreenColour,
+    shadowColor: colourObj.mainScreenColour,
     shadowOffset: {
       width: 0,
       height: 2,
