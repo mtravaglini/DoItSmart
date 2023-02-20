@@ -28,7 +28,7 @@ import { doc, collection, query, getDoc, getDocs, setDoc, addDoc, deleteDoc, onS
 const styles = require('./Style.js');
 // use custom components
 import { Title, Footer } from './Components.js'
-import { completeTask, deleteTask } from './Functions.js'
+import { completeTask, deleteTask, scheduleTasks } from './Functions.js'
 
 export function TasksScreen({ route, navigation }) {
 
@@ -138,7 +138,7 @@ export function TasksScreen({ route, navigation }) {
     }
   }
 
-  const addTask = () => {
+  const addTask  = async () => {
     try {
       const timestamp = Math.floor(Date.now()) //serverTimestamp();
       const data = {
@@ -151,7 +151,9 @@ export function TasksScreen({ route, navigation }) {
         effort: 30,
         createdDate: timestamp
       }
-      addDoc(collection(db, "Tasks"), data)
+      var docRef = await addDoc(collection(db, "Tasks"), data)
+      // console.log("Document written with ID: ", docRef.id);
+      scheduleTasks();
       setNewTaskName('');
     } catch (error) {
       console.log(error);

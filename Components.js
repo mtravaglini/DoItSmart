@@ -10,11 +10,6 @@ import { signOut } from "firebase/auth";
 // use custom style sheet
 const styles = require('./Style.js');
 
-export function scheduleTasks(unscheduled_tasks) {
-  var scheduled_tasks = unscheduled_tasks;
-  return scheduled_tasks;
-}
-
 export const Title = props => {
   return (
     <View style={styles.header}>

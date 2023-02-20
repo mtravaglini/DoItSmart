@@ -26,6 +26,7 @@ import { doc, collection, collectionGroup, query, getDoc, getDocs, getParent, ge
 const styles = require('./Style.js');
 // use custom components
 import { Title, Footer } from './Components.js'
+import { scheduleTasks } from './Functions.js'
 
 export function ProfileScreen({ route, navigation }) {
 
@@ -274,6 +275,7 @@ export function ProfileScreen({ route, navigation }) {
       await addDoc(collection(db, "Groups", groupId, "GroupUsers"), data)
       await deleteDoc(doc(db, "GroupInvites", inviteId))
       setProfileGroupUpdated(profileGroupUpdated + 1);
+      scheduleTasks()
 
     } catch (error) {
       const errorMessage = error.message;

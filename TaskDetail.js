@@ -25,7 +25,7 @@ import InputSpinner from "react-native-input-spinner";
 const styles = require('./Style.js');
 // use custom components
 import { Title, Footer } from './Components.js'
-import { completeTask, deleteTask } from './Functions.js'
+import { completeTask, deleteTask, scheduleTasks } from './Functions.js'
 
 export function TaskDetailScreen({ route, navigation }) {
 
@@ -466,6 +466,19 @@ export function TaskDetailScreen({ route, navigation }) {
 
     try {
       await setDoc(doc(db, "Tasks", taskId), task)
+
+      // if any task scheduling items changed, reschedule the tasks
+      if (
+        task.startDate != origTask.startDate ||
+        task.endDate != origTask.endDate ||
+        task.assignee != origTask.assignee ||
+        task.priority != origTask.priority ||
+        task.effort != origTask.effort
+        )
+        {
+          scheduleTasks()
+        }
+
     } catch (error) {
       // const errorCode = error.code;
       const errorMessage = error.message;
@@ -489,6 +502,7 @@ export function TaskDetailScreen({ route, navigation }) {
       setTaskGroupUpdated(taskGroupUpdated + 1);
       setTaskGroupPickerVisible(false)
       setBackgroundOpacity(1.0)
+      scheduleTasks()
     } catch (error) {
       console.error(error);
     }
@@ -553,6 +567,7 @@ export function TaskDetailScreen({ route, navigation }) {
       setTaskResourceUpdated(taskResourceUpdated + 1);
       setTaskResourcePickerVisible(false)
       setBackgroundOpacity(1.0)
+      scheduleTasks()
     } catch (error) {
       console.error(error);
     }
@@ -591,7 +606,7 @@ export function TaskDetailScreen({ route, navigation }) {
         deleteDoc(doc.ref)
         setTaskResourceUpdated(taskResourceUpdated + 1);
       })
-
+      scheduleTasks()
 
     } catch (error) {
       console.error(error);

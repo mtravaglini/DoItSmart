@@ -3,15 +3,16 @@ import { db, auth } from './firebase.config';
 
 
 
-export function scheduleTasks(unscheduled_tasks) {
-  var scheduled_tasks = unscheduled_tasks;
-  return scheduled_tasks;
+export async function  scheduleTasks() {
+
+  console.log("SCHEDULING TASK")
+  return;
 }
 
 
 // complete a task
 export const completeTask = async (taskObj, index) => {
-console.log(taskObj)
+// console.log(taskObj)
   // if (index) {
     // swipeableRef[index].close();
   // }
@@ -74,7 +75,7 @@ export const deleteGroup = async (groupId) => {
 
     // // delete any outstanding invitations to the group
     querySnapshot = await getDocs(query(collection(db, "GroupInvites"), where("groupId", "==", groupId)))
-    console.log(querySnapshot)
+    // console.log(querySnapshot)
     querySnapshot.forEach((doc) => {
       deleteDoc(doc.ref)
     })
