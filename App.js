@@ -5,7 +5,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 // import custom functions/screens
 import { SigninScreen } from './Signin.js';
-import { RegisterScreen } from './Register.js';
+import { SignupScreen } from './Signup.js';
 import { TasksScreen } from './Tasks.js';
 import { TaskDetailScreen } from './TaskDetail.js';
 import { GroupsScreen } from './Groups.js';
@@ -23,7 +23,7 @@ export default function App() {
       <NavigationContainer>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
           <Stack.Screen name="Signin" component={SigninScreen} />
-          <Stack.Screen name="Register" component={RegisterScreen} />
+          <Stack.Screen name="Signup" component={SignupScreen} />
           <Stack.Screen name="Tasks" component={TasksScreen} />
           <Stack.Screen name="TaskDetail" component={TaskDetailScreen} />
           <Stack.Screen name="Groups" component={GroupsScreen} />

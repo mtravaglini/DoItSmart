@@ -20,7 +20,7 @@ const styles = require('./Style.js');
 // use custom components
 import { Title, Footer } from './Components.js'
 
-export function RegisterScreen({ route, navigation }) {
+export function SignupScreen({ route, navigation }) {
 
   const insets = useSafeAreaInsets();
   
@@ -31,7 +31,7 @@ export function RegisterScreen({ route, navigation }) {
   const [screenMsg, setScreenMsg] = useState('');
 
   // function to register a new user
-  const RegisterNewUser = async () => {
+  const SignupNewUser = async () => {
 
     if (password != passwordConf) {
       setScreenMsg("Passwords don't match.");
@@ -69,7 +69,7 @@ export function RegisterScreen({ route, navigation }) {
 
 
 
-    // console.log("Registered successfully.");
+    // console.log("Signuped successfully.");
     // console.log("currentuser=", auth.currentUser);
     // console.log("uid=", auth.currentUser.uid);
 
@@ -92,7 +92,7 @@ export function RegisterScreen({ route, navigation }) {
           <View>
 
             <Title
-              title="Register"
+              title="Sign up"
               name="Welcome to Do It. Smart."
               navigation={navigation} />
 
@@ -145,7 +145,7 @@ export function RegisterScreen({ route, navigation }) {
                 { opacity: (!name || !email || !password || !passwordConf) ? 0.5 : 1.0 }
                 ]}
                   onPress={async () => {
-                    await RegisterNewUser().then(
+                    await SignupNewUser().then(
                       (result) => {
                         // console.log("return code=", result)
                         if (result == 0) {
@@ -159,7 +159,7 @@ export function RegisterScreen({ route, navigation }) {
                 >
                   <Text
                     style={styles.buttonText}
-                  >Register
+                  >Sign up
                   </Text>
                 </TouchableOpacity>
 
