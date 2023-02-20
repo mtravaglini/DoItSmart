@@ -148,7 +148,7 @@ export function SigninScreen({ route, navigation }) {
                   Don't have an account?
                 </Text>
                 <Text onPress={() => { navigation.navigate('Signup') }}
-                  style={[styles.textLabel, { fontSize: 20, color: "blue" }]}
+                  style={[styles.textLink]}
                 > Sign up
                 </Text>
               </View>
@@ -160,7 +160,7 @@ export function SigninScreen({ route, navigation }) {
                 <Text 
                 disabled={!email}
                 onPress={() => { emailUser() }}
-                  style={[styles.textLabel, { fontSize: 20, color: "blue" }]}
+                  style={[styles.textLink]}
                 > Reset
                 </Text>
               </View>

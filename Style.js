@@ -61,8 +61,8 @@ const RoseCelesteLight = {
   footerBackgroundColour: RoseCelesteScheme.IndigoDye,
   footerColour: RoseCelesteScheme.NonPhotoBlue,
 
-  successColour: "darkgreen",
-  warningColour: "orange",
+  successColour: RoseCelesteScheme.Cerulean,
+  warningColour: "#c46913",
   errorColour: RoseCelesteScheme.RoseRed
 }
 const RoseCelesteDark = {
@@ -75,8 +75,8 @@ const RoseCelesteDark = {
 
   labelColour: RoseCelesteScheme.RoseRed,
 
-  mainTextColour: RoseCelesteScheme.NonPhotoBlue,
-  inputTextColour: RoseCelesteScheme.NonPhotoBlue,
+  mainTextColour: RoseCelesteScheme.IndigoDye,
+  inputTextColour: RoseCelesteScheme.IndigoDye,
   textBackgroundColour: "white",
 
   listBackgroundColour: "lightgreen",
@@ -85,8 +85,8 @@ const RoseCelesteDark = {
   footerBackgroundColour: RoseCelesteScheme.Cerulean,
   footerColour: RoseCelesteScheme.Celeste,
 
-  successColour: "darkgreen",
-  warningColour: "orange",
+  successColour: RoseCelesteScheme.Cerulean,
+  warningColour: "#c46913",
   errorColour: RoseCelesteScheme.RoseRed
 }
 
@@ -139,12 +139,14 @@ module.exports = StyleSheet.create({
     fontSize: 35,
     fontWeight: "bold",
     // fontFamily: Platform.OS === "android" ? "sans-serif" : "AppleSDGothicNeo",
-    color: colourObj.mainTextColour,
+    color: colourObj.labelColour,
   },
-  logo: {
-    width: 66,
-    height: 58,
-  },
+textLink: {
+  paddingLeft: 10,
+  fontWeight: "bold",
+  fontSize: 20, 
+  color: colourObj.secondaryScreenColour,
+},
   // ########################################
 
   // header ###########################
