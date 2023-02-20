@@ -12,9 +12,10 @@ import {
 import {
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
 import { auth } from './firebase.config';
 import { SwipeGesture } from './Swipe.js';
+import { CardStyleInterpolators } from '@react-navigation/stack';
 
 // use custom style sheet
 const styles = require('./Style.js');
@@ -23,23 +24,34 @@ const styles = require('./Style.js');
 
 export function SigninScreen({ route, navigation }) {
 
-  // TODO CLEANUP: remove next 2 lines
-  const [email, setEmail] = useState('marctravaglini@gmail.com');
-  const [password, setPassword] = useState('mmmmmm');
-  // TODO CLEANUP: uncomment next 2 lines
-  // const [email, setEmail] = useState('');
-  // const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [screenMsg, setScreenMsg] = useState('');
 
   const insets = useSafeAreaInsets();
   // console.log("insets", insets)
 
-  // TODO CLEANUP: uncomment next section
+
   // clear password on screen load 
-  // useEffect(() => {
-  //     // console.log("page load")
-  //     setPassword("")
-  // }, [])
+  useEffect(() => {
+      // console.log("page load")
+      setPassword("")
+  }, [])
+
+  const emailUser = async () => {
+
+    try {
+      await sendPasswordResetEmail(auth, email)
+      setScreenMsg("Password reset email sent.")
+
+    } catch (error) {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      console.log(error)
+      // ..
+    }
+  }
+
 
   const SigninUser = async () => {
 
@@ -75,76 +87,89 @@ export function SigninScreen({ route, navigation }) {
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         {/* <TouchableWithoutFeedback onPress={Keyboard.dismiss}> */}
-          <View>
+        <View>
 
-            <View style={styles.mainTitleContainer}>
-              <Text style={styles.titleText}>
-                Do It. Smart.
-              </Text>
-            </View>
+          <View style={styles.mainTitleContainer}>
+            <Text style={styles.titleText}>
+              Do It. Smart.
+            </Text>
+          </View>
 
-            <View style={styles.inputFormContainer}>
+          <View style={styles.inputFormContainer}>
 
-              <Text style={styles.inputLabel}>Email</Text>
-              <TextInput
-                // display icon in the textinput box
-                // left={<TextInput.Icon name="account" />}
-                style={styles.input}
-                onChangeText={(newText) => setEmail(newText)}
-                defaultValue={email}
-                autoCapitalize="none"
-              />
+            <Text style={styles.textLabel}>Email</Text>
+            <TextInput
+              // display icon in the textinput box
+              // left={<TextInput.Icon name="account" />}
+              style={styles.input}
+              onChangeText={(newText) => setEmail(newText)}
+              defaultValue={email}
+              autoCapitalize="none"
+            />
 
-              <Text style={styles.inputLabel}>Password</Text>
-              <TextInput
-                // display icon in the textinput box
-                // left={<TextInput.Icon name="form-textbox-password" />}
-                style={styles.input}
-                onChangeText={(newText) => setPassword(newText)}
-                defaultValue={password}
-                autoCapitalize="none"
-                secureTextEntry={true}
-              />
+            <Text style={styles.textLabel}>Password</Text>
+            <TextInput
+              // display icon in the textinput box
+              // left={<TextInput.Icon name="form-textbox-password" />}
+              style={styles.input}
+              onChangeText={(newText) => setPassword(newText)}
+              defaultValue={password}
+              autoCapitalize="none"
+              secureTextEntry={true}
+            />
 
-              <View style={{ alignItems: "center" }}>
-                <TouchableOpacity style={[styles.mainButton,
-                { opacity: (!email || !password) ? 0.5 : 1.0 }
-                ]}
-                  onPress={async () => {
-                    Keyboard.dismiss();
-                    await SigninUser().then(
-                      (result) => {
-                        // console.log("return code=", result)
-                        if (result == 0) {
-                          // TODO CLEANUP: uncomment next 1 lines
-                          // setPassword("");
-                          navigation.navigate('Tasks', { uid: auth.currentUser.uid });
-                          // navigation.navigate('Tasks');
-                        }
+            <View style={{ alignItems: "center" }}>
+              <TouchableOpacity style={[styles.mainButton,
+              { opacity: (!email || !password) ? 0.5 : 1.0 }
+              ]}
+                onPress={async () => {
+                  Keyboard.dismiss();
+                  await SigninUser().then(
+                    (result) => {
+                      // console.log("return code=", result)
+                      if (result == 0) {
+                        setPassword("");
+                        navigation.navigate('Tasks', { uid: auth.currentUser.uid });
+                        // navigation.navigate('Tasks');
                       }
-                    )
-                  }}
-                  disabled={!email || !password}
-                >
-                  <Text
-                    style={styles.buttonText}
-                  >Sign in
-                  </Text>
-                </TouchableOpacity>
+                    }
+                  )
+                }}
+                disabled={!email || !password}
+              >
+                <Text
+                  style={styles.buttonText}
+                >Sign in
+                </Text>
+              </TouchableOpacity>
 
-                <TouchableOpacity style={styles.secondaryButton}
-                  onPress={() => { navigation.navigate('Register') }}
-                >
-                  <Text
-                    style={styles.secondaryButtonText}
-                  >Register
-                  </Text>
-                </TouchableOpacity>
-
-                <Text style={[styles.standardText, styles.txtError]}>{screenMsg}</Text>
+              <View style={{ flexDirection: "row", marginTop: "5%" }}>
+                <Text style={[styles.textLabel, { fontSize: 20 }]}>
+                  Don't have an account?
+                </Text>
+                <Text onPress={() => { navigation.navigate('Signup') }}
+                  style={[styles.textLabel, { fontSize: 20, color: "blue" }]}
+                > Sign up
+                </Text>
               </View>
+
+              <View style={{ flexDirection: "row" }}>
+                <Text style={[styles.textLabel, { fontSize: 20 }]}>
+                  Forgot password?
+                </Text>
+                <Text 
+                disabled={!email}
+                onPress={() => { emailUser() }}
+                  style={[styles.textLabel, { fontSize: 20, color: "blue" }]}
+                > Reset
+                </Text>
+              </View>
+
+              <Text style={[styles.standardText, styles.txtError]}>{screenMsg}</Text>
+
             </View>
           </View>
+        </View>
         {/* </TouchableWithoutFeedback> */}
       </KeyboardAvoidingView>
     </View >
