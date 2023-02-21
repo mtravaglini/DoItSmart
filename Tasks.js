@@ -153,7 +153,7 @@ export function TasksScreen({ route, navigation }) {
       }
       var docRef = await addDoc(collection(db, "Tasks"), data)
       // console.log("Document written with ID: ", docRef.id);
-      scheduleTasks();
+      scheduleTasks(uid);
       setNewTaskName('');
     } catch (error) {
       console.log(error);

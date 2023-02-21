@@ -26,7 +26,7 @@ import { doc, collection, collectionGroup, query, getDoc, getDocs, getParent, ge
 const styles = require('./Style.js');
 // use custom components
 import { Title, Footer } from './Components.js'
-import { scheduleTasks } from './Functions.js'
+import { scheduleTasks, getAllGroupsForUser } from './Functions.js'
 
 export function ProfileScreen({ route, navigation }) {
 
@@ -48,14 +48,22 @@ export function ProfileScreen({ route, navigation }) {
     async function getProfile() {
       var userSnap = await getUser()
 
-      var groupSnaps = await getGroupUsersByUser()
-      // console.log("groupSnaps", await groupSnaps)
-      var retrievedGroupNames = await processGroupUsers(groupSnaps)
-      await saveGroupNames(retrievedGroupNames)
+      // var groupSnaps = await getGroupUsersByUser()
+      // var retrievedUserGroupNames = await processGroupUsers(groupSnaps)
+      var retrievedUserGroupNames = await getAllGroupsForUser(uid)
+      
+      // await saveGroupNames(retrievedUserGroupNames)
+      setGroupNames(retrievedUserGroupNames)
+
+
 
       var inviteInfo = await getInvites(userSnap)
+      console.log("inviteinfo", inviteInfo)
       var retrievedInvites = await processInvites(inviteInfo)
-      await saveInvites(retrievedInvites)
+
+      setInvites(retrievedInvites)
+      console.log(retrievedInvites)
+      // await saveInvites(retrievedInvites)
     }
 
     // get user 
@@ -72,60 +80,60 @@ export function ProfileScreen({ route, navigation }) {
       }
     }
 
-    // get all the groupuser subcollection of the groups collection for the user
-    async function getGroupUsersByUser() {
-      try {
-        // var querySnapshot;
-        // unsubscribe = onSnapshot(
-        querySnapshot = await
-          getDocs(query(collectionGroup(db, 'GroupUsers'), where('userId', '==', uid)))
-        //     , () => {
-        //     });
-        console.log("groupSnaps", typeof querySnapshot)
-        return querySnapshot
-      } catch (error) {
-        console.error(error);
-      }
-    }
+    // // get all the groupuser subcollection of the groups collection for the user
+    // async function getGroupUsersByUser() {
+    //   try {
+    //     // var querySnapshot;
+    //     // unsubscribe = onSnapshot(
+    //     querySnapshot = await
+    //       getDocs(query(collectionGroup(db, 'GroupUsers'), where('userId', '==', uid)))
+    //     //     , () => {
+    //     //     });
+    //     console.log("groupSnaps", typeof querySnapshot)
+    //     return querySnapshot
+    //   } catch (error) {
+    //     console.error(error);
+    //   }
+    // }
 
-    // process all the groupuser docs
-    async function processGroupUsers(querySnapshot) {
-      try {
-        var retrievedGroupNames = await getGroupUsersParents(querySnapshot.docs)
-        console.log("retreivedGroupNames", retrievedGroupNames)
-        return retrievedGroupNames
-      } catch (error) {
-        console.error(error);
-      }
-    }
+    // // process all the groupuser docs
+    // async function processGroupUsers(querySnapshot) {
+    //   try {
+    //     var retrievedUserGroupNames = await getGroupUsersParents(querySnapshot.docs)
+    //     console.log("retreivedGroupNames", retrievedUserGroupNames)
+    //     return retrievedUserGroupNames
+    //   } catch (error) {
+    //     console.error(error);
+    //   }
+    // }
 
-    // from the groupuser doc, get user's group informtion from the parent group collection
-    function getGroupUsersParents(groupUsersSnaps) {
-      return Promise.all(groupUsersSnaps.map(async (groupUser) => {
+    // // from the groupuser doc, get user's group informtion from the parent group collection
+    // function getGroupUsersParents(groupUsersSnaps) {
+    //   return Promise.all(groupUsersSnaps.map(async (groupUser) => {
 
-        console.log("groupUsersSnaps IN", groupUsersSnaps.length)
-        const docRef = groupUser.ref;
-        const parentCollectionRef = docRef.parent; // CollectionReference
-        const immediateParentDocumentRef = parentCollectionRef.parent; // DocumentReference
-        const parentDoc = await getDoc(immediateParentDocumentRef)
+    //     console.log("groupUsersSnaps IN", groupUsersSnaps.length)
+    //     const docRef = groupUser.ref;
+    //     const parentCollectionRef = docRef.parent; // CollectionReference
+    //     const immediateParentDocumentRef = parentCollectionRef.parent; // DocumentReference
+    //     const parentDoc = await getDoc(immediateParentDocumentRef)
 
-        return {
-          "id": parentDoc?.id,
-          "name": parentDoc?.data().name,
-        }
-      }))
-    }
+    //     return {
+    //       "id": parentDoc?.id,
+    //       "name": parentDoc?.data().name,
+    //     }
+    //   }))
+    // }
 
-    async function saveGroupNames(retrievedGroupNames) {
-      setGroupNames(retrievedGroupNames)
-      return retrievedGroupNames
+    async function saveGroupNames(retrievedUserGroupNames) {
+      setGroupNames(retrievedUserGroupNames)
+      return retrievedUserGroupNames
     }
 
     // get all the groupinvites for the user
     async function getInvites(userSnap) {
       try {
         //     unsubscribe = onSnapshot(
-        querySnapshot = await
+        var querySnapshot = await
           getDocs(query(collectionGroup(db, 'GroupInvites'), where('invitee', '==', userSnap.data().email)))
         // , () => {
 
@@ -177,9 +185,9 @@ export function ProfileScreen({ route, navigation }) {
     }
 
 
-    async function saveInvites(retrievedInvite) {
-      setInvites(retrievedInvite)
-      return retrievedInvite
+    async function saveInvites(retrievedInvites) {
+      setInvites(retrievedInvites)
+      return retrievedInvites
     }
 
 
@@ -275,7 +283,7 @@ export function ProfileScreen({ route, navigation }) {
       await addDoc(collection(db, "Groups", groupId, "GroupUsers"), data)
       await deleteDoc(doc(db, "GroupInvites", inviteId))
       setProfileGroupUpdated(profileGroupUpdated + 1);
-      scheduleTasks()
+      scheduleTasks(uid)
 
     } catch (error) {
       const errorMessage = error.message;

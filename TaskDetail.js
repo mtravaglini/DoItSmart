@@ -25,7 +25,7 @@ import InputSpinner from "react-native-input-spinner";
 const styles = require('./Style.js');
 // use custom components
 import { Title, Footer } from './Components.js'
-import { completeTask, deleteTask, scheduleTasks } from './Functions.js'
+import { completeTask, deleteTask, scheduleTasks, getAllGroupsForUser, getAllUsers } from './Functions.js'
 
 export function TaskDetailScreen({ route, navigation }) {
 
@@ -99,15 +99,21 @@ export function TaskDetailScreen({ route, navigation }) {
       var retrievedTaskGroupNames = await processTaskGroups(taskGroupsSnap)
       setTaskGroupNames(retrievedTaskGroupNames)
 
-      var userGroupsSnap = await getGroupUsersByUser(retrievedTaskGroupNames)
-      var retrievedUserGroupNames = await processUserGroups(userGroupsSnap)
+      // var userGroupsSnap = await getGroupUsersByUser(retrievedTaskGroupNames)
+      // var retrievedUserGroupNames = await processUserGroups(userGroupsSnap)
+      var retrievedUserGroupNames = await getAllGroupsForUser(uid)
 
       var filterGroupsResult = await filterGroups(retrievedTaskGroupNames, retrievedUserGroupNames)
       setUserGroupNames(filterGroupsResult)
 
       // get info for reassigning tasks
-      var userArray = await processGroups(retrievedUserGroupNames)
-      var userNameArray = await processUsers(userArray)
+      // var userArray = await processGroups(retrievedUserGroupNames)
+      // var userNameArray = await processUsers(userArray)
+
+      var retrievedUserNames = await getAllUsers(retrievedUserGroupNames)
+      // setUserPool(userNameArray)
+      setUserPool(retrievedUserNames)
+
 
 
 
@@ -210,41 +216,41 @@ export function TaskDetailScreen({ route, navigation }) {
       }
     }
 
-    async function getGroupUsersByUser(savedTaskGroups) {
-      try {
-        var querySnapshot = await getDocs(query(collectionGroup(db, 'GroupUsers'), where('userId', '==', uid)));
-        return querySnapshot
-      } catch (error) {
-        console.error(error);
-      }
-    }
+    // async function getGroupUsersByUser(savedTaskGroups) {
+    //   try {
+    //     var querySnapshot = await getDocs(query(collectionGroup(db, 'GroupUsers'), where('userId', '==', uid)));
+    //     return querySnapshot
+    //   } catch (error) {
+    //     console.error(error);
+    //   }
+    // }
 
-    async function processUserGroups(querySnapshot) {
-      try {
-        var retrievedUserGroupNames = await getGroupUsersParents(querySnapshot.docs)
-        return retrievedUserGroupNames
-      } catch (error) {
-        console.error(error);
-      }
-    }
+    // async function processUserGroups(querySnapshot) {
+    //   try {
+    //     var retrievedUserGroupNames = await getGroupUsersParents(querySnapshot.docs)
+    //     return retrievedUserGroupNames
+    //   } catch (error) {
+    //     console.error(error);
+    //   }
+    // }
 
-    async function getGroupUsersParents(groupUsersSnaps) {
-      try {
-        return Promise.all(groupUsersSnaps.map(async (groupUser) => {
-          const docRef = groupUser.ref;
-          const parentCollectionRef = docRef.parent; // CollectionReference
-          const immediateParentDocumentRef = parentCollectionRef.parent; // DocumentReference
-          const parentDoc = await getDoc(immediateParentDocumentRef)
+    // async function getGroupUsersParents(groupUsersSnaps) {
+    //   try {
+    //     return Promise.all(groupUsersSnaps.map(async (groupUser) => {
+    //       const docRef = groupUser.ref;
+    //       const parentCollectionRef = docRef.parent; // CollectionReference
+    //       const immediateParentDocumentRef = parentCollectionRef.parent; // DocumentReference
+    //       const parentDoc = await getDoc(immediateParentDocumentRef)
 
-          return {
-            "id": parentDoc?.id,
-            "name": parentDoc?.data().name,
-          }
-        }))
-      } catch (error) {
-        console.error(error);
-      }
-    }
+    //       return {
+    //         "id": parentDoc?.id,
+    //         "name": parentDoc?.data().name,
+    //       }
+    //     }))
+    //   } catch (error) {
+    //     console.error(error);
+    //   }
+    // }
 
     async function filterGroups(savedTaskGroups, savedUserGroups) {
       // check if task is already in a group, if so don't need to save it
@@ -268,43 +274,43 @@ export function TaskDetailScreen({ route, navigation }) {
       return newUserGroupNames
     }
 
-    // get all the users in each groupid 
-    async function processGroups(groupArray) {
-      // console.log("processGroups", groupArray)
-      // use a set to just store unique values
-      var userArray = new Set();
+    // // get all the users in each groupid 
+    // async function processGroups(groupArray) {
+    //   // console.log("processGroups", groupArray)
+    //   // use a set to just store unique values
+    //   var userArray = new Set();
 
-      for (var groupId of groupArray) {
-        // console.log("Getting users for group", groupId)
-        var querySnapshot = await getDocs(query(collection(db, "Groups", groupId.id, "GroupUsers")));
-        querySnapshot.forEach((doc) => {
-          // console.log("xxxxx",groupId, doc.data().userId, uid)
-          if (doc.data().userId !== uid) {
-            userArray.add(doc.data().userId)
-          }
-        })
-      }
-      // console.log(userArray)
-      return userArray
-    }
+    //   for (var groupId of groupArray) {
+    //     // console.log("Getting users for group", groupId)
+    //     var querySnapshot = await getDocs(query(collection(db, "Groups", groupId.id, "GroupUsers")));
+    //     querySnapshot.forEach((doc) => {
+    //       // console.log("xxxxx",groupId, doc.data().userId, uid)
+    //       if (doc.data().userId !== uid) {
+    //         userArray.add(doc.data().userId)
+    //       }
+    //     })
+    //   }
+    //   // console.log(userArray)
+    //   return userArray
+    // }
 
-    // get user info for the userids retrieved above
-    async function processUsers(userArray) {
-      // console.log("processUsers", userArray)
-      var userNameArray = []
-      for (var userId of userArray) {
-        // const querySnapshot = await getDocs(query(collection(db, "Users"), where("userId", "==", userId)));
-        const userDoc = await getDoc(doc(db, "Users", userId));
-        var data = {
-          id: userId,
-          userName: userDoc.data().name
-        }
-        userNameArray.push(data)
-      }
-      // console.log(userNameArray)
-      setUserPool(userNameArray)
-      return userNameArray
-    }
+    // // get user info for the userids retrieved above
+    // async function processUsers(userArray) {
+    //   // console.log("processUsers", userArray)
+    //   var userNameArray = []
+    //   for (var userId of userArray) {
+    //     // const querySnapshot = await getDocs(query(collection(db, "Users"), where("userId", "==", userId)));
+    //     const userDoc = await getDoc(doc(db, "Users", userId));
+    //     var data = {
+    //       id: userId,
+    //       userName: userDoc.data().name
+    //     }
+    //     userNameArray.push(data)
+    //   }
+    //   // console.log(userNameArray)
+    //   // setUserPool(userNameArray)
+    //   return userNameArray
+    // }
 
 
     // get the resources assigned to this task
@@ -476,7 +482,7 @@ export function TaskDetailScreen({ route, navigation }) {
         task.effort != origTask.effort
         )
         {
-          scheduleTasks()
+          scheduleTasks(uid)
         }
 
     } catch (error) {
@@ -502,7 +508,7 @@ export function TaskDetailScreen({ route, navigation }) {
       setTaskGroupUpdated(taskGroupUpdated + 1);
       setTaskGroupPickerVisible(false)
       setBackgroundOpacity(1.0)
-      scheduleTasks()
+      scheduleTasks(uid)
     } catch (error) {
       console.error(error);
     }
@@ -567,7 +573,7 @@ export function TaskDetailScreen({ route, navigation }) {
       setTaskResourceUpdated(taskResourceUpdated + 1);
       setTaskResourcePickerVisible(false)
       setBackgroundOpacity(1.0)
-      scheduleTasks()
+      scheduleTasks(uid)
     } catch (error) {
       console.error(error);
     }
@@ -606,7 +612,7 @@ export function TaskDetailScreen({ route, navigation }) {
         deleteDoc(doc.ref)
         setTaskResourceUpdated(taskResourceUpdated + 1);
       })
-      scheduleTasks()
+      scheduleTasks(uid)
 
     } catch (error) {
       console.error(error);
@@ -748,6 +754,7 @@ export function TaskDetailScreen({ route, navigation }) {
 
                             {
                               userPool.map((item) =>
+                              (item.id != uid) ? (
                                 <Pressable key={item.id} style={styles.tagButton}
                                   onPress={() => {
                                     reassignTask(item.id, item.userName)
@@ -757,6 +764,7 @@ export function TaskDetailScreen({ route, navigation }) {
                                     {item.userName}
                                   </Text>
                                 </Pressable>
+                              ):(null)
                               )
                             }
                           </View>

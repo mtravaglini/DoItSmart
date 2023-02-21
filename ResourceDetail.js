@@ -21,7 +21,7 @@ import { doc, collection, query, addDoc, getDoc, getDocs, setDoc, deleteDoc, onS
 const styles = require('./Style.js');
 // use custom components
 import { Title, Footer } from './Components.js'
-import { deleteGroup, deleteResource } from './Functions.js'
+import { getAllGroupsForUser, deleteResource } from './Functions.js'
 
 export function ResourceDetailScreen({ route, navigation }) {
 
@@ -54,8 +54,9 @@ export function ResourceDetailScreen({ route, navigation }) {
       var retrievedGroupResourceNames = await processGroupSubcollection(groupResourcesSnap)
       setGroupResourceNames(retrievedGroupResourceNames)
 
-      var userGroupsSnap = await getGroupUsersByUser(userSnap)
-      var retrievedUserGroupNames = await processGroupSubcollection(userGroupsSnap)
+      // var userGroupsSnap = await getGroupUsersByUser(userSnap)
+      // var retrievedUserGroupNames = await processGroupSubcollection(userGroupsSnap)
+      var retrievedUserGroupNames = await getAllGroupsForUser(uid)
 
       var filterGroupsResult = await filterGroups(retrievedGroupResourceNames, retrievedUserGroupNames)
       setUserGroupNames(filterGroupsResult)
@@ -96,14 +97,14 @@ export function ResourceDetailScreen({ route, navigation }) {
         }
       }
 
-      async function getGroupUsersByUser(userSnap) {
-        try {
-          var querySnapshot = await getDocs(query(collectionGroup(db, 'GroupUsers'), where('userId', '==', uid)));
-          return querySnapshot
-        } catch (error) {
-          console.error(error);
-        }
-      }
+      // async function getGroupUsersByUser(userSnap) {
+      //   try {
+      //     var querySnapshot = await getDocs(query(collectionGroup(db, 'GroupUsers'), where('userId', '==', uid)));
+      //     return querySnapshot
+      //   } catch (error) {
+      //     console.error(error);
+      //   }
+      // }
 
       async function processGroupSubcollection(querySnapshot) {
         try {
