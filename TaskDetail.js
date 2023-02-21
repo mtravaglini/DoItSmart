@@ -25,7 +25,7 @@ import InputSpinner from "react-native-input-spinner";
 const styles = require('./Style.js');
 // use custom components
 import { Title, Footer } from './Components.js'
-import { completeTask, deleteTask, scheduleTasks, getAllGroupsForUser, getAllUsers } from './Functions.js'
+import { completeTask, deleteTask, scheduleTasks, getAllGroupsForUser, getAllUsersForGroups } from './Functions.js'
 
 export function TaskDetailScreen({ route, navigation }) {
 
@@ -110,7 +110,7 @@ export function TaskDetailScreen({ route, navigation }) {
       // var userArray = await processGroups(retrievedUserGroupNames)
       // var userNameArray = await processUsers(userArray)
 
-      var retrievedUserNames = await getAllUsers(retrievedUserGroupNames)
+      var retrievedUserNames = await getAllUsersForGroups(retrievedUserGroupNames)
       // setUserPool(userNameArray)
       setUserPool(retrievedUserNames)
 
