@@ -48,7 +48,7 @@ export function ProfileScreen({ route, navigation }) {
     async function getProfile() {
       var userSnap = await getUser()
 
-      var groupSnaps = await getGroupUsers()
+      var groupSnaps = await getGroupUsersByUser()
       // console.log("groupSnaps", await groupSnaps)
       var retrievedGroupNames = await processGroupUsers(groupSnaps)
       await saveGroupNames(retrievedGroupNames)
@@ -73,7 +73,7 @@ export function ProfileScreen({ route, navigation }) {
     }
 
     // get all the groupuser subcollection of the groups collection for the user
-    async function getGroupUsers() {
+    async function getGroupUsersByUser() {
       try {
         // var querySnapshot;
         // unsubscribe = onSnapshot(
