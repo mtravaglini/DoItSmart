@@ -70,6 +70,7 @@ export function SigninScreen({ route, navigation }) {
     // console.log("Signed in successfully.");
     // console.log("currentuser=", auth.currentUser);
     // console.log("uid=", auth.currentUser.uid);
+    console.log(new Date(Date.now()).toString().slice(0, 24), auth.currentUser.email, "signed in")
     setScreenMsg("");
     return 0;
   }

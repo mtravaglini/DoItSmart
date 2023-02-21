@@ -103,7 +103,7 @@ if (colorScheme == "dark") {
 
 }
 
-console.log("COLOR OBJ", colourObj)
+// console.log("COLOR OBJ", colourObj)
 
 
 

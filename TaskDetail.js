@@ -122,7 +122,7 @@ export function TaskDetailScreen({ route, navigation }) {
       var retrievedTaskResourceNames = await processTaskResources(taskResourceSnaps)
       setTaskResourceNames(retrievedTaskResourceNames)
       // console.log("taskResources", retrievedTaskResourceNames)
-      console.log("######################################################################")
+      // console.log("######################################################################")
       var retrievedUserResourceNames = []
       for (var group of retrievedUserGroupNames) {
         var groupResourcesSnaps = await getGroupResourcesByGroup(group)
