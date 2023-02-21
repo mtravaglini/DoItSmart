@@ -88,11 +88,14 @@ export async function scheduleTasks(userId) {
   var retrievedUserGroupNames = await getAllGroupsForUser(userId)
   var retrievedUserNames = await getAllUsersForGroups(retrievedUserGroupNames)
   var retreivedTaskNames = await getAllTasksForGroups(retrievedUserGroupNames)
-  var retreivedAllTaskNames = await getAllTasksForUsers(retrievedUserNames)
+  var result = await getAllTasksForUsers(retrievedUserNames)
+  var retreivedAllTaskNames = result.retrievedTasks
+  var retreivedAllResourceNames = result.retrievedResources
   console.log("SCHEDULING TASK retrievedUserNames", retrievedUserNames)
   console.log("SCHEDULING TASK retreivedTaskNames", retreivedTaskNames)
   console.log("SCHEDULING TASK retreivedAllTaskNames", retreivedAllTaskNames)
-  
+  console.log("SCHEDULING TASK retreivedAllResourceNames", retreivedAllResourceNames)
+
 
   return;
 }
@@ -180,12 +183,12 @@ export const getAllTasksForGroups = async (retrievedUserGroupNames, userId) => {
 export const getAllTasksForUsers = async (retrievedUserNames) => {
 
   var retrievedTasks = []
+  var retrievedResources = []
 
   // get all the tasks for each user 
   for (var user of retrievedUserNames) {
-    console.log(user)
     var querySnapshot = await getDocs(query(collection(db, "Tasks"), where("assignee", "==", user.id)));
-    querySnapshot.forEach((doc) => {
+    querySnapshot.forEach(async (doc) => {
       retrievedTasks.push({
         "taskId": doc.id,
         "assignee": doc.data().assignee,
@@ -193,8 +196,20 @@ export const getAllTasksForUsers = async (retrievedUserNames) => {
         "endDate": doc.data().endDate,
         "priority": doc.data().priority,
         "effort": doc.data().effort
-    })
+      })
+
+      // GET ALL THE RESOURCES FOR THE TASKS HERE
+      // console.log("getting resources for task", doc.id)
+      var querySnapshot2 = await getDocs(query(collection(db, "Tasks", doc.id, "TaskResources")));
+      querySnapshot2.forEach((doc2) => {
+        retrievedResources.push({
+          "resourceId": doc2.data().resourceId,
+          "tasikId": doc.id,
+          "startDate": doc.data().startDate,
+          "endDate": doc.data().endDate,
+        })
+      })
     })
   }
-  return retrievedTasks
+  return {retrievedTasks, retrievedResources}
 }
