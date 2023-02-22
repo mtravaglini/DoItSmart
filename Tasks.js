@@ -149,7 +149,9 @@ export function TasksScreen({ route, navigation }) {
         endDate: timestamp + (24*2 * 60 * 60 * 1000),
         priority: 1,
         effort: 30,
-        createdDate: timestamp
+        createdDate: timestamp,
+        status: 'new',
+        completedDate: 0
       }
       var docRef = await addDoc(collection(db, "Tasks"), data)
       // console.log("Document written with ID: ", docRef.id);
