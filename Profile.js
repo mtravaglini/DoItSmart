@@ -58,11 +58,11 @@ export function ProfileScreen({ route, navigation }) {
 
 
       var inviteInfo = await getInvites(userSnap)
-      console.log("inviteinfo", inviteInfo)
+      // console.log("inviteinfo", inviteInfo)
       var retrievedInvites = await processInvites(inviteInfo)
 
       setInvites(retrievedInvites)
-      console.log(retrievedInvites)
+      // console.log(retrievedInvites)
       // await saveInvites(retrievedInvites)
     }
 
@@ -146,7 +146,7 @@ export function ProfileScreen({ route, navigation }) {
         // setInvites(retrievedInvites)
         // console.log(invites);
         // })
-        console.log("inviteSnaps", typeof querySnapshot)
+        // console.log("inviteSnaps", typeof querySnapshot)
         return querySnapshot
       } catch (error) {
         console.error(error);
@@ -157,7 +157,7 @@ export function ProfileScreen({ route, navigation }) {
     async function processInvites(querySnapshot) {
       try {
         var retrievedInvite = await getInviteParents(querySnapshot.docs)
-        console.log("retreivedInviteInfo", retrievedInvite)
+        // console.log("retreivedInviteInfo", retrievedInvite)
         return retrievedInvite
       } catch (error) {
         console.error(error);
@@ -168,9 +168,9 @@ export function ProfileScreen({ route, navigation }) {
     function getInviteParents(inviteSnaps) {
       return Promise.all(inviteSnaps.map(async (invite) => {
 
-        console.log("inviteSnaps IN", inviteSnaps.length)
+        // console.log("inviteSnaps IN", inviteSnaps.length)
         const docRef = invite;
-        console.log("invite docref", invite.data())
+        // console.log("invite docref", invite.data())
         const inviterParentDoc = await getDoc(doc(db, "Users", docRef.data().inviter))
         const groupParentDoc = await getDoc(doc(db, "Groups", docRef.data().groupId))
 
@@ -313,7 +313,7 @@ export function ProfileScreen({ route, navigation }) {
     // }
     try {
       await setDoc(doc(db, "Users", uid), user)
-      console.log(auth.currentUser, user.email)
+      // console.log(auth.currentUser, user.email)
       updateEmail(auth.currentUser, user.email)
     } catch (error) {
       // const errorCode = error.code;
