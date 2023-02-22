@@ -1,3 +1,4 @@
+import { PreventRemoveContext } from "@react-navigation/native";
 import { doc, collection, collectionGroup, query, addDoc, getDoc, getDocs, setDoc, deleteDoc, onSnapshot, where, orderBy, DocumentReference } from "firebase/firestore";
 import { db, auth } from './firebase.config';
 
@@ -273,7 +274,7 @@ const createUserLoad = (retrievedAllTaskNames) => {
     // console.log(task.assignee, task.effort)
 
     if (prevAssignee && task.assignee != prevAssignee) {
-      userLoad.push({ "assignee": prevAssignee, totalTasks, totalEffort })
+      userLoad.push({ "userId": prevAssignee, totalTasks, totalEffort })
       totalTasks = 0
       totalEffort = 0
 
@@ -284,7 +285,7 @@ const createUserLoad = (retrievedAllTaskNames) => {
 
     prevAssignee = task.assignee
   }
-  userLoad.push({ "assignee": prevAssignee, totalTasks, totalEffort })
+  userLoad.push({ "userId": prevAssignee, totalTasks, totalEffort })
 
   // sort the resulting userLoad by load
 
@@ -302,7 +303,7 @@ const checkTaskConflicts = (retrievedAllTaskNames, retrievedTaskNames) => {
 
   var taskConflicts = []
 
-  // sort the array by assignee, startDate, endDate
+  // sort the All Tasks array by assignee, startDate, endDate
   let sortedTasks = retrievedAllTaskNames.sort(
     (t1, t2) =>
       (t1.assignee + t1.startDate + t1.endDate < t2.assignee + t2.startDate + t2.endDate) ? -1 :
@@ -351,34 +352,61 @@ const checkTaskConflicts = (retrievedAllTaskNames, retrievedTaskNames) => {
 
 
 const resolveConflicts = (taskConflicts, userLoad, retrievedAllTaskNames) => {
-  console.log("RESOLVING CONFLICT for", taskConflicts)
+  // console.log("RESOLVING CONFLICTS")
 
   // for each task to resolve a conflict
   for (var taskConflict of taskConflicts) {
 
+    // console.log("RESOLVING CONFLICT for", taskConflict)
+    // console.log("RESOLVING CONFLICT all tasks", retrievedAllTaskNames)
     var checksExhausted = false;
-    while (checksExhausted = false) {
+    while (checksExhausted == false) {
 
       // check users with least load
-      for (user of userLoad) {
+      for (var user of userLoad) {
 
+        // console.log("RESOLVING CONFLICT checking user", user)
         // skip user load for current task assignee
-        if (user.userId == task.assignee) { continue }
+        // if (user.userId == taskConflict.assignee) { continue }
 
-        var prevStartDate = 0;
-        var prevEndDate = 999999999999999;
+        // var prevStartDate = 0;
+        var prevEndDate = Date.now() + 24 * 60 * 60 * 1000;
+        // console.log("prevEndDate", prevEndDate)
 
-        for (allTask of retrievedAllTaskNames) {
-          if (taskConflict.startDate > prevEndDate && taskConflict.endDate <= allTask.startDate){
-            console.log ("POTENTIAL RESOLUTION between", prevEndDate, "and" , allTask.startDate)
+        for (var allTask of retrievedAllTaskNames.filter(element => {
+          return element.assignee === user.userId
+        })) {
+          // console.log("RESOLVING CONFLICT checking task gaps", allTask.startDate, allTask.endDate, taskConflict.startDate, taskConflict.endDate, taskConflict.effort)
+
+          if (
+            allTask.startDate - prevEndDate >= taskConflict.effort * 60 * 1000
+            &&
+            taskConflict.endDate - taskConflict.effort * 60 * 1000 >= prevEndDate
+            &&
+            taskConflict.startDate + taskConflict.effort * 60 * 1000 <= allTask.startDate
+          ) {
+            console.log("RESOLUTION set", taskConflict.name, "to user:", allTask.assignee, "start:", new Date(prevEndDate).toString().slice(0, 24), "end:", new Date(allTask.startDate).toString().slice(0, 24))
+            // console.log(taskConflict)
+            autoReassignTask(taskConflict.taskId, allTask.assignee, prevEndDate, prevEndDate + (taskConflict.endDate - taskConflict.startDate))
             checksExhausted = true;
           }
-
         }
-        checksExhausted = true;
-
-
       }
+      checksExhausted = true;
     }
+  }
+}
+
+const autoReassignTask = async (taskId, assignee, startDate, endDate) => {
+
+  // console.log("updating database", typeof startDate, typeof endDate)
+  try {
+    taskDoc = await getDoc(doc(db, "Tasks", taskId))
+
+    data = { ...taskDoc.data(), "assignee": assignee, "startDate": startDate, "endDate": endDate }
+    await setDoc(doc(db, "Tasks", taskId), data)
+
+  } catch (error) {
+    console.log(error.message)
   }
 }
