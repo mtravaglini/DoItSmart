@@ -84,17 +84,48 @@ export const deleteResource = async (resourceId) => {
 
 export async function scheduleTasks(userId) {
 
-  console.log("SCHEDULING TASK Entered Function")
+  console.log("SCHEDULING TASK Entered Function **************************************")
+
+  // get all users in all groups for which current user is a member
   var retrievedUserGroupNames = await getAllGroupsForUser(userId)
   var retrievedUserNames = await getAllUsersForGroups(retrievedUserGroupNames)
-  var retreivedTaskNames = await getAllTasksForGroups(retrievedUserGroupNames)
+  // console.log("SCHEDULING TASK retrievedUserNames", retrievedUserNames)
+
+  // get all tasks for the above groups 
+  // - this will be all tasks for all groups for which current user is a member 
+  var retrievedTaskNames = await getAllTasksForGroups(retrievedUserGroupNames)
+  // console.log("SCHEDULING TASK retrievedTaskNames", retrievedTaskNames)
+
+  // get all tasks for the above users 
+  // - this will be all tasks for all users in all groups for which current user is a member 
+  // - also retrieves all the resources for all of these tasks
   var result = await getAllTasksForUsers(retrievedUserNames)
-  var retreivedAllTaskNames = result.retrievedTasks
-  var retreivedAllResourceNames = result.retrievedResources
-  console.log("SCHEDULING TASK retrievedUserNames", retrievedUserNames)
-  console.log("SCHEDULING TASK retreivedTaskNames", retreivedTaskNames)
-  console.log("SCHEDULING TASK retreivedAllTaskNames", retreivedAllTaskNames)
-  console.log("SCHEDULING TASK retreivedAllResourceNames", retreivedAllResourceNames)
+  var retrievedAllTaskNames = result.retrievedTasks
+  var retrievedAllResourceNames = result.retrievedResources
+  // console.log("SCHEDULING TASK retrievedAllTaskNames", retrievedAllTaskNames)
+  // console.log("SCHEDULING TASK retrievedAllResourceNames", retrievedAllResourceNames)
+
+  // create array of user load
+  var userLoad = createUserLoad(retrievedAllTaskNames)
+  // console.log("SCHEDULING TASK userLoad", userLoad)
+
+  // check for task conflicts
+  var taskConflicts = checkTaskConflicts(retrievedAllTaskNames, retrievedTaskNames)
+
+  // resolve conflicts
+  resolveConflicts(taskConflicts, userLoad, retrievedAllTaskNames)
+
+
+
+
+
+
+
+
+
+
+
+
 
 
   return;
@@ -164,13 +195,18 @@ export const getAllTasksForGroups = async (retrievedUserGroupNames, userId) => {
       const immediateParentDocumentRef = parentCollectionRef.parent; // DocumentReference
       const parentDoc = await getDoc(immediateParentDocumentRef)
 
-      return {
-        "taskId": parentDoc.id,
-        "assignee": parentDoc.data().assignee,
-        "startDate": parentDoc.data().startDate,
-        "endDate": parentDoc.data().endDate,
-        "priority": parentDoc.data().priority,
-        "effort": parentDoc.data().effort
+      if (parentDoc.data().status != 'complete') {
+        return {
+          "taskId": parentDoc.id,
+          "name": parentDoc.data().name,
+          "assignee": parentDoc.data().assignee,
+          "startDate": parentDoc.data().startDate,
+          "endDate": parentDoc.data().endDate,
+          "priority": parentDoc.data().priority,
+          "effort": parentDoc.data().effort
+        }
+      } else {
+        return {}
       }
     }))
 
@@ -187,10 +223,11 @@ export const getAllTasksForUsers = async (retrievedUserNames) => {
 
   // get all the tasks for each user 
   for (var user of retrievedUserNames) {
-    var querySnapshot = await getDocs(query(collection(db, "Tasks"), where("assignee", "==", user.id)));
+    var querySnapshot = await getDocs(query(collection(db, "Tasks"), where("assignee", "==", user.id), where("status", "!=", 'complete')));
     querySnapshot.forEach(async (doc) => {
       retrievedTasks.push({
         "taskId": doc.id,
+        "name": doc.data().name,
         "assignee": doc.data().assignee,
         "startDate": doc.data().startDate,
         "endDate": doc.data().endDate,
@@ -204,12 +241,144 @@ export const getAllTasksForUsers = async (retrievedUserNames) => {
       querySnapshot2.forEach((doc2) => {
         retrievedResources.push({
           "resourceId": doc2.data().resourceId,
-          "tasikId": doc.id,
+          "taskId": doc.id,
           "startDate": doc.data().startDate,
           "endDate": doc.data().endDate,
         })
       })
     })
   }
-  return {retrievedTasks, retrievedResources}
+  return { retrievedTasks, retrievedResources }
+}
+
+
+const createUserLoad = (retrievedAllTaskNames) => {
+
+  // sort the array by assignee
+  let sortedTasks = retrievedAllTaskNames.sort(
+    (t1, t2) =>
+      (t1.assignee < t2.assignee) ? -1 :
+        (t1.assignee > t2.assignee) ? 1 :
+          0
+  );
+
+  // create array of count of tasks and sum of effort per assignee
+  var userLoad = []
+  var prevAssignee = null
+  var totalTasks = 0
+  var totalEffort = 0
+
+  for (const task of sortedTasks) {
+
+    // console.log(task.assignee, task.effort)
+
+    if (prevAssignee && task.assignee != prevAssignee) {
+      userLoad.push({ "assignee": prevAssignee, totalTasks, totalEffort })
+      totalTasks = 0
+      totalEffort = 0
+
+    }
+
+    totalTasks++
+    totalEffort += task.effort
+
+    prevAssignee = task.assignee
+  }
+  userLoad.push({ "assignee": prevAssignee, totalTasks, totalEffort })
+
+  // sort the resulting userLoad by load
+
+  // console.log(userLoad)
+  let sortedUserLoad = userLoad.sort(
+    (u1, u2) =>
+      (u1.totalEffort < u2.totalEffort) ? -1 :
+        (u1.totalEffort > u2.totalEffort) ? 1 :
+          0
+  );
+  return sortedUserLoad
+}
+
+const checkTaskConflicts = (retrievedAllTaskNames, retrievedTaskNames) => {
+
+  var taskConflicts = []
+
+  // sort the array by assignee, startDate, endDate
+  let sortedTasks = retrievedAllTaskNames.sort(
+    (t1, t2) =>
+      (t1.assignee + t1.startDate + t1.endDate < t2.assignee + t2.startDate + t2.endDate) ? -1 :
+        (t1.assignee + t1.startDate + t1.endDate > t2.assignee + t2.startDate + t2.endDate) ? 1 :
+          0);
+
+  var prevAssignee = null
+  var prevStartDate = 0;
+  var prevEndDate = 0;
+
+  for (const task of sortedTasks) {
+
+    // console.log(task.assignee, task.startDate, task.endDate, task.taskId)
+
+    if (prevAssignee && prevAssignee != task.assignee) {
+      prevAssignee = task.assignee
+      prevStartDate = task.startDate
+      prevEndDate = task.endDate
+      continue
+    }
+
+    if (task.startDate < prevEndDate) {
+
+      // console.log("^^^^^^^ POTENTIAL CONFLICT")
+
+      var result = retrievedTaskNames.find(element => {
+        return element.taskId === task.taskId
+      })
+      if (result != undefined) {
+        // console.log("^^^^^^^ CONFLICT")
+        taskConflicts.push(task)
+      }
+
+
+    }
+
+    prevAssignee = task.assignee
+    prevStartDate = task.startDate
+    prevEndDate = task.endDate
+
+  }
+
+  return taskConflicts
+
+}
+
+
+const resolveConflicts = (taskConflicts, userLoad, retrievedAllTaskNames) => {
+  console.log("RESOLVING CONFLICT for", taskConflicts)
+
+  // for each task to resolve a conflict
+  for (var taskConflict of taskConflicts) {
+
+    var checksExhausted = false;
+    while (checksExhausted = false) {
+
+      // check users with least load
+      for (user of userLoad) {
+
+        // skip user load for current task assignee
+        if (user.userId == task.assignee) { continue }
+
+        var prevStartDate = 0;
+        var prevEndDate = 999999999999999;
+
+        for (allTask of retrievedAllTaskNames) {
+          if (taskConflict.startDate > prevEndDate && taskConflict.endDate <= allTask.startDate){
+            console.log ("POTENTIAL RESOLUTION between", prevEndDate, "and" , allTask.startDate)
+            checksExhausted = true;
+          }
+
+        }
+        checksExhausted = true;
+
+
+      }
+    }
+  }
 }
