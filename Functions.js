@@ -11,8 +11,7 @@ export const completeTask = async (taskObj, index) => {
     await setDoc(doc(db, "Tasks", taskObj.id), taskObj)
   } catch (error) {
     // const errorCode = error.code;
-    const errorMessage = error.message;
-    console.log(errorMessage);
+    console.log(error.message);
     return 1;
   }
 
@@ -68,7 +67,7 @@ export const deleteGroup = async (groupId) => {
     // delete the Group doc
     await deleteDoc(doc(db, "Groups", groupId));
   } catch (error) {
-    console.log(error);
+    console.log(error.message);
   }
 }
 
@@ -94,8 +93,11 @@ export async function scheduleTasks(userId) {
 
   // get all tasks for the above groups 
   // - this will be all tasks for all groups for which current user is a member 
-  var retrievedTaskNames = await getAllTasksForGroups(retrievedUserGroupNames)
+  var result = await getAllTasksForGroups(retrievedUserGroupNames)
+  var retrievedTaskNames = result.retrievedTasks
+  var retrievedResourceNames = result.retrievedResources
   // console.log("SCHEDULING TASK retrievedTaskNames", retrievedTaskNames)
+  console.log("SCHEDULING TASK retrievedResourceNames", retrievedResourceNames)
 
   // get all tasks for the above users 
   // - this will be all tasks for all users in all groups for which current user is a member 
@@ -104,7 +106,7 @@ export async function scheduleTasks(userId) {
   var retrievedAllTaskNames = result.retrievedTasks
   var retrievedAllResourceNames = result.retrievedResources
   // console.log("SCHEDULING TASK retrievedAllTaskNames", retrievedAllTaskNames)
-  // console.log("SCHEDULING TASK retrievedAllResourceNames", retrievedAllResourceNames)
+  console.log("SCHEDULING TASK retrievedAllResourceNames", retrievedAllResourceNames)
 
   // create array of user load
   var userLoad = createUserLoad(retrievedAllTaskNames)
@@ -112,7 +114,7 @@ export async function scheduleTasks(userId) {
 
   // check for task conflicts
   var taskConflicts = checkTaskConflicts(retrievedAllTaskNames, retrievedTaskNames)
-  console.log("SCHEDULING TASK taskConflicts", taskConflicts)
+  // console.log("SCHEDULING TASK taskConflicts", taskConflicts)
 
   // resolve conflicts
   var resolved = resolveConflicts(taskConflicts, userLoad, retrievedAllTaskNames)
@@ -186,6 +188,7 @@ export const getAllUsersForGroups = async (retrievedUserGroupNames, userId) => {
 export const getAllTasksForGroups = async (retrievedUserGroupNames, userId) => {
 
   var retrievedTasks = []
+  var retrievedResources = []
 
   // get all the tasks in each groupid 
   for (var group of retrievedUserGroupNames) {
@@ -200,6 +203,8 @@ export const getAllTasksForGroups = async (retrievedUserGroupNames, userId) => {
 
       if (parentDoc.data().status != 'complete') {
         // console.log(parentDoc.data().assignee, parentDoc.data().name)
+        var retrievedResourcesForTask = await getAllResourcesForTask(parentDoc)
+        retrievedResources = retrievedResources.concat(retrievedResourcesForTask)
 
         return {
           "taskId": parentDoc.id,
@@ -214,12 +219,32 @@ export const getAllTasksForGroups = async (retrievedUserGroupNames, userId) => {
         return {}
       }
     }))
-
+    
     retrievedTasks = retrievedTasks.concat(retrievedTaskNames)
   }
-  return retrievedTasks
+  return {retrievedTasks, retrievedResources}
 }
 
+export const getAllResourcesForTask = async(taskDoc) => {
+            // get all the resources for the task
+            var retrievedResources = [];
+
+            // console.log("getAllResourcesForTask getting resources for task", taskDoc.id)
+            var querySnapshot2 = await getDocs(query(collection(db, "Tasks", taskDoc.id, "TaskResources")));
+            querySnapshot2.forEach((doc2) => {
+              retrievedResources.push({
+                "resourceId": doc2.data().resourceId,
+                "taskId": taskDoc.id,
+                "startDate": taskDoc.data().startDate,
+                "endDate": taskDoc.data().endDate,
+                "assignee": taskDoc.data().assignee,
+                "effort": taskDoc.data().effort,
+                "priority": taskDoc.data().priority,
+                "name": taskDoc.data().name
+              })
+            })
+            return retrievedResources;
+}
 
 export const getAllTasksForUsers = async (retrievedUserNames) => {
 
@@ -240,17 +265,20 @@ export const getAllTasksForUsers = async (retrievedUserNames) => {
         "effort": doc.data().effort
       })
 
-      // GET ALL THE RESOURCES FOR THE TASKS HERE
-      // console.log("getting resources for task", doc.id)
-      var querySnapshot2 = await getDocs(query(collection(db, "Tasks", doc.id, "TaskResources")));
-      querySnapshot2.forEach((doc2) => {
-        retrievedResources.push({
-          "resourceId": doc2.data().resourceId,
-          "taskId": doc.id,
-          "startDate": doc.data().startDate,
-          "endDate": doc.data().endDate,
-        })
-      })
+      var retrievedResourcesForTask = await getAllResourcesForTask(doc)
+      retrievedResources = retrievedResources.concat(retrievedResourcesForTask)
+
+      // // get all the resources for all the tasks for each user 
+      // // console.log("getAllTasksForUsers getting resources for task", doc.id)
+      // var querySnapshot2 = await getDocs(query(collection(db, "Tasks", doc.id, "TaskResources")));
+      // querySnapshot2.forEach((doc2) => {
+      //   retrievedResources.push({
+      //     "resourceId": doc2.data().resourceId,
+      //     "taskId": doc.id,
+      //     "startDate": doc.data().startDate,
+      //     "endDate": doc.data().endDate,
+      //   })
+      // })
     })
   }
   return { retrievedTasks, retrievedResources }
@@ -372,14 +400,14 @@ const checkTaskConflicts = (retrievedAllTaskNames, retrievedTaskNames) => {
 
 
 const resolveConflicts = (taskConflicts, userLoad, retrievedAllTaskNames) => {
-  console.log("RES CONFS entered")
+  // console.log("RES CONFS entered")
   var resolved = false;
 
   // for each task to resolve a conflict
   for (var taskConflict of taskConflicts) {
 
-    console.log("RES CONF resolving", "taskConflict.startDate", "taskConflict.endDate", "taskConflict.effort")
-    console.log("RES CONF resolving", printDate(taskConflict.startDate), printDate(taskConflict.endDate), taskConflict.effort, taskConflict.name)
+    // console.log("RES CONF resolving", "taskConflict.startDate", "taskConflict.endDate", "taskConflict.effort")
+    // console.log("RES CONF resolving", printDate(taskConflict.startDate), printDate(taskConflict.endDate), taskConflict.effort, taskConflict.name)
 
     // console.log("RES CONF all tasks", retrievedAllTaskNames)
     var checksExhausted = false;
@@ -388,7 +416,7 @@ const resolveConflicts = (taskConflicts, userLoad, retrievedAllTaskNames) => {
       // check users with least load
       for (var user of userLoad) {
 
-        console.log("RES CONF checking user", user.userId)
+        // console.log("RES CONF checking user", user.userId)
         // skip user load for current task assignee
         // if (user.userId == taskConflict.assignee) { continue }
 
@@ -398,8 +426,8 @@ const resolveConflicts = (taskConflicts, userLoad, retrievedAllTaskNames) => {
         for (var allTask of retrievedAllTaskNames.filter(element => {
           return element.assignee === user.userId
         })) {
-          console.log("RES CONF chk task gap", "allTask.startDate", "allTask.endDate", "prevEndDate")
-          console.log("RES CONF chk task gap", printDate(allTask.startDate), printDate(allTask.endDate), printDate(prevEndDate))
+          // console.log("RES CONF chk task gap", "allTask.startDate", "allTask.endDate", "prevEndDate")
+          // console.log("RES CONF chk task gap", printDate(allTask.startDate), printDate(allTask.endDate), printDate(prevEndDate))
 
           if (
             allTask.startDate - prevEndDate >= taskConflict.effort * 60 * 1000
@@ -408,7 +436,7 @@ const resolveConflicts = (taskConflicts, userLoad, retrievedAllTaskNames) => {
             &&
             taskConflict.startDate + taskConflict.effort * 60 * 1000 <= allTask.startDate
           ) {
-            console.log("RESOLUTION set 1", taskConflict.name, "to user:", allTask.assignee, "start:", printDate(prevEndDate), "end:", printDate(prevEndDate + (taskConflict.endDate - taskConflict.startDate)))
+            // console.log("RESOLUTION set 1", taskConflict.name, "to user:", allTask.assignee, "start:", printDate(prevEndDate), "end:", printDate(prevEndDate + (taskConflict.endDate - taskConflict.startDate)))
             // console.log(taskConflict)
             autoReassignTask(taskConflict.taskId, allTask.assignee, prevEndDate, prevEndDate + (taskConflict.endDate - taskConflict.startDate))
             resolved = true;
@@ -419,7 +447,7 @@ const resolveConflicts = (taskConflicts, userLoad, retrievedAllTaskNames) => {
         // check at end of alltasks for each user if the new task fits
         if (prevEndDate + taskConflict.effort * 60 * 1000 <= taskConflict.endDate) {
           var newStartDate = Math.max(prevEndDate, taskConflict.startDate)
-          console.log("RESOLUTION set 2", taskConflict.name, "to user:", allTask.assignee, "start:", printDate(newStartDate), "end:", printDate(newStartDate + (taskConflict.endDate - taskConflict.startDate)))
+          // console.log("RESOLUTION set 2", taskConflict.name, "to user:", allTask.assignee, "start:", printDate(newStartDate), "end:", printDate(newStartDate + (taskConflict.endDate - taskConflict.startDate)))
           // console.log(taskConflict)
           autoReassignTask(taskConflict.taskId, allTask.assignee, newStartDate, newStartDate + (taskConflict.endDate - taskConflict.startDate))
           resolved = true;
