@@ -576,7 +576,7 @@ const resolveConflicts = (taskConflicts, userLoad, retrievedAllTaskNames, userId
           ) {
 
             // assign task to new user and adjust start time if required
-            if (taskConflict.type == "time") {
+            if (taskConflict.conflictType == "time") {
               var newAssignee = allTask.assignee
             } else {
               var newAssignee = taskConflict.assignee
@@ -635,7 +635,7 @@ const resolveConflicts = (taskConflicts, userLoad, retrievedAllTaskNames, userId
             // TODO : add logic to check availability of all taskConflict's resources here
 
             // assign task to new user and adjust start time if required
-            if (taskConflict.type == "time") {
+            if (taskConflict.conflictType == "time") {
               var newAssignee = allTask.assignee
             } else {
               var newAssignee = taskConflict.assignee
