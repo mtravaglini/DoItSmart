@@ -754,10 +754,10 @@ export function TaskDetailScreen({ route, navigation }) {
 
                             {
                               userPool.map((item) =>
-                              (item.id != uid) ? (
-                                <Pressable key={item.id} style={styles.tagButton}
+                              (item.userId != uid) ? (
+                                <Pressable key={item.userId} style={styles.tagButton}
                                   onPress={() => {
-                                    reassignTask(item.id, item.userName)
+                                    reassignTask(item.userId, item.userName)
                                   }}
                                 >
                                   <Text style={styles.tagText}>
@@ -793,7 +793,7 @@ export function TaskDetailScreen({ route, navigation }) {
                         onPress={() => {
                           var taskObj = task;
                           taskObj.id = taskId;
-                          completeTask(taskObj);
+                          comple,teTask(taskObj);
                           navigation.goBack();
                         }
                         }
