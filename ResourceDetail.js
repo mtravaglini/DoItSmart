@@ -267,7 +267,8 @@ export function ResourceDetailScreen({ route, navigation }) {
           <Title
             title="Resource Details"
             name={user.name}
-            navigation={navigation} />
+            navigation={navigation}
+            enableBack={true} />
 
           {/* <ScrollView style={{ height: "81%", marginBottom: 15 }}> */}
           <ScrollView>

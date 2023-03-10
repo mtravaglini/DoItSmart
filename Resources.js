@@ -150,7 +150,8 @@ export function ResourcesScreen({ route, navigation }) {
           <Title
             title="Resources"
             name={user.name}
-            navigation={navigation} />
+            navigation={navigation}
+            enableBack={true} />
 
           <View style={styles.inputBtnFormContainer}>
             <TextInput

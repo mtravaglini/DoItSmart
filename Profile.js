@@ -346,7 +346,8 @@ export function ProfileScreen({ route, navigation }) {
             <Title
               title="Profile"
               name={user.name}
-              navigation={navigation} />
+              navigation={navigation}
+              enableBack={true} />
 
             {/* <ScrollView style={{ height: "81%", marginBottom: 15 }}> */}
             <ScrollView>

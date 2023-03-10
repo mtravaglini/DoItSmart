@@ -94,7 +94,8 @@ export function SignupScreen({ route, navigation }) {
             <Title
               title="Sign up"
               name="Welcome to Do It. Smart."
-              navigation={navigation} />
+              navigation={navigation}
+              enableBack={true} />
 
             <View style={styles.inputFormContainer}>
               <Text style={styles.textLabel}>Name</Text>

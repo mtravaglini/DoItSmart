@@ -270,7 +270,8 @@ export function GroupDetailScreen({ route, navigation }) {
           <Title
             title="Group Details"
             name={user.name}
-            navigation={navigation} />
+            navigation={navigation}
+            enableBack={true} />
 
           {/* <ScrollView style={{ height: "81%", marginBottom: 15 }}> */}
           <ScrollView>

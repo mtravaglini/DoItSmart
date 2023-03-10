@@ -480,10 +480,9 @@ export function TaskDetailScreen({ route, navigation }) {
         task.assignee != origTask.assignee ||
         task.priority != origTask.priority ||
         task.effort != origTask.effort
-        )
-        {
-          scheduleTasks(uid)
-        }
+      ) {
+        scheduleTasks(uid)
+      }
 
     } catch (error) {
       // const errorCode = error.code;
@@ -642,7 +641,8 @@ export function TaskDetailScreen({ route, navigation }) {
           <Title
             title="Task Details"
             name={user.name}
-            navigation={navigation} />
+            navigation={navigation}
+            enableBack={true} />
 
           {isTaskDetailLoading ?
             (
@@ -651,7 +651,7 @@ export function TaskDetailScreen({ route, navigation }) {
             :
             (
               // <ScrollView style={{ height: "81%", marginBottom: 15 }}>
-              <ScrollView style={{opacity: (task.status == 'complete' ? .50 : backgroundOpacity)}}>
+              <ScrollView style={{ opacity: (task.status == 'complete' ? .50 : backgroundOpacity) }}>
 
                 <View style={styles.inputFormContainer}>
                   <Text style={styles.textLabel}>Created by {createdByUser}</Text>
@@ -754,17 +754,17 @@ export function TaskDetailScreen({ route, navigation }) {
 
                             {
                               userPool.map((item) =>
-                              (item.userId != uid) ? (
-                                <Pressable key={item.userId} style={styles.tagButton}
-                                  onPress={() => {
-                                    reassignTask(item.userId, item.userName)
-                                  }}
-                                >
-                                  <Text style={styles.tagText}>
-                                    {item.userName}
-                                  </Text>
-                                </Pressable>
-                              ):(null)
+                                (item.userId != uid) ? (
+                                  <Pressable key={item.userId} style={styles.tagButton}
+                                    onPress={() => {
+                                      reassignTask(item.userId, item.userName)
+                                    }}
+                                  >
+                                    <Text style={styles.tagText}>
+                                      {item.userName}
+                                    </Text>
+                                  </Pressable>
+                                ) : (null)
                               )
                             }
                           </View>
@@ -793,7 +793,7 @@ export function TaskDetailScreen({ route, navigation }) {
                         onPress={() => {
                           var taskObj = task;
                           taskObj.id = taskId;
-                          comple,teTask(taskObj);
+                          comple, teTask(taskObj);
                           navigation.goBack();
                         }
                         }

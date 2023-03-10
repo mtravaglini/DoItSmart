@@ -157,7 +157,8 @@ export function GroupsScreen({ route, navigation }) {
           <Title
             title="Groups"
             name={user.name}
-            navigation={navigation} />
+            navigation={navigation}
+            enableBack={true} />
 
           <View style={styles.inputBtnFormContainer}>
             <TextInput

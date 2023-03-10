@@ -361,7 +361,8 @@ export function TasksScreen({ route, navigation }) {
           <Title
             title="Tasks"
             name={user.name}
-            navigation={navigation} />
+            navigation={navigation}
+            enableBack={false} />
 
           <View style={styles.inputBtnFormContainer}>
             <TextInput
