@@ -52,6 +52,8 @@ const RoseCelesteLight = {
   labelColour: RoseCelesteScheme.RoseRed,
 
   mainTextColour: RoseCelesteScheme.Cerulean,
+  secondaryTextColour: RoseCelesteScheme.NonPhotoBlue,
+  
   inputTextColour: RoseCelesteScheme.Cerulean,
   textBackgroundColour: RoseCelesteScheme.Celeste,
 
@@ -76,6 +78,7 @@ const RoseCelesteDark = {
   labelColour: RoseCelesteScheme.RoseRed,
 
   mainTextColour: RoseCelesteScheme.IndigoDye,
+  secondaryTextColour: RoseCelesteScheme.IndigoDye,
   inputTextColour: RoseCelesteScheme.IndigoDye,
   textBackgroundColour: "white",
 
@@ -185,6 +188,14 @@ module.exports = StyleSheet.create({
     marginRight: "5%",
     color: colourObj.headerColour,
   },
+  headerIconText: {
+    textAlign: 'right',
+    fontSize: 11,
+    marginLeft: "3%",
+    marginRight: "5%",
+    width: 70,
+    color: colourObj.headerColour,
+  },
   // ########################################
 
   // standard buttons ########################################
@@ -192,8 +203,7 @@ module.exports = StyleSheet.create({
     width: "75%",
     height: 50,
     borderRadius: 15,
-    marginTop: 10,
-    marginBottom: 10,
+    marginVertical: 10,
     backgroundColor: colourObj.secondaryScreenColour,
     justifyContent: "center",
     shadowColor: colourObj.mainScreenColour,
@@ -243,6 +253,7 @@ module.exports = StyleSheet.create({
     alignItems: "flex-start",
     paddingLeft: "5%",
     height: 30,
+    marginVertical: "3%",
     borderRadius: 5,
   },
   btnNarrow: {
@@ -408,6 +419,11 @@ module.exports = StyleSheet.create({
     // fontWeight: "bold",
     fontSize: 16,
     color: colourObj.mainTextColour,
+  },
+  secondaryText: {
+    fontWeight: "bold",
+    fontSize: 18,
+    color: colourObj.secondaryTextColour,
   },
   txtSuccess: {
     color: colourObj.successColour,

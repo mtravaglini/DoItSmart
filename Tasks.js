@@ -17,7 +17,7 @@ import {
 import {
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
-import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
+import { FontAwesome, FontAwesome5, Feather } from '@expo/vector-icons';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 
 import { db, auth } from './firebase.config';
@@ -44,6 +44,7 @@ export function TasksScreen({ route, navigation }) {
   // menu modal
   const [taskMenuVisible, setTaskMenuVisible] = useState(false);
   const [taskDisplayLimit, setTaskDisplayLimit] = useState(0);
+  const [taskDisplayLimitText, setTaskDisplayLimitText] = useState("All");
   const [currTimeStamp, setCurrTimeStamp] = useState(Math.floor(Date.now()));
   const [includeCompleteTasks, setIncludeCompleteTasks] = useState(false);
   const [includeDeletedTasks, setIncludeDeletedTasks] = useState(false);
@@ -100,6 +101,8 @@ export function TasksScreen({ route, navigation }) {
 
   // set the task display limit
   const determineTaskDisplayLimit = (range) => {
+
+    setTaskDisplayLimitText(range);
 
     switch (range) {
       case 'All':
@@ -241,14 +244,13 @@ export function TasksScreen({ route, navigation }) {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         {/* <TouchableWithoutFeedback onPress={Keyboard.dismiss}> */}
         <View style={{ flex: 1 }}>
-
           {/* ///////////////////////////////////////////////////// */}
           <Pressable style={{
             position: "absolute",
-            right: 0,
+            right: 75,
             zIndex: 3,
             width: "10%",
-            marginTop: "4%"
+            marginTop: "2%"
             // elevation: 3
           }}
             onPress={() => {
@@ -256,14 +258,47 @@ export function TasksScreen({ route, navigation }) {
               setBackgroundOpacity(.33)
             }}
           >
-            <Text style={{
-              color: "white", fontSize: 30,
-            }}>
-              <FontAwesome
+
+            <View style={{ flexDirection: "row" }}>
+
+              <View>
+                <Text style={styles.headerIconText}>
+                  {taskDisplayLimitText}
+                </Text>
+
+                {includeCompleteTasks ? (
+                  <Text style={styles.headerIconText}>
+                    Completed
+                  </Text>) : (null)
+                }
+
+                {includeDeletedTasks ? (
+                  <Text style={styles.headerIconText}>
+                    Deleted
+                  </Text>) : (null)
+                }
+
+                {includeReassignedTasks ? (
+                  <Text style={styles.headerIconText}>
+                    Re-Assigned
+                  </Text>) : (null)
+                }
+
+              </View>
+
+              <Text style={{
+                fontSize: 30,
+              }}>
+                {/* <FontAwesome
                 style={styles.headerIcon}
                 name='bars'
-              />
-            </Text>
+              /> */}
+                <Feather
+                  style={styles.headerIcon}
+                  name="filter" />
+              </Text>
+
+            </View>
           </Pressable>
 
 
@@ -278,7 +313,20 @@ export function TasksScreen({ route, navigation }) {
               setBackgroundOpacity(1.0)
             }}>
             <View style={styles.modalMenuView}>
-
+              <Pressable style={{ alignSelf: "flex-start", position: "absolute", left: "3%", marginTop: "1%" }}
+                onPress={() => {
+                  setTaskMenuVisible(false)
+                  setBackgroundOpacity(1.0)
+                }}
+              >
+                <Text style={[styles.pageTitleText]}>
+                  <FontAwesome
+                    style={styles.headerIcon}
+                    name='arrow-circle-o-left'
+                  // color='cornflowerblue'
+                  />
+                </Text>
+              </Pressable>
               <Text style={[styles.pageTitleText, { marginBottom: "20%" }]}>Task View</Text>
 
               <Pressable
@@ -349,7 +397,13 @@ export function TasksScreen({ route, navigation }) {
                 </Text>
               </Pressable>
 
-              <View style={{ flexDirection: "row", marginTop: "15%" }}>
+              <Text style={[styles.secondaryText, { marginTop: "15%" }]}>
+                Tasks to Include:
+              </Text>
+
+              <View
+                style={{ flexDirection: "row", marginTop: "1%" }}
+              >
                 <Switch
                   trackColor={{ false: 'grey', true: 'white' }}
                   thumbColor={includeCompleteTasks ? 'cornflowerblue' : 'lightgrey'}
@@ -357,10 +411,10 @@ export function TasksScreen({ route, navigation }) {
                   onValueChange={() => setIncludeCompleteTasks(previousState => !previousState)}
                   value={includeCompleteTasks}
                 />
-                <Text style={styles.standardText}>Include Completed Tasks</Text>
+                <Text style={[styles.secondaryText, { marginTop: "5%" }]}>Completed</Text>
               </View>
 
-              <View style={{ flexDirection: "row", marginTop: "15%" }}>
+              <View style={{ flexDirection: "row", marginTop: "1%" }}>
                 <Switch
                   trackColor={{ false: 'grey', true: 'white' }}
                   thumbColor={includeDeletedTasks ? 'cornflowerblue' : 'lightgrey'}
@@ -368,10 +422,10 @@ export function TasksScreen({ route, navigation }) {
                   onValueChange={() => setIncludeDeletedTasks(previousState => !previousState)}
                   value={includeDeletedTasks}
                 />
-                <Text style={styles.standardText}>Include Deleted Tasks</Text>
+                <Text style={[styles.secondaryText, { marginTop: "5%" }]}>Deleted</Text>
               </View>
 
-              <View style={{ flexDirection: "row", marginTop: "15%" }}>
+              <View style={{ flexDirection: "row", marginTop: "1%" }}>
                 <Switch
                   trackColor={{ false: 'grey', true: 'white' }}
                   thumbColor={includeReassignedTasks ? 'cornflowerblue' : 'lightgrey'}
@@ -379,18 +433,124 @@ export function TasksScreen({ route, navigation }) {
                   onValueChange={() => setIncludeReassignedTasks(previousState => !previousState)}
                   value={includeReassignedTasks}
                 />
-                <Text style={styles.standardText}>Include Re-Assigned Tasks</Text>
+                <Text style={[styles.secondaryText, { marginTop: "5%" }]}>Re-Assigned</Text>
               </View>
 
             </View>
           </Modal>
-          {/* ///////////////////////////////////////////////////// */}
 
           <Title
             title="Tasks"
             name={user.name}
             navigation={navigation}
             enableBack={false} />
+
+
+          {/* <View style={[{ flexDirection: "row" }]}>
+            <Pressable
+              style={[styles.mainButton, styles.menuButton]}
+              onPress={() => {
+                determineTaskDisplayLimit('Day')
+                setTaskMenuVisible(false)
+                setBackgroundOpacity(1.0)
+              }}>
+              <Text style={[styles.buttonText]}>
+                <FontAwesome5
+                  style={[styles.buttonText]}
+                  // icon={faCalendarDay}
+                  name='calendar-day'
+                // color='white'
+                /> Day
+              </Text>
+            </Pressable>
+
+            <Pressable
+              style={[styles.mainButton, styles.menuButton]}
+              onPress={() => {
+                determineTaskDisplayLimit('Week')
+                setTaskMenuVisible(false)
+                setBackgroundOpacity(1.0)
+              }}>
+              <Text style={[styles.buttonText]}>
+                <FontAwesome5
+                  style={[styles.buttonText]}
+                  // icon={faCalendarDay}
+                  name='calendar-week'
+                // color='white'
+                /> Week
+              </Text>
+            </Pressable>
+
+            <Pressable
+              style={[styles.mainButton, styles.menuButton]}
+              onPress={() => {
+                determineTaskDisplayLimit('Month')
+                setTaskMenuVisible(false)
+                setBackgroundOpacity(1.0)
+              }}>
+              <Text style={[styles.buttonText]}>
+                <FontAwesome5
+                  style={[styles.buttonText]}
+                  // icon={faCalendarDay}
+                  name='calendar'
+                // color='white'
+                /> Month
+              </Text>
+            </Pressable>
+
+            <Pressable
+              style={[styles.mainButton, styles.menuButton]}
+              onPress={() => {
+                determineTaskDisplayLimit('All')
+                setTaskMenuVisible(false)
+                setBackgroundOpacity(1.0)
+              }}>
+              <Text style={[styles.buttonText]}>
+                <FontAwesome
+                  style={[styles.buttonText]}
+                  // icon={faCalendarDay}
+                  name='tasks'
+                // color='white'
+                /> All
+              </Text>
+            </Pressable>
+
+            <View style={{ flexDirection: "row", marginTop: "15%" }}>
+              <Switch
+                trackColor={{ false: 'grey', true: 'white' }}
+                thumbColor={includeCompleteTasks ? 'cornflowerblue' : 'lightgrey'}
+                ios_backgroundColor="grey"
+                onValueChange={() => setIncludeCompleteTasks(previousState => !previousState)}
+                value={includeCompleteTasks}
+              />
+              <Text style={styles.standardText}>Include Completed Tasks</Text>
+            </View>
+
+            <View style={{ flexDirection: "row", marginTop: "15%" }}>
+              <Switch
+                trackColor={{ false: 'grey', true: 'white' }}
+                thumbColor={includeDeletedTasks ? 'cornflowerblue' : 'lightgrey'}
+                ios_backgroundColor="grey"
+                onValueChange={() => setIncludeDeletedTasks(previousState => !previousState)}
+                value={includeDeletedTasks}
+              />
+              <Text style={styles.standardText}>Include Deleted Tasks</Text>
+            </View>
+
+            <View style={{ flexDirection: "row", marginTop: "15%" }}>
+              <Switch
+                trackColor={{ false: 'grey', true: 'white' }}
+                thumbColor={includeReassignedTasks ? 'cornflowerblue' : 'lightgrey'}
+                ios_backgroundColor="grey"
+                onValueChange={() => setIncludeReassignedTasks(previousState => !previousState)}
+                value={includeReassignedTasks}
+              />
+              <Text style={styles.standardText}>Include Re-Assigned Tasks</Text>
+            </View>
+          </View> */}
+
+
+
 
           <View style={styles.inputBtnFormContainer}>
             <TextInput
@@ -496,7 +656,7 @@ export function TasksScreen({ route, navigation }) {
                             onPress={() => navigation.navigate('TaskDetail', { uid: uid, taskId: item.id })}
                           >
                             <Text style={[styles.listText,
-                            ( item.status == 'complete' || item.status == 'deleted' || item.assignee != uid ? { color: "black" } : null)
+                            (item.status == 'complete' || item.status == 'deleted' || item.assignee != uid ? { color: "black" } : null)
                             ]} >
                               {item.name}
                             </Text>
@@ -509,7 +669,7 @@ export function TasksScreen({ route, navigation }) {
                                 />
                               </Text>) : (null)}
 
-                              {item.status == 'deleted' ? (
+                            {item.status == 'deleted' ? (
                               <Text style={[{ marginLeft: "5%", color: "black" }]} >
                                 <FontAwesome
                                   style={{ fontSize: 24 }}
@@ -517,7 +677,7 @@ export function TasksScreen({ route, navigation }) {
                                 />
                               </Text>) : (null)}
 
-                              {item.assignee != uid ? (
+                            {item.assignee != uid ? (
                               <Text style={[{ marginLeft: "5%", color: "black" }]} >
                                 <FontAwesome
                                   style={{ fontSize: 24 }}
