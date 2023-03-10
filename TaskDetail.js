@@ -434,7 +434,6 @@ export function TaskDetailScreen({ route, navigation }) {
 
     setReassignVisible(false);
     setBackgroundOpacity(1.0);
-    navigation.goBack();
 
 
     Alert.alert("Task Reassigned", "Task has been reassigned to " + userName,
@@ -664,7 +663,9 @@ export function TaskDetailScreen({ route, navigation }) {
                 }}
                 value={false}
               />
-              <Text style={[styles.standardText, styles.txtError, { paddingTop: 10, fontSize: 20 }]}>Re-Set to Active</Text>
+              <Text style={[styles.standardText, styles.txtError, { paddingTop: 10, fontSize: 20 }]}>
+                Re-Set to Active
+              </Text>
             </View>
           ) : (null)}
 
@@ -680,7 +681,27 @@ export function TaskDetailScreen({ route, navigation }) {
                 }}
                 value={false}
               />
-              <Text style={[styles.standardText, styles.txtError, { paddingTop: 10, fontSize: 20 }]}>Un-Delete Task</Text>
+              <Text style={[styles.standardText, styles.txtError, { paddingTop: 10, fontSize: 20 }]}>
+                Un-Delete Task
+              </Text>
+            </View>
+          ) : (null)}
+
+          {task.assignee != uid ? (
+            <View style={{ flexDirection: "row" }}>
+              <Switch
+                trackColor={{ false: 'grey', true: 'white' }}
+                thumbColor={'lightgrey'}
+                ios_backgroundColor="grey"
+                onValueChange={() => {
+                  reassignTask(uid, user.name)
+                  setTriggerRefresh(triggerRefresh + 1);
+                }}
+                value={false}
+              />
+              <Text style={[styles.standardText, styles.txtError, { paddingTop: 10, fontSize: 20 }]}>
+                Assign Task Back to Me
+              </Text>
             </View>
           ) : (null)}
 
@@ -691,7 +712,7 @@ export function TaskDetailScreen({ route, navigation }) {
             :
             (
               // <ScrollView style={{ height: "81%", marginBottom: 15 }}>
-              <ScrollView style={{ opacity: (task.status == 'complete' || task.status == 'deleted' ? .50 : backgroundOpacity) }}>
+              <ScrollView style={{ opacity: (task.status == 'complete' || task.status == 'deleted' || task.assignee != uid ? .50 : backgroundOpacity) }}>
 
                 <View style={styles.inputFormContainer}>
                   <Text style={styles.textLabel}>Created by {createdByUser}</Text>
@@ -710,7 +731,7 @@ export function TaskDetailScreen({ route, navigation }) {
 
                     {/* delete task button */}
                     <TouchableOpacity style={[styles.mainButton, styles.btnDanger, styles.btnNarrow, { flex: 1 }]}
-                      disabled={task.status == 'complete' || task.status == 'deleted' ? (true) : (false)}
+                      disabled={task.status == 'complete' || task.status == 'deleted' || task.assignee != uid ? (true) : (false)}
                       // disabled={!groupChanged()}
                       onPress={() => {
                         // deleteTask(taskId)
@@ -730,7 +751,7 @@ export function TaskDetailScreen({ route, navigation }) {
 
                     {/* save task button */}
                     <TouchableOpacity style={[styles.mainButton, styles.btnSuccess, { flex: 2 }, { opacity: (!taskChanged()) ? 0.5 : 1.0 }]}
-                      disabled={!taskChanged() || task.status == 'complete' || task.status == 'deleted' ? (true) : (false)}
+                      disabled={!taskChanged() || task.status == 'complete' || task.status == 'deleted' || task.assignee != uid ? (true) : (false)}
                       onPress={async () => {
                         await SaveTask().then(
                           (result) => {
@@ -757,7 +778,7 @@ export function TaskDetailScreen({ route, navigation }) {
 
                     {/* reassign button */}
                     <Pressable style={[styles.mainButton, styles.btnSuccess, { flex: 1 }]}
-                      disabled={task.status == 'complete' || task.status == 'deleted' ? (true) : (false)}
+                      disabled={task.status == 'complete' || task.status == 'deleted' || task.assignee != uid ? (true) : (false)}
                       onPress={async () => {
                         // await getUserPool()
                         // console.log("USERPOOL at invoke reassign", userPool)
@@ -775,7 +796,7 @@ export function TaskDetailScreen({ route, navigation }) {
 
                     {/* comlete task button */}
                     <Pressable style={[styles.mainButton, styles.btnSuccess, { flex: 1 }]}
-                      disabled={task.status == 'complete' || task.status == 'deleted' ? (true) : (false)}
+                      disabled={task.status == 'complete' || task.status == 'deleted' || task.assignee != uid ? (true) : (false)}
                       onPress={() => {
                         var taskObj = task;
                         taskObj.id = taskId;
@@ -801,7 +822,7 @@ export function TaskDetailScreen({ route, navigation }) {
                     value={task.name}
                     underlineColorAndroid='transparent'
                     autoCapitalize='none'
-                    editable={task.status == 'complete' || task.status == 'deleted' ? (false) : (true)}
+                    editable={task.status == 'complete' || task.status == 'deleted' || task.assignee != uid ? (false) : (true)}
                   />
 
                   {/* <TextInput
@@ -826,7 +847,7 @@ export function TaskDetailScreen({ route, navigation }) {
                     value={task.notes}
                     underlineColorAndroid='transparent'
                     autoCapitalize='none'
-                    editable={task.status == 'complete' || task.status == 'deleted' ? (false) : (true)}
+                    editable={task.status == 'complete' || task.status == 'deleted' || task.assignee != uid ? (false) : (true)}
                   />
 
                   <View style={{ flexDirection: "row" }}>
@@ -834,7 +855,7 @@ export function TaskDetailScreen({ route, navigation }) {
                     <View style={{ flexDirection: "column", flex: 1 }}>
                       <Text style={styles.textLabel}>Start Anytime After</Text>
                       <Pressable
-                        disabled={task.status == 'complete' || task.status == 'deleted' ? (true) : (false)}
+                        disabled={task.status == 'complete' || task.status == 'deleted' || task.assignee != uid ? (true) : (false)}
                         onPress={() => {
                           setStartDatePickerVisibility(true)
                           setBackgroundOpacity(0.33)
@@ -864,7 +885,7 @@ export function TaskDetailScreen({ route, navigation }) {
                     <View style={{ flexDirection: "column", flex: 1 }}>
                       <Text style={styles.textLabel}>Finish By</Text>
                       <Pressable
-                        disabled={task.status == 'complete' || task.status == 'deleted' ? (true) : (false)}
+                        disabled={task.status == 'complete' || task.status == 'deleted' || task.assignee != uid ? (true) : (false)}
                         onPress={() => {
                           setEndDatePickerVisibility(true)
                           setBackgroundOpacity(0.33)
@@ -897,8 +918,8 @@ export function TaskDetailScreen({ route, navigation }) {
                     <View style={{ flexDirection: "column", flex: 1 }}>
                       <Text style={styles.textLabel}>Priority</Text>
                       <InputSpinner
-                        disabled={task.status == 'complete' || task.status == 'deleted' ? (true) : (false)}
-                        editable={task.status == 'complete' || task.status == 'deleted' ? (false) : (true)}
+                        disabled={task.status == 'complete' || task.status == 'deleted' || task.assignee != uid ? (true) : (false)}
+                        editable={task.status == 'complete' || task.status == 'deleted' || task.assignee != uid ? (false) : (true)}
                         skin={"clean"}
                         height={48}
                         width={140}
@@ -926,8 +947,8 @@ export function TaskDetailScreen({ route, navigation }) {
                     <View style={{ flexDirection: "column", flex: 1 }}>
                       <Text style={styles.textLabel}>Effort Minutes</Text>
                       <InputSpinner
-                        disabled={task.status == 'complete' || task.status == 'deleted' ? (true) : (false)}
-                        editable={task.status == 'complete' || task.status == 'deleted' ? (false) : (true)}
+                        disabled={task.status == 'complete' || task.status == 'deleted' || task.assignee != uid ? (true) : (false)}
+                        editable={task.status == 'complete' || task.status == 'deleted' || task.assignee != uid ? (false) : (true)}
                         skin={"clean"}
                         height={48}
                         width={140}
@@ -962,7 +983,7 @@ export function TaskDetailScreen({ route, navigation }) {
                     {
                       taskGroupNames.map((item) =>
                         <Pressable key={item.id} style={styles.tagButton}
-                          disabled={task.status == 'complete' || task.status == 'deleted' ? (true) : (false)}
+                          disabled={task.status == 'complete' || task.status == 'deleted' || task.assignee != uid ? (true) : (false)}
                           onPress={() => navigation.navigate('GroupDetail', { uid: uid, groupId: item.id })}
                           onLongPress={() => confirmGroupDelete(item.id, item.name)}
                         >
@@ -973,7 +994,7 @@ export function TaskDetailScreen({ route, navigation }) {
                       )
                     }
                     <Pressable style={styles.tagButton}
-                      disabled={task.status == 'complete' || task.status == 'deleted' ? (true) : (false)}
+                      disabled={task.status == 'complete' || task.status == 'deleted' || task.assignee != uid ? (true) : (false)}
                       onPress={() => {
                         setTaskGroupPickerVisible(true)
                         setBackgroundOpacity(.33)
@@ -991,7 +1012,7 @@ export function TaskDetailScreen({ route, navigation }) {
                     {
                       taskResourceNames.map((item) =>
                         <Pressable key={item.id} style={styles.tagButton}
-                          disabled={task.status == 'complete' || task.status == 'deleted' ? (true) : (false)}
+                          disabled={task.status == 'complete' || task.status == 'deleted' || task.assignee != uid ? (true) : (false)}
                           onPress={() => navigation.navigate('ResourceDetail', { uid: uid, resourceId: item.id })}
                           onLongPress={() => confirmResourceDelete(item.id, item.name)}
                         >
@@ -1002,7 +1023,7 @@ export function TaskDetailScreen({ route, navigation }) {
                       )
                     }
                     <Pressable style={styles.tagButton}
-                      disabled={task.status == 'complete' || task.status == 'deleted' ? (true) : (false)}
+                      disabled={task.status == 'complete' || task.status == 'deleted' || task.assignee != uid ? (true) : (false)}
 
                       onPress={() => {
                         setTaskResourcePickerVisible(true)
@@ -1052,6 +1073,7 @@ export function TaskDetailScreen({ route, navigation }) {
                               <Pressable key={item.userId} style={styles.tagButton}
                                 onPress={() => {
                                   reassignTask(item.userId, item.userName)
+                                  navigation.goBack();
                                 }}
                               >
                                 <Text style={styles.tagText}>

@@ -47,6 +47,7 @@ export function TasksScreen({ route, navigation }) {
   const [currTimeStamp, setCurrTimeStamp] = useState(Math.floor(Date.now()));
   const [includeCompleteTasks, setIncludeCompleteTasks] = useState(false);
   const [includeDeletedTasks, setIncludeDeletedTasks] = useState(false);
+  const [includeReassignedTasks, setIncludeReassignedTasks] = useState(false);
 
   // opacity
   const [backgroundOpacity, setBackgroundOpacity] = useState(1.0);
@@ -68,11 +69,12 @@ export function TasksScreen({ route, navigation }) {
   useEffect(() => {
     var unsubscribe;
     var taskObj;
-    async function getTasks() {
+
+    async function getTasks(qryField) {
       try {
         unsubscribe = onSnapshot(
           query(
-            collection(db, "Tasks"), where("assignee", "==", uid), orderBy('startDate'), orderBy('priority'), orderBy('name')), (querySnapshot) => {
+            collection(db, "Tasks"), where(qryField, "==", uid), orderBy('startDate'), orderBy('priority'), orderBy('name')), (querySnapshot) => {
               const retrievedTasks = [];
               querySnapshot.forEach((doc) => {
                 taskObj = doc.data();
@@ -86,7 +88,10 @@ export function TasksScreen({ route, navigation }) {
         console.error(error);
       }
     }
-    getTasks();
+
+    getTasks("assignee");
+    getTasks("creator");
+
     return function cleanup() {
       unsubscribe();
     };
@@ -366,6 +371,17 @@ export function TasksScreen({ route, navigation }) {
                 <Text style={styles.standardText}>Include Deleted Tasks</Text>
               </View>
 
+              <View style={{ flexDirection: "row", marginTop: "15%" }}>
+                <Switch
+                  trackColor={{ false: 'grey', true: 'white' }}
+                  thumbColor={includeReassignedTasks ? 'cornflowerblue' : 'lightgrey'}
+                  ios_backgroundColor="grey"
+                  onValueChange={() => setIncludeReassignedTasks(previousState => !previousState)}
+                  value={includeReassignedTasks}
+                />
+                <Text style={styles.standardText}>Include Re-Assigned Tasks</Text>
+              </View>
+
             </View>
           </Modal>
           {/* ///////////////////////////////////////////////////// */}
@@ -426,6 +442,8 @@ export function TasksScreen({ route, navigation }) {
                   (!includeCompleteTasks && item.status == 'complete')
                   ||
                   (!includeDeletedTasks && item.status == 'deleted')
+                  ||
+                  (!includeReassignedTasks && item.assignee != uid)
                 ) {
                   displayTask = false;
                 }
@@ -473,12 +491,12 @@ export function TasksScreen({ route, navigation }) {
                             style={[styles.listContainer,
                             {
                               // backgroundColor: (item.startDate < currTimeStamp && item.status != 'complete' ? "tomato" : "lightgreen") 
-                              backgroundColor: (item.status == 'complete' || item.status == 'deleted' ? 'grey' : (item.startDate < currTimeStamp ? "tomato" : "lightgreen"))
+                              backgroundColor: (item.status == 'complete' || item.status == 'deleted' || item.assignee != uid ? 'grey' : (item.startDate < currTimeStamp ? "tomato" : "lightgreen"))
                             }]}
                             onPress={() => navigation.navigate('TaskDetail', { uid: uid, taskId: item.id })}
                           >
                             <Text style={[styles.listText,
-                            ( item.status == 'complete' || item.status == 'deleted' ? { color: "black" } : null)
+                            ( item.status == 'complete' || item.status == 'deleted' || item.assignee != uid ? { color: "black" } : null)
                             ]} >
                               {item.name}
                             </Text>
@@ -496,6 +514,14 @@ export function TasksScreen({ route, navigation }) {
                                 <FontAwesome
                                   style={{ fontSize: 24 }}
                                   name='trash-o'
+                                />
+                              </Text>) : (null)}
+
+                              {item.assignee != uid ? (
+                              <Text style={[{ marginLeft: "5%", color: "black" }]} >
+                                <FontAwesome
+                                  style={{ fontSize: 24 }}
+                                  name='user'
                                 />
                               </Text>) : (null)}
 
