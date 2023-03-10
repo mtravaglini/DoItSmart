@@ -157,7 +157,7 @@ export const scheduleTasks = async (userId) => {
 
 
 
-  return;
+  return resolved;
 }
 
 export const getAllGroupsForUser = async (userId, plainFlag) => {
