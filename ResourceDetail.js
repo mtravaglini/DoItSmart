@@ -126,7 +126,7 @@ export function ResourceDetailScreen({ route, navigation }) {
 
             return {
               "id": parentDoc?.id,
-              "name": parentDoc?.data().name,
+              "name": parentDoc.data()?.name,
             }
           }))
         } catch (error) {

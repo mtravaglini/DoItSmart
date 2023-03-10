@@ -176,9 +176,9 @@ export function ProfileScreen({ route, navigation }) {
 
         return {
           "inviteId": docRef.id,
-          "inviterName": inviterParentDoc?.data().name,
+          "inviterName": inviterParentDoc.data()?.name,
           "inviterUid": docRef.data().inviter,
-          "groupName": groupParentDoc?.data().name,
+          "groupName": groupParentDoc.data()?.name,
           "groupId": docRef.data().groupId
         }
       }))
