@@ -6,7 +6,7 @@ import {
 } from 'react-native';
 
 const colorScheme = Appearance.getColorScheme();
-console.log("COLOR SCHEME",colorScheme)
+console.log("COLOR SCHEME", colorScheme)
 
 // Blue with green
 const originalBlueGreenColourObj = {
@@ -141,12 +141,12 @@ module.exports = StyleSheet.create({
     // fontFamily: Platform.OS === "android" ? "sans-serif" : "AppleSDGothicNeo",
     color: colourObj.labelColour,
   },
-textLink: {
-  paddingLeft: 10,
-  fontWeight: "bold",
-  fontSize: 20, 
-  color: colourObj.secondaryScreenColour,
-},
+  textLink: {
+    paddingLeft: 10,
+    fontWeight: "bold",
+    fontSize: 20,
+    color: colourObj.secondaryScreenColour,
+  },
   // ########################################
 
   // header ###########################
@@ -404,6 +404,11 @@ textLink: {
     fontSize: 18,
     color: colourObj.mainTextColour,
   },
+  standardTextLight: {
+    // fontWeight: "bold",
+    fontSize: 16,
+    color: colourObj.mainTextColour,
+  },
   txtSuccess: {
     color: colourObj.successColour,
   },
@@ -479,17 +484,17 @@ textLink: {
   },
 
   // OTHER ########################################
-  textDisplay: {
-    color: colourObj.secondaryScreenColour,
-    width: "90%",
-    height: 48,
-    lineHeight: 48,
-    marginBottom: 15,
-    paddingLeft: "5%",
-    fontSize: 18,
-    backgroundColor: colourObj.textBackgroundColour,
-    borderRadius: 15,
-  },
+  // textDisplay: {
+  //   color: colourObj.secondaryScreenColour,
+  //   width: "90%",
+  //   height: 48,
+  //   lineHeight: 48,
+  //   marginBottom: 15,
+  //   paddingLeft: "5%",
+  //   fontSize: 18,
+  //   backgroundColor: colourObj.textBackgroundColour,
+  //   borderRadius: 15,
+  // },
   closeBox: {
     position: 'absolute',
     bottom: "2%",

@@ -36,6 +36,7 @@ export function TaskDetailScreen({ route, navigation }) {
 
   const [user, setUser] = useState('');
   const [createdByUser, setCreatedByUser] = useState('');
+  const [assigneeUser, setAssigneeUser] = useState('');
   const [origTask, setOrigTask] = useState({});
   const [task, setTask] = useState({});
 
@@ -173,6 +174,11 @@ export function TaskDetailScreen({ route, navigation }) {
         // get user doc for the task creator
         var docSnap2 = await getDoc(doc(db, "Users", docSnap.data().creator));
         setCreatedByUser(docSnap2.data().name + " (" + docSnap2.data().email + ")")
+
+        // get user doc for the task assignee
+        var docSnap3 = await getDoc(doc(db, "Users", docSnap.data().assignee));
+        setAssigneeUser(docSnap3.data().name)
+
       } catch (error) {
         console.error(error);
       }
@@ -699,9 +705,14 @@ export function TaskDetailScreen({ route, navigation }) {
                 }}
                 value={false}
               />
+              <View style={{flexDirection: "column"}}>
               <Text style={[styles.standardText, styles.txtError, { paddingTop: 10, fontSize: 20 }]}>
                 Assign Task Back to Me
               </Text>
+              <Text style={[styles.standardTextLight]}>
+                Currently assigned to {assigneeUser}
+              </Text>
+              </View>
             </View>
           ) : (null)}
 
@@ -715,14 +726,9 @@ export function TaskDetailScreen({ route, navigation }) {
               <ScrollView style={{ opacity: (task.status == 'complete' || task.status == 'deleted' || task.assignee != uid ? .50 : backgroundOpacity) }}>
 
                 <View style={styles.inputFormContainer}>
-                  <Text style={styles.textLabel}>Created by {createdByUser}</Text>
-                  <Text style={styles.textLabel}>Created on {new Date(task.createdDate).toString().slice(0, 24)}</Text>
-                  {task.status == 'complete' ? (
-                    <Text style={styles.textLabel}>Completed on {new Date(task.completedDate).toString().slice(0, 24)}</Text>
-                  ) : (null)}
-                  {task.status == 'deleted' ? (
-                    <Text style={styles.textLabel}>Deleted on {new Date(task.deletedDate).toString().slice(0, 24)}</Text>
-                  ) : (null)}
+
+
+
                   <View style={{ flexDirection: "row" }}>
 
                     {/* spacer */}
@@ -814,6 +820,23 @@ export function TaskDetailScreen({ route, navigation }) {
                     </Pressable>
 
                   </View>
+
+                  {/* <Text style={[styles.textLabel, { paddingTop: 15 }]}>Task Info</Text> */}
+                  <View style={[styles.input, {height: null}]}>
+                    <Text style={styles.standardTextLight}>Created by {createdByUser}</Text>
+                    <Text style={styles.standardTextLight}>Created on {new Date(task.createdDate).toString().slice(0, 24)}</Text>
+                    {task.status == 'complete' ? (
+                      <Text style={styles.standardTextLight}>Completed on {new Date(task.completedDate).toString().slice(0, 24)}</Text>
+                    ) : (null)}
+                    {task.status == 'deleted' ? (
+                      <Text style={styles.standardTextLight}>Deleted on {new Date(task.deletedDate).toString().slice(0, 24)}</Text>
+                    ) : (null)}
+                    {/* {task.assignee != uid ? (
+                      <Text style={styles.standardTextLight}>Assigned to {assigneeUser}</Text>
+                    ) : (null)} */}
+                  </View>
+
+
 
                   <Text style={[styles.textLabel, { paddingTop: 15 }]}>Name</Text>
                   <TextInput
