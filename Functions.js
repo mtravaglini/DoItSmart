@@ -12,12 +12,65 @@ export const completeTask = async (taskObj) => {
   } catch (error) {
     // const errorCode = error.code;
     console.log(error.message);
-    return 1;
+    // return 1;
   }
 
 }
-// delete a task
-export const deleteTask = async (taskId) => {
+
+// un-complete a task
+export const unCompleteTask = async (taskObj) => {
+
+  taskObj.status = 'active'
+  taskObj.completedDate = 0;
+
+  try {
+    await setDoc(doc(db, "Tasks", taskObj.id), taskObj)
+  } catch (error) {
+    // const errorCode = error.code;
+    console.log(error.message);
+  }
+
+}
+
+// mark the task as deleted
+export const deleteTask = async (taskObj) => {
+
+  taskObj.status = 'deleted'
+  taskObj.deletedDate = Math.floor(Date.now()) //serverTimestamp();
+
+  try {
+    await setDoc(doc(db, "Tasks", taskObj.id), taskObj)
+  } catch (error) {
+    // const errorCode = error.code;
+    console.log(error.message);
+  }
+
+}
+
+// un-delete a task
+export const unDeleteTask = async (taskObj) => {
+
+  console.log("unDeleteTask triggered")
+  // mark the task as active or complete (depending on previous status)
+  if (taskObj.completedDate > 0) {
+    taskObj.status = 'complete'
+  } else {
+    taskObj.status = 'active'
+  }
+
+  taskObj.deletedDate = 0;
+
+  try {
+    await setDoc(doc(db, "Tasks", taskObj.id), taskObj)
+  } catch (error) {
+    // const errorCode = error.code;
+    console.log(error.message);
+  }
+
+}
+
+// permanently delete a task
+export const purgeTask = async (taskId) => {
   try {
 
     var querySnapshot;
@@ -245,7 +298,7 @@ export const getAllTasksForUsers = async (retrievedUserNames) => {
 
     // console.log("GETTING 1 tasks for user", user.id)
 
-    const querySnapshot = await getDocs(query(collection(db, "Tasks"), where("assignee", "==", user.userId), where("status", "!=", 'complete')));
+    const querySnapshot = await getDocs(query(collection(db, "Tasks"), where("assignee", "==", user.userId), where("status", "not-in", ['complete', 'deleted'])));
     querySnapshot.forEach(async (doc) => {
 
 

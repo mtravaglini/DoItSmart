@@ -46,6 +46,7 @@ export function TasksScreen({ route, navigation }) {
   const [taskDisplayLimit, setTaskDisplayLimit] = useState(0);
   const [currTimeStamp, setCurrTimeStamp] = useState(Math.floor(Date.now()));
   const [includeCompleteTasks, setIncludeCompleteTasks] = useState(false);
+  const [includeDeletedTasks, setIncludeDeletedTasks] = useState(false);
 
   // opacity
   const [backgroundOpacity, setBackgroundOpacity] = useState(1.0);
@@ -138,7 +139,7 @@ export function TasksScreen({ route, navigation }) {
     }
   }
 
-  const addTask  = async () => {
+  const addTask = async () => {
     try {
       const timestamp = Math.floor(Date.now()) //serverTimestamp();
       const data = {
@@ -146,11 +147,11 @@ export function TasksScreen({ route, navigation }) {
         creator: uid,
         assignee: uid,
         startDate: timestamp + (24 * 60 * 60 * 1000),
-        endDate: timestamp + (24*2 * 60 * 60 * 1000),
+        endDate: timestamp + (24 * 2 * 60 * 60 * 1000),
         priority: 1,
         effort: 30,
         createdDate: timestamp,
-        status: 'new',
+        status: 'active',
         completedDate: 0
       }
       var docRef = await addDoc(collection(db, "Tasks"), data)
@@ -211,12 +212,12 @@ export function TasksScreen({ route, navigation }) {
       </View>
     );
   };
-  const swipeFromLeftOpen = (itemId) => {
-    alert('Swipe from left ' + itemId);
-  };
-  const swipeFromRightOpen = (itemId) => {
-    alert('Swipe from right ' + itemId);
-  };
+  // const swipeFromLeftOpen = (itemId) => {
+  //   alert('Swipe from left ' + itemId);
+  // };
+  // const swipeFromRightOpen = (itemId) => {
+  //   alert('Swipe from right ' + itemId);
+  // };
   /////////////////// Swipeable
 
 
@@ -354,6 +355,17 @@ export function TasksScreen({ route, navigation }) {
                 <Text style={styles.standardText}>Include Completed Tasks</Text>
               </View>
 
+              <View style={{ flexDirection: "row", marginTop: "15%" }}>
+                <Switch
+                  trackColor={{ false: 'grey', true: 'white' }}
+                  thumbColor={includeDeletedTasks ? 'cornflowerblue' : 'lightgrey'}
+                  ios_backgroundColor="grey"
+                  onValueChange={() => setIncludeDeletedTasks(previousState => !previousState)}
+                  value={includeDeletedTasks}
+                />
+                <Text style={styles.standardText}>Include Deleted Tasks</Text>
+              </View>
+
             </View>
           </Modal>
           {/* ///////////////////////////////////////////////////// */}
@@ -411,7 +423,10 @@ export function TasksScreen({ route, navigation }) {
                 var displayTask = true;
                 if ((taskDisplayLimit > 0 && item.startDate > taskDisplayLimit)
                   ||
-                  (!includeCompleteTasks && item.status == 'complete')) {
+                  (!includeCompleteTasks && item.status == 'complete')
+                  ||
+                  (!includeDeletedTasks && item.status == 'deleted')
+                ) {
                   displayTask = false;
                 }
 
@@ -442,7 +457,11 @@ export function TasksScreen({ route, navigation }) {
                           ref={ref => swipeableRef[index] = ref}
                           renderLeftActions={LeftSwipeActions}
                           renderRightActions={rightSwipeActions}
-                          onSwipeableRightOpen={() => deleteTask(item.id)}
+                          onSwipeableRightOpen={() => {
+                            deleteTask(item)
+                            swipeableRef[index].close();
+                          }}
+                          // onSwipeableRightOpen={() => deleteTask(item.id)}
                           onSwipeableLeftOpen={() => {
                             completeTask(item, index)
                             swipeableRef[index].close();
@@ -454,12 +473,12 @@ export function TasksScreen({ route, navigation }) {
                             style={[styles.listContainer,
                             {
                               // backgroundColor: (item.startDate < currTimeStamp && item.status != 'complete' ? "tomato" : "lightgreen") 
-                              backgroundColor: (item.status == 'complete' ? 'grey' : (item.startDate < currTimeStamp ? "tomato" : "lightgreen"))
+                              backgroundColor: (item.status == 'complete' || item.status == 'deleted' ? 'grey' : (item.startDate < currTimeStamp ? "tomato" : "lightgreen"))
                             }]}
                             onPress={() => navigation.navigate('TaskDetail', { uid: uid, taskId: item.id })}
                           >
                             <Text style={[styles.listText,
-                            (item.status == 'complete' ? { color: "black" } : null)
+                            ( item.status == 'complete' || item.status == 'deleted' ? { color: "black" } : null)
                             ]} >
                               {item.name}
                             </Text>
@@ -471,6 +490,15 @@ export function TasksScreen({ route, navigation }) {
                                   name='check'
                                 />
                               </Text>) : (null)}
+
+                              {item.status == 'deleted' ? (
+                              <Text style={[{ marginLeft: "5%", color: "black" }]} >
+                                <FontAwesome
+                                  style={{ fontSize: 24 }}
+                                  name='trash-o'
+                                />
+                              </Text>) : (null)}
+
                           </Pressable>
 
                         </Swipeable>
