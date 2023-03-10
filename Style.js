@@ -184,8 +184,8 @@ module.exports = StyleSheet.create({
   },
   headerIcon: {
     fontSize: 30,
-    marginLeft: "3%",
-    marginRight: "5%",
+    // marginLeft: "3%",
+    // marginRight: "5%",
     color: colourObj.headerColour,
   },
   headerIconText: {
@@ -562,6 +562,7 @@ module.exports = StyleSheet.create({
     alignItems: 'flex-start',
     marginLeft: "35%",
     marginBottom: "60%",
+    marginTop: "10%",
     // marginVertical: "50%",
     backgroundColor: colourObj.headerBackgroundColour,
     borderTopLeftRadius: 15,

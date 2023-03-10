@@ -300,14 +300,15 @@ export function TasksScreen({ route, navigation }) {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         {/* <TouchableWithoutFeedback onPress={Keyboard.dismiss}> */}
         <View style={{ flex: 1 }}>
-          {/* ///////////////////////////////////////////////////// */}
-          <Pressable style={{
+          
+          <TouchableOpacity 
+          style={{
             position: "absolute",
-            right: 75,
+            right: "1%",
             zIndex: 3,
-            width: "10%",
-            marginTop: "2%"
-            // elevation: 3
+            // width: 100,
+            marginTop: "2%",
+            elevation: 3,
           }}
             onPress={() => {
               setTaskMenuVisible(true)
@@ -315,7 +316,7 @@ export function TasksScreen({ route, navigation }) {
             }}
           >
 
-            <View style={{ flexDirection: "row" }}>
+            <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
 
               <View>
                 <Text style={styles.headerIconText}>
@@ -344,22 +345,24 @@ export function TasksScreen({ route, navigation }) {
 
               <Text style={{
                 fontSize: 30,
+                paddingTop: 5
               }}>
                 {/* <FontAwesome
                 style={styles.headerIcon}
                 name='bars'
               /> */}
                 <Feather
-                  style={styles.headerIcon}
+                  style={[styles.headerIcon]}
                   name="filter" />
               </Text>
 
             </View>
-          </Pressable>
+
+          </TouchableOpacity>
 
 
 
-          {/* modal for menu  */}
+          {/* modal for filter menu  */}
           <Modal
             animationType="slide"
             transparent={true}
