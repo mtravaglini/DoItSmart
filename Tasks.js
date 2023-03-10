@@ -174,15 +174,71 @@ export function TasksScreen({ route, navigation }) {
 
 
 
+  const TaskLine = props => {
+
+    var item = props.item
+
+    return (
+
+      <Pressable
+        style={[styles.listContainer,
+        {
+          // backgroundColor: (item.startDate < currTimeStamp && item.status != 'complete' ? "tomato" : "lightgreen") 
+          backgroundColor: (item.status == 'complete' || item.status == 'deleted' || item.assignee != uid ? 'grey' : (item.startDate < currTimeStamp ? "tomato" : "lightgreen"))
+        }]}
+        onPress={() => navigation.navigate('TaskDetail', { uid: uid, taskId: item.id })}
+      >
+        <Text style={[styles.listText,
+        (item.status == 'complete' || item.status == 'deleted' || item.assignee != uid ? { color: "black" } : null)
+        ]} >
+          {item.name}
+        </Text>
+
+        {item.status == 'complete' ? (
+          <Text style={[{ marginLeft: "5%", color: "black" }]} >
+            <FontAwesome
+              style={{ fontSize: 24 }}
+              name='check'
+            />
+          </Text>) : (null)}
+
+        {item.status == 'deleted' ? (
+          <Text style={[{ marginLeft: "5%", color: "black" }]} >
+            <FontAwesome
+              style={{ fontSize: 24 }}
+              name='trash-o'
+            />
+          </Text>) : (null)}
+
+        {item.assignee != uid ? (
+          <Text style={[{ marginLeft: "5%", color: "black" }]} >
+            <FontAwesome
+              style={{ fontSize: 24 }}
+              name='user'
+            />
+          </Text>) : (null)}
+
+        {item.startDate < currTimeStamp ? (
+          <Text style={[{ marginLeft: "5%", color: "black" }]} >
+            <FontAwesome
+              style={{ fontSize: 24 }}
+              name='hourglass-half'
+            />
+          </Text>) : (null)}
 
 
+
+      </Pressable>
+
+    )
+  }
 
 
 
 
 
   /////////////////// Swipeable
-  const LeftSwipeActions = () => {
+  const leftSwipeActions = () => {
     return (
       <View
         style={styles.leftSwipeContainer}
@@ -625,71 +681,49 @@ export function TasksScreen({ route, navigation }) {
                           new Date(item.startDate).toString().slice(0, 10)
                         }</Text>
                       ) : (
-                        ''
+                        null
                       )}
 
-                    {(displayTask) ?
-                      (
+                    {
+                      (displayTask && (item.status == 'complete' || item.status == 'deleted' || item.assignee != uid)) ?
+                        (<View>
 
-                        <Swipeable
-                          ref={ref => swipeableRef[index] = ref}
-                          renderLeftActions={LeftSwipeActions}
-                          renderRightActions={rightSwipeActions}
-                          onSwipeableRightOpen={() => {
-                            deleteTask(item)
-                            swipeableRef[index].close();
-                          }}
-                          // onSwipeableRightOpen={() => deleteTask(item.id)}
-                          onSwipeableLeftOpen={() => {
-                            completeTask(item, index)
-                            swipeableRef[index].close();
-                          }}
-                          friction={1}
-                        >
+                          <TaskLine
+                            item={item}>
+                          </TaskLine>
 
-                          <Pressable
-                            style={[styles.listContainer,
-                            {
-                              // backgroundColor: (item.startDate < currTimeStamp && item.status != 'complete' ? "tomato" : "lightgreen") 
-                              backgroundColor: (item.status == 'complete' || item.status == 'deleted' || item.assignee != uid ? 'grey' : (item.startDate < currTimeStamp ? "tomato" : "lightgreen"))
-                            }]}
-                            onPress={() => navigation.navigate('TaskDetail', { uid: uid, taskId: item.id })}
-                          >
-                            <Text style={[styles.listText,
-                            (item.status == 'complete' || item.status == 'deleted' || item.assignee != uid ? { color: "black" } : null)
-                            ]} >
-                              {item.name}
-                            </Text>
+                        </View>
+                        ) : (
 
-                            {item.status == 'complete' ? (
-                              <Text style={[{ marginLeft: "5%", color: "black" }]} >
-                                <FontAwesome
-                                  style={{ fontSize: 24 }}
-                                  name='check'
-                                />
-                              </Text>) : (null)}
+                          (displayTask) ?
+                            (
+                              <Swipeable
+                                ref={ref => swipeableRef[index] = ref}
+                                renderLeftActions={leftSwipeActions}
+                                renderRightActions={rightSwipeActions}
+                                onSwipeableRightOpen={() => {
+                                  deleteTask(item)
+                                  swipeableRef[index].close();
+                                }}
+                                // onSwipeableRightOpen={() => deleteTask(item.id)}
+                                onSwipeableLeftOpen={() => {
+                                  completeTask(item, index)
+                                  swipeableRef[index].close();
+                                }}
+                                friction={1}
+                              >
 
-                            {item.status == 'deleted' ? (
-                              <Text style={[{ marginLeft: "5%", color: "black" }]} >
-                                <FontAwesome
-                                  style={{ fontSize: 24 }}
-                                  name='trash-o'
-                                />
-                              </Text>) : (null)}
+                                <TaskLine
+                                  item={item}>
+                                </TaskLine>
 
-                            {item.assignee != uid ? (
-                              <Text style={[{ marginLeft: "5%", color: "black" }]} >
-                                <FontAwesome
-                                  style={{ fontSize: 24 }}
-                                  name='user'
-                                />
-                              </Text>) : (null)}
+                              </Swipeable>
+                            ) : (
+                              null
+                            )
+                        )
+                    }
 
-                          </Pressable>
-
-                        </Swipeable>
-
-                      ) : ('')}
                   </View>
                 )
               }}
