@@ -660,14 +660,6 @@ export function TaskDetailScreen({ route, navigation }) {
                     <Text style={styles.textLabel}>Completed on {new Date(task.completedDate).toString().slice(0, 24)}</Text>
                   ) : (null)}
 
-
-
-
-
-
-
-
-
                   <View style={{ flexDirection: "row" }}>
 
                     {/* spacer */}
@@ -717,7 +709,6 @@ export function TaskDetailScreen({ route, navigation }) {
 
                   </View>
 
-
                   {task.status != 'complete' ? (
                     <View style={{ flexDirection: "row" }}>
 
@@ -737,56 +728,6 @@ export function TaskDetailScreen({ route, navigation }) {
                           /> Reassign
                         </Text>
                       </Pressable>
-                      {/* modal for reassigning task  */}
-                      <Modal
-                        animationType="slide"
-                        transparent={true}
-                        visible={reassignVisible}
-                        onRequestClose={() => {
-                          setReassignVisible(false)
-                          setBackgroundOpacity(1.0)
-                        }}>
-                        <View style={styles.modalView}>
-                          <Text style={styles.pageTitleText}>Reassign Task</Text>
-
-                          <Text style={[styles.textLabel, { paddingTop: 15, alignSelf: 'flex-start' }]}>Select user to reassign task</Text>
-                          <View style={styles.tagContainer}>
-
-                            {
-                              userPool.map((item) =>
-                                (item.userId != uid) ? (
-                                  <Pressable key={item.userId} style={styles.tagButton}
-                                    onPress={() => {
-                                      reassignTask(item.userId, item.userName)
-                                    }}
-                                  >
-                                    <Text style={styles.tagText}>
-                                      {item.userName}
-                                    </Text>
-                                  </Pressable>
-                                ) : (null)
-                              )
-                            }
-                          </View>
-
-
-                          <Pressable
-                            style={[styles.mainButton, styles.btnWarning, styles.btnNarrow]}
-                            onPress={() => {
-                              setReassignVisible(false)
-                              setBackgroundOpacity(1.0)
-                            }}>
-                            <Text style={[styles.buttonText]}>
-                              <FontAwesome
-                                style={[{ fontSize: 35 }]}
-                                name='arrow-circle-o-left'
-                              // color='white'
-                              />
-                            </Text>
-                          </Pressable>
-
-                        </View>
-                      </Modal>
 
                       {/* comlete task button */}
                       <Pressable style={[styles.mainButton, styles.btnSuccess, { flex: 1 }]}
@@ -1001,56 +942,6 @@ export function TaskDetailScreen({ route, navigation }) {
                     </Pressable>
                   </View>
 
-
-                  {/* modal for selecting groups  */}
-                  <Modal
-                    animationType="slide"
-                    transparent={true}
-                    visible={taskGroupPickerVisible}
-                    onRequestClose={() => {
-                      setTaskGroupPickerVisible(false)
-                      setBackgroundOpacity(1.0)
-                    }}>
-                    <View style={styles.modalView}>
-                      <Text style={styles.pageTitleText}>Add Task to Groups</Text>
-
-                      <Text style={[styles.textLabel, { paddingTop: 15, alignSelf: 'flex-start' }]}>Groups</Text>
-
-                      <View style={styles.tagContainer}>
-
-                        {
-                          userGroupNames.map((item) =>
-                            <Pressable key={item.id} style={styles.tagButton}
-                              onPress={() => addTaskGroup(item.id)}
-                            >
-                              <Text style={styles.tagText}>
-                                {item.name}
-                              </Text>
-                            </Pressable>
-                          )
-                        }
-                      </View>
-
-                      <Pressable
-                        style={[styles.mainButton, styles.btnWarning, styles.btnNarrow]}
-                        onPress={() => {
-                          setTaskGroupPickerVisible(false)
-                          setBackgroundOpacity(1.0)
-                        }}>
-                        <Text style={[styles.buttonText]}>
-                          <FontAwesome
-                            style={[{ fontSize: 35 }]}
-                            name='arrow-circle-o-left'
-                          // color='white'
-                          />
-                        </Text>
-                      </Pressable>
-
-                    </View>
-                  </Modal>
-
-
-
                   {/* Resources display */}
                   <Text style={styles.textLabel}>Resources</Text>
                   <View style={styles.tagContainer}>
@@ -1079,21 +970,150 @@ export function TaskDetailScreen({ route, navigation }) {
                       </Text>
                     </Pressable>
                   </View>
+                </View>
+
+                {/* modal for reassigning task  */}
+                <Modal
+                  animationType="slide"
+                  transparent={true}
+                  visible={reassignVisible}
+                  onRequestClose={() => {
+                    setReassignVisible(false)
+                    setBackgroundOpacity(1.0)
+                  }}>
+                  <View style={styles.modalView}>
+                    <Pressable style={{ alignSelf: "flex-start", position: "absolute", left: "3%", marginTop: "1%" }}
+                      onPress={() => {
+                        setReassignVisible(false)
+                        setBackgroundOpacity(1.0)
+                      }}
+                    >
+                      <Text style={[styles.pageTitleText]}>
+                        <FontAwesome
+                          style={styles.headerIcon}
+                          name='arrow-circle-o-left'
+                        // color='cornflowerblue'
+                        />
+                      </Text>
+                    </Pressable>
+                    <Text style={styles.pageTitleText}>Reassign Task</Text>
+
+                    <Text style={[styles.textLabel, { paddingTop: 15, alignSelf: 'flex-start' }]}>Select User to reassign Task</Text>
+                    {userPool.length > 1 ? (
+                      <View style={styles.tagContainer}>
+
+                        {
+                          userPool.map((item) =>
+                            (item.userId != uid) ? (
+                              <Pressable key={item.userId} style={styles.tagButton}
+                                onPress={() => {
+                                  reassignTask(item.userId, item.userName)
+                                }}
+                              >
+                                <Text style={styles.tagText}>
+                                  {item.userName}
+                                </Text>
+                              </Pressable>
+                            ) : (null)
+                          )
+                        }
+                      </View>)
+                      :
+                      (<View style={styles.tagContainer}>
+                        <Text style={[styles.standardText, styles.txtError]}>
+                          No Users in your Groups!
+                        </Text>
+                      </View>)}
 
 
-                  {/* modal for selecting resources  */}
-                  <Modal
-                    animationType="slide"
-                    transparent={true}
-                    visible={taskResourcePickerVisible}
-                    onRequestClose={() => {
-                      setTaskResourcePickerVisible(false)
-                      setBackgroundOpacity(1.0)
-                    }}>
-                    <View style={styles.modalView}>
-                      <Text style={styles.pageTitleText}>Assign Resource to Task</Text>
 
-                      <Text style={[styles.textLabel, { paddingTop: 15, alignSelf: 'flex-start' }]}>Resources</Text>
+
+                  </View>
+                </Modal>
+
+                {/* modal for selecting groups  */}
+                <Modal
+                  animationType="slide"
+                  transparent={true}
+                  visible={taskGroupPickerVisible}
+                  onRequestClose={() => {
+                    setTaskGroupPickerVisible(false)
+                    setBackgroundOpacity(1.0)
+                  }}>
+                  <View style={styles.modalView}>
+
+                    <Pressable style={{ alignSelf: "flex-start", position: "absolute", left: "3%", marginTop: "1%" }}
+                      onPress={() => {
+                        setTaskGroupPickerVisible(false)
+                        setBackgroundOpacity(1.0)
+                      }}
+                    >
+                      <Text style={[styles.pageTitleText]}>
+                        <FontAwesome
+                          style={styles.headerIcon}
+                          name='arrow-circle-o-left'
+                        // color='cornflowerblue'
+                        />
+                      </Text>
+                    </Pressable>
+
+                    <Text style={styles.pageTitleText}>Add Task to Groups</Text>
+
+                    <Text style={[styles.textLabel, { paddingTop: 15, alignSelf: 'flex-start' }]}>Groups</Text>
+                    {userGroupNames.length > 0 ? (
+                      <View style={styles.tagContainer}>
+
+                        {
+                          userGroupNames.map((item) =>
+                            <Pressable key={item.id} style={styles.tagButton}
+                              onPress={() => addTaskGroup(item.id)}
+                            >
+                              <Text style={styles.tagText}>
+                                {item.name}
+                              </Text>
+                            </Pressable>
+                          )
+                        }
+                      </View>)
+                      :
+                      (<View style={styles.tagContainer}>
+                        <Text style={[styles.standardText, styles.txtError]}>
+                          No more Groups to add!
+                        </Text>
+                      </View>)}
+                  </View>
+                </Modal>
+
+                {/* modal for selecting resources  */}
+                <Modal
+                  animationType="slide"
+                  transparent={true}
+                  visible={taskResourcePickerVisible}
+                  onRequestClose={() => {
+                    setTaskResourcePickerVisible(false)
+                    setBackgroundOpacity(1.0)
+                  }}>
+                  <View style={styles.modalView}>
+
+                    <Pressable style={{ alignSelf: "flex-start", position: "absolute", left: "3%", marginTop: "1%" }}
+                      onPress={() => {
+                        setTaskResourcePickerVisible(false)
+                        setBackgroundOpacity(1.0)
+                      }}
+                    >
+                      <Text style={[styles.pageTitleText]}>
+                        <FontAwesome
+                          style={styles.headerIcon}
+                          name='arrow-circle-o-left'
+                        // color='cornflowerblue'
+                        />
+                      </Text>
+                    </Pressable>
+
+                    <Text style={styles.pageTitleText}>Assign Resource to Task</Text>
+
+                    <Text style={[styles.textLabel, { paddingTop: 15, alignSelf: 'flex-start' }]}>Resources</Text>
+                    {userResourceNames.length > 0 ? (
 
                       <View style={styles.tagContainer}>
 
@@ -1108,27 +1128,16 @@ export function TaskDetailScreen({ route, navigation }) {
                             </Pressable>
                           )
                         }
-                      </View>
-
-                      <Pressable
-                        style={[styles.mainButton, styles.btnWarning, styles.btnNarrow]}
-                        onPress={() => {
-                          setTaskResourcePickerVisible(false)
-                          setBackgroundOpacity(1.0)
-                        }}>
-                        <Text style={[styles.buttonText]}>
-                          <FontAwesome
-                            style={[{ fontSize: 35 }]}
-                            name='arrow-circle-o-left'
-                          // color='white'
-                          />
+                      </View>)
+                      :
+                      (<View style={styles.tagContainer}>
+                        <Text style={[styles.standardText, styles.txtError]}>
+                          No more Resources to add!
                         </Text>
-                      </Pressable>
+                      </View>)}
 
-                    </View>
-                  </Modal>
-
-                </View>
+                  </View>
+                </Modal>
 
               </ScrollView>
             )}

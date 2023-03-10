@@ -370,69 +370,64 @@ export function GroupDetailScreen({ route, navigation }) {
                 </Pressable>
 
               </View>
+            </View>
 
 
 
-              {/* modal for inviting user to group */}
-              <Modal
-                animationType="slide"
-                transparent={true}
-                visible={inviteUserVisible}
-                onRequestClose={() => {
-                  setInviteUserVisible(false)
-                  setBackgroundOpacity(1.0)
-                }}>
-                <View style={[styles.modalView, { marginBottom: "20%" }]}>
-                  <Text style={styles.pageTitleText}>Invite User to Group</Text>
-                  {/* <View style={{ marginBottom: 15, alignItems: "flex-start", flexWrap: "wrap", flexDirection: "row" }}> */}
-                  <View style={styles.inputFormContainer}>
+            {/* modal for inviting user to group */}
+            <Modal
+              animationType="slide"
+              transparent={true}
+              visible={inviteUserVisible}
+              onRequestClose={() => {
+                setInviteUserVisible(false)
+                setBackgroundOpacity(1.0)
+              }}>
 
+              <View style={[styles.modalView, { marginBottom: "20%" }]}>
 
-                    <Text style={[styles.textLabel, { paddingTop: 15 }]}>Email</Text>
-                    <TextInput style={[styles.input, { width: 250 }]}
-                      onChangeText={(newValue) => { setEmailInvite(newValue) }}
-                      value={emailInvite}
-                      underlineColorAndroid='transparent'
-                      autoCapitalize='none'
+                <Pressable style={{ alignSelf: "flex-start", position: "absolute", left: "3%", marginTop: "1%" }}
+                  onPress={() => {
+                    setInviteUserVisible(false)
+                    setBackgroundOpacity(1.0)
+                  }}
+                >
+                  <Text style={[styles.pageTitleText]}>
+                    <FontAwesome
+                      style={styles.headerIcon}
+                      name='arrow-circle-o-left'
+                    // color='cornflowerblue'
                     />
+                  </Text>
+                </Pressable>
 
-                  </View>
-                  {/* </View> */}
+                <Text style={[styles.pageTitleText, { paddingTop: 30 }]}>Invite User to Group</Text>
+                {/* <View style={{ marginBottom: 15, alignItems: "flex-start", flexWrap: "wrap", flexDirection: "row" }}> */}
+                <View style={styles.inputFormContainer}>
 
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-
-                    <Pressable
-                      style={[styles.mainButton, styles.btnWarning, styles.btnNarrow]}
-                      onPress={() => {
-                        setInviteUserVisible(false)
-                        setBackgroundOpacity(1.0)
-                      }}>
-                      <Text style={[styles.buttonText]}>
-                        <FontAwesome
-                          style={[{ fontSize: 35 }]}
-                          name='arrow-circle-o-left'
-                        // color='white'
-                        />
-                      </Text>
-                    </Pressable>
-
-                    <Pressable
-                      style={[styles.mainButton, styles.btnSuccess]}
-                      onPress={() => inviteUser()}>
-                      <Text style={styles.buttonText}>Invite</Text>
-                    </Pressable>
-
-
-                  </View>
+                  <Text style={[styles.textLabel, { paddingTop: 15 }]}>Email</Text>
+                  <TextInput style={[styles.input, {width: 350}]}
+                    onChangeText={(newValue) => { setEmailInvite(newValue) }}
+                    value={emailInvite}
+                    underlineColorAndroid='transparent'
+                    autoCapitalize='none'
+                  />
 
                 </View>
-              </Modal>
+                {/* </View> */}
 
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
 
+                  <Pressable
+                    style={[styles.mainButton, styles.btnSuccess]}
+                    onPress={() => inviteUser()}>
+                    <Text style={styles.buttonText}>Invite</Text>
+                  </Pressable>
 
+                </View>
 
-
-            </View>
+              </View>
+            </Modal>
           </ScrollView>
 
           <Footer auth={auth}

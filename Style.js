@@ -315,8 +315,8 @@ textLink: {
     // height: 80,
     marginLeft: 10,
     marginRight: 10,
-    // marginTop: 15,
-    // marginBottom: 15,
+    // marginTop: 0,
+    // marginBottom: 0,
   },
   textLabel: {
     paddingLeft: 10,
@@ -512,10 +512,10 @@ textLink: {
 
   // },
   modalView: {
-    flex: 1,
-    justifyContent: 'center',
+    // flex: 1,
+    // justifyContent: 'center',
     alignItems: 'center',
-    marginHorizontal: 30,
+    marginHorizontal: "3%",
     marginTop: "20%",
     marginBottom: "60%",
     // marginVertical: "50%",
@@ -524,6 +524,7 @@ textLink: {
     borderColor: colourObj.secondaryScreenColour,
     borderWidth: 1,
     padding: 35,
+    // paddingHorizontal: 0,
     alignItems: 'center',
     shadowColor: colourObj.mainScreenColour,
     shadowOffset: {

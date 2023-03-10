@@ -368,20 +368,40 @@ export function ResourceDetailScreen({ route, navigation }) {
                 </Pressable>
 
               </View>
+            </View>
 
-              {/* modal for selecting groups  */}
-              <Modal
-                animationType="slide"
-                transparent={true}
-                visible={groupResourcePickerVisible}
-                onRequestClose={() => {
-                  setGroupResourcePickerVisible(false)
-                  setBackgroundOpacity(1.0)
-                }}>
-                <View style={styles.modalView}>
-                  <Text style={styles.pageTitleText}>Add Resource to Groups</Text>
 
-                  <Text style={[styles.textLabel, { paddingTop: 15, alignSelf: 'flex-start' }]}>Groups</Text>
+            {/* modal for selecting groups  */}
+            <Modal
+              animationType="slide"
+              transparent={true}
+              visible={groupResourcePickerVisible}
+              onRequestClose={() => {
+                setGroupResourcePickerVisible(false)
+                setBackgroundOpacity(1.0)
+              }}>
+              <View style={styles.modalView}>
+
+                <Pressable style={{ alignSelf: "flex-start", position: "absolute", left: "3%", marginTop: "1%" }}
+                  onPress={() => {
+                    setGroupResourcePickerVisible(false)
+                    setBackgroundOpacity(1.0)
+                  }}
+                >
+                  <Text style={[styles.pageTitleText]}>
+                    <FontAwesome
+                      style={styles.headerIcon}
+                      name='arrow-circle-o-left'
+                    // color='cornflowerblue'
+                    />
+                  </Text>
+                </Pressable>
+
+                <Text style={styles.pageTitleText}>Add Resource to Groups</Text>
+
+                <Text style={[styles.textLabel, { paddingTop: 15, alignSelf: 'flex-start' }]}>Groups</Text>
+
+                {userGroupNames.length > 0 ? (
                   <View style={styles.tagContainer}>
 
                     {
@@ -395,27 +415,15 @@ export function ResourceDetailScreen({ route, navigation }) {
                         </Pressable>
                       )
                     }
-                  </View>
-
-                  <Pressable
-                    style={[styles.mainButton, styles.btnWarning, styles.btnNarrow]}
-                    onPress={() => {
-                      setGroupResourcePickerVisible(false)
-                      setBackgroundOpacity(1.0)
-                    }}>
-                    <Text style={[styles.buttonText]}>
-                      <FontAwesome
-                        style={[{ fontSize: 35 }]}
-                        name='arrow-circle-o-left'
-                      // color='white'
-                      />
+                  </View>)
+                  :
+                  (<View style={styles.tagContainer}>
+                    <Text style={[styles.standardText, styles.txtError]}>
+                      No more Groups to add!
                     </Text>
-                  </Pressable>
-
-                </View>
-              </Modal>
-
-            </View>
+                  </View>)}
+              </View>
+            </Modal>
           </ScrollView>
 
           <Footer auth={auth}
