@@ -194,7 +194,7 @@ export function TasksScreen({ route, navigation }) {
           {item.name}
         </Text>
 
-        {item.status == 'complete' ? (
+        {item.status == 'complete' || item.completedDate > 0 ? (
           <Text style={[{ marginLeft: "5%", color: "black" }]} >
             <FontAwesome
               style={{ fontSize: 24 }}
@@ -688,7 +688,7 @@ export function TasksScreen({ route, navigation }) {
                       )}
 
                     {
-                      (displayTask && (item.status == 'complete' || item.status == 'deleted' || item.assignee != uid)) ?
+                      (displayTask && (item.status == 'deleted' || item.assignee != uid)) ?
                         (<View>
 
                           <TaskLine
