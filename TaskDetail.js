@@ -67,12 +67,19 @@ export function TaskDetailScreen({ route, navigation }) {
 
   const handleStartDatePickerConfirm = (date) => {
     setTask((prevState) => ({ ...prevState, startDate: Date.parse(date) }));
+    if (Date.parse(date) + task.effort * 60000 > task.endDate) {
+      console.log("set end time")
+      setTask((prevState) => ({ ...prevState, endDate: Date.parse(date) + task.effort * 60000 }));
+    }
     setStartDatePickerVisibility(false);
     setBackgroundOpacity(1.0)
   }
 
   const handleEndDatePickerConfirm = (date) => {
     setTask((prevState) => ({ ...prevState, endDate: Date.parse(date) }));
+    if (Date.parse(date) - task.effort * 60000 < task.startDate) {
+      setTask((prevState) => ({ ...prevState, startDate: Date.parse(date) - task.effort * 60000 }));
+    }
     setEndDatePickerVisibility(false);
     setBackgroundOpacity(1.0)
   }
@@ -217,7 +224,7 @@ export function TaskDetailScreen({ route, navigation }) {
 
           return {
             "id": parentDoc?.id,
-            "name": parentDoc?.data().name,
+            "name": parentDoc.data()?.name,
           }
         }))
       } catch (error) {
@@ -351,7 +358,7 @@ export function TaskDetailScreen({ route, navigation }) {
 
           return {
             "id": parentDoc?.id,
-            "name": parentDoc?.data().name,
+            "name": parentDoc.data()?.name,
           }
         }))
       } catch (error) {
@@ -394,7 +401,7 @@ export function TaskDetailScreen({ route, navigation }) {
 
           return {
             "id": parentDoc?.id,
-            "name": parentDoc?.data().name,
+            "name": parentDoc.data()?.name,
           }
         }))
       } catch (error) {
@@ -705,13 +712,13 @@ export function TaskDetailScreen({ route, navigation }) {
                 }}
                 value={false}
               />
-              <View style={{flexDirection: "column"}}>
-              <Text style={[styles.standardText, styles.txtError, { paddingTop: 10, fontSize: 20 }]}>
-                Assign Task Back to Me
-              </Text>
-              <Text style={[styles.standardTextLight]}>
-                Currently assigned to {assigneeUser}
-              </Text>
+              <View style={{ flexDirection: "column" }}>
+                <Text style={[styles.standardText, styles.txtError, { paddingTop: 10, fontSize: 20 }]}>
+                  Assign Task Back to Me
+                </Text>
+                <Text style={[styles.standardTextLight]}>
+                  Currently assigned to {assigneeUser}
+                </Text>
               </View>
             </View>
           ) : (null)}
@@ -822,7 +829,7 @@ export function TaskDetailScreen({ route, navigation }) {
                   </View>
 
                   {/* <Text style={[styles.textLabel, { paddingTop: 15 }]}>Task Info</Text> */}
-                  <View style={[styles.input, {height: null}]}>
+                  <View style={[styles.input, { height: null }]}>
                     <Text style={styles.standardTextLight}>Created by {createdByUser}</Text>
                     <Text style={styles.standardTextLight}>Created on {new Date(task.createdDate).toString().slice(0, 24)}</Text>
                     {task.status == 'complete' ? (
@@ -895,7 +902,7 @@ export function TaskDetailScreen({ route, navigation }) {
                           isVisible={isStartDatePickerVisible}
                           mode="datetime"
                           date={new Date(task.startDate)}
-                          maximumDate={new Date(task.endDate)}
+                          // maximumDate={new Date(task.endDate)}
                           onConfirm={handleStartDatePickerConfirm}
                           onCancel={() => {
                             setStartDatePickerVisibility(false)
@@ -925,7 +932,7 @@ export function TaskDetailScreen({ route, navigation }) {
                           isVisible={isEndDatePickerVisible}
                           mode="datetime"
                           date={new Date(task.endDate)}
-                          minimumDate={new Date(task.startDate)}
+                          // minimumDate={new Date(task.startDate)}
                           onConfirm={handleEndDatePickerConfirm}
                           onCancel={() => {
                             setEndDatePickerVisibility(false)
@@ -995,7 +1002,16 @@ export function TaskDetailScreen({ route, navigation }) {
                         // colorMin={"#40c5f4"}
                         value={task.effort?.toString()}
                         // value={formatEffort(task.effort)}
-                        onChange={(newValue) => { setTask((prevState) => ({ ...prevState, effort: +newValue })) }}
+                        onChange={
+                          (newValue) => {
+                            setTask((prevState) => ({ ...prevState, effort: +newValue }))
+                            // adjust end time if required
+                            if (task.endDate - newValue * 60000 < task.startDate) {
+                              setTask((prevState) => ({ ...prevState, endDate: task.startDate + newValue * 60000 }));
+                            }
+                          }
+
+                        }
                       />
                     </View>
                   </View>
