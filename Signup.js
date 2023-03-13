@@ -62,7 +62,7 @@ export function SignupScreen({ route, navigation }) {
         // alert("Added!");
       })
       .catch(error => {
-        alert(error);
+        console.log(error.message);
       })
 
 

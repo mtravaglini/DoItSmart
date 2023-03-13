@@ -107,7 +107,7 @@ export function ResourcesScreen({ route, navigation }) {
         addDoc(collection(db, "Resources"), data)
         setNewResourceName('');
       } catch (error) {
-        alert(error);
+        console.log(error.message);
       }
     }
   }

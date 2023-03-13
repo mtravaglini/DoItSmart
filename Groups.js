@@ -114,7 +114,7 @@ export function GroupsScreen({ route, navigation }) {
         }
         addDoc(collection(db, "Groups", (await groupRef).id, "GroupUsers"), data)
       } catch (error) {
-        alert(error);
+        console.log(error.message);
       }
     }
   }

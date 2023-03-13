@@ -10,9 +10,7 @@ export const completeTask = async (taskObj) => {
   try {
     await setDoc(doc(db, "Tasks", taskObj.id), taskObj)
   } catch (error) {
-    // const errorCode = error.code;
     console.log(error.message);
-    // return 1;
   }
 
 }
@@ -26,7 +24,6 @@ export const unCompleteTask = async (taskObj) => {
   try {
     await setDoc(doc(db, "Tasks", taskObj.id), taskObj)
   } catch (error) {
-    // const errorCode = error.code;
     console.log(error.message);
   }
 
@@ -41,7 +38,6 @@ export const deleteTask = async (taskObj) => {
   try {
     await setDoc(doc(db, "Tasks", taskObj.id), taskObj)
   } catch (error) {
-    // const errorCode = error.code;
     console.log(error.message);
   }
 
@@ -63,7 +59,6 @@ export const unDeleteTask = async (taskObj) => {
   try {
     await setDoc(doc(db, "Tasks", taskObj.id), taskObj)
   } catch (error) {
-    // const errorCode = error.code;
     console.log(error.message);
   }
 
@@ -90,7 +85,7 @@ export const purgeTask = async (taskId) => {
     // delete Tasks doc
     await deleteDoc(doc(db, "Tasks", taskId));
   } catch (error) {
-    alert(error);
+    console.log(error.message);
   }
 }
 

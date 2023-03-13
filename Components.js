@@ -104,7 +104,7 @@ export const Footer = props => {
               //   alert("SIGNED OUT")
               props.navigation.navigate('Signin')
             }).catch((error) => {
-              alert(error.message)
+              console.log(error.message)
             });
           }}
         >

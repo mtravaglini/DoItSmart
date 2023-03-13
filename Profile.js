@@ -267,8 +267,7 @@ export function ProfileScreen({ route, navigation }) {
       setProfileGroupUpdated(profileGroupUpdated + 1);
 
     } catch (error) {
-      const errorMessage = error.message;
-      alert(errorMessage);
+      console.log(error.message);
     }
     return;
   }
@@ -286,8 +285,7 @@ export function ProfileScreen({ route, navigation }) {
       scheduleTasks(uid)
 
     } catch (error) {
-      const errorMessage = error.message;
-      alert(errorMessage);
+      console.log(error.message);
     }
     return;
   }
@@ -316,13 +314,8 @@ export function ProfileScreen({ route, navigation }) {
       // console.log(auth.currentUser, user.email)
       updateEmail(auth.currentUser, user.email)
     } catch (error) {
-      // const errorCode = error.code;
-      const errorMessage = error.message;
-      alert(errorMessage);
-      // return 1;
-      return;
+      console.log(error.message);
     }
-    // return 0;
     return;
   }
 

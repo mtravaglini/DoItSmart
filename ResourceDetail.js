@@ -219,9 +219,7 @@ export function ResourceDetailScreen({ route, navigation }) {
     try {
       await setDoc(doc(db, "Resources", resourceId), resource)
     } catch (error) {
-      // const errorCode = error.code;
-      const errorMessage = error.message;
-      alert(errorMessage);
+      console.log(error.message);
       return 1;
     }
 

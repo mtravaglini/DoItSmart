@@ -242,9 +242,7 @@ export function GroupDetailScreen({ route, navigation }) {
     try {
       await setDoc(doc(db, "Groups", groupId), group)
     } catch (error) {
-      // const errorCode = error.code;
-      const errorMessage = error.message;
-      alert(errorMessage);
+      console.log(error.message);
       return 1;
     }
     return 0;
