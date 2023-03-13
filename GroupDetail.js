@@ -178,9 +178,9 @@ export function GroupDetailScreen({ route, navigation }) {
 
   const confirmDeleteGroupMembership = (userId, userName) => {
     // check if user is group owner, don't allow removal
-    if (userId == uid) {
+    if (userId == group.creator) {
       Alert.alert("Group Owner",
-        "You are the group owner and can't remove yourself from the group",
+        userName+ " is the group owner and can't be removed from the group",
         [
           {
             text: "Ok"
