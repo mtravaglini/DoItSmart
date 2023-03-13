@@ -111,13 +111,13 @@ export const deleteGroup = async (groupId) => {
       deleteDoc(doc.ref)
     })
 
-    // // delete the group from any tasks
+    // delete the group from any tasks
     querySnapshot = await getDocs(query(collectionGroup(db, "TaskGroups"), where("groupId", "==", groupId)))
     querySnapshot.forEach((doc) => {
       deleteDoc(doc.ref)
     })
 
-    // // delete any outstanding invitations to the group
+    // delete any outstanding invitations to the group
     querySnapshot = await getDocs(query(collection(db, "GroupInvites"), where("groupId", "==", groupId)))
     querySnapshot.forEach((doc) => {
       deleteDoc(doc.ref)
@@ -134,9 +134,24 @@ export const deleteGroup = async (groupId) => {
 // delete a resource
 export const deleteResource = async (resourceId) => {
   try {
+
+    
+    // delete the resource from any groups
+    querySnapshot = await getDocs(query(collectionGroup(db, "GroupResources"), where("resourceId", "==", resourceId)))
+    querySnapshot.forEach((doc) => {
+      deleteDoc(doc.ref)
+    })
+
+    // delete the resource from any tasks
+    querySnapshot = await getDocs(query(collectionGroup(db, "TaskResources"), where("resourceId", "==", resourceId)))
+    querySnapshot.forEach((doc) => {
+      deleteDoc(doc.ref)
+    })
+
+    // delete the Resource doc
     await deleteDoc(doc(db, "Resources", resourceId));
   } catch (error) {
-    alert(error);
+    console.log(error.message);
   }
 }
 
