@@ -24,7 +24,7 @@ import { doc, collection, query, getDoc, setDoc, addDoc, deleteDoc, onSnapshot, 
 const styles = require('./Style.js');
 // use custom components
 import { Title, Footer } from './Components.js'
-import { deleteGroup } from './Functions.js'
+import { getAllGroupsForUser, deleteGroup } from './Functions.js'
 
 export function GroupsScreen({ route, navigation }) {
 
@@ -50,33 +50,43 @@ export function GroupsScreen({ route, navigation }) {
     getUser();
   }, [])
 
-  // get groups
+  // get groups 
   useEffect(() => {
-    var unsubscribe;
-    var groupObj;
     async function getGroups() {
-      try {
-        unsubscribe = onSnapshot(
-          query(
-            collection(db, "Groups"), orderBy('name'), where("creator", "==", uid)), (querySnapshot) => {
-              const retrievedGroups = [];
-              querySnapshot.forEach((doc) => {
-                groupObj = doc.data();
-                groupObj.id = doc.id;
-                retrievedGroups.push(groupObj)
-              })
-              setGroups(retrievedGroups)
-              setLoading(false);
-            })
-      } catch (error) {
-        console.error(error);
-      }
+      var retrievedGroups = await getAllGroupsForUser(uid)
+      setGroups(retrievedGroups)
+      setLoading(false);
     }
     getGroups();
-    return function cleanup() {
-      unsubscribe();
-    };
   }, [])
+
+  // // get groups
+  // useEffect(() => {
+  //   var unsubscribe;
+  //   var groupObj;
+  //   async function getGroups() {
+  //     try {
+  //       unsubscribe = onSnapshot(
+  //         query(
+  //           collection(db, "Groups"), orderBy('name'), where("creator", "==", uid)), (querySnapshot) => {
+  //             const retrievedGroups = [];
+  //             querySnapshot.forEach((doc) => {
+  //               groupObj = doc.data();
+  //               groupObj.id = doc.id;
+  //               retrievedGroups.push(groupObj)
+  //             })
+  //             setGroups(retrievedGroups)
+  //             setLoading(false);
+  //           })
+  //     } catch (error) {
+  //       console.error(error);
+  //     }
+  //   }
+  //   getGroups();
+  //   return function cleanup() {
+  //     unsubscribe();
+  //   };
+  // }, [])
 
   // add a group
   const addGroup = async () => {
