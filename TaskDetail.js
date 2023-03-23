@@ -431,7 +431,7 @@ export function TaskDetailScreen({ route, navigation }) {
     // add logic to reassign task to selected user
     // console.log("reassign task", taskId, "to user", userId)
 
-    var newTask = { ...task, assignee: userId }
+    var newTask = { ...task, assignee: userId, userList: [uid, userId] }
     setTask(newTask)
     // console.log("newTask", newTask)
 

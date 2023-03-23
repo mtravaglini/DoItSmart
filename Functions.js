@@ -1,3 +1,4 @@
+import {Alert} from 'react-native';
 import { doc, collection, collectionGroup, query, addDoc, getDoc, getDocs, setDoc, deleteDoc, onSnapshot, where, orderBy, DocumentReference, queryEqual } from "firebase/firestore";
 import { db, auth } from './firebase.config';
 
@@ -32,6 +33,23 @@ export const unCompleteTask = async (taskObj) => {
 // mark the task as deleted
 export const deleteTask = async (taskObj) => {
 
+  // if task already in deleted status, confirm to PERMANENTLY delete it
+  if (taskObj.status == 'deleted') {
+
+    Alert.alert("DANGER - PERMANENTLY delete " + taskObj.name,
+      "Are you sure?",
+      [{
+        text: "Delete",
+        onPress: () => purgeTask(taskObj.id),
+
+      },
+      {
+        text: "Cancel"
+      }]
+    )
+
+    return
+  }
   taskObj.status = 'deleted'
   taskObj.deletedDate = Math.floor(Date.now()) //serverTimestamp();
 
@@ -130,7 +148,7 @@ export const deleteGroup = async (groupId) => {
 export const deleteResource = async (resourceId) => {
   try {
 
-    
+
     // delete the resource from any groups
     querySnapshot = await getDocs(query(collectionGroup(db, "GroupResources"), where("resourceId", "==", resourceId)))
     querySnapshot.forEach((doc) => {
