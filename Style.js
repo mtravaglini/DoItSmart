@@ -8,32 +8,6 @@ import {
 const colorScheme = Appearance.getColorScheme();
 console.log("COLOR SCHEME", colorScheme)
 
-// Blue with green
-const originalBlueGreenColourObj = {
-  headerBackgroundColour: "black",
-  headerColour: "cornflowerblue",
-
-  mainScreenColour: "cornflowerblue",
-  secondaryScreenColour: "midnightblue",
-
-  labelColour: "midnightblue",
-
-  mainTextColour: "cornflowerblue",
-  inputTextColour: "cornflowerblue",
-  textBackgroundColour: "white",
-
-  listBackgroundColour: "lightgreen",
-  listTextColour: "darkgreen",
-
-  footerBackgroundColour: "black",
-  footerColour: "cornflowerblue",
-
-  successColour: "darkgreen",
-  warningColour: "orange",
-  errorColour: "red"
-}
-
-
 const RoseCelesteScheme = {
   "RoseRed": "#c33c54",
   "IndigoDye": "#254e70",
@@ -55,7 +29,7 @@ const RoseCelesteLight = {
   secondaryTextColour: RoseCelesteScheme.NonPhotoBlue,
   
   inputTextColour: RoseCelesteScheme.Cerulean,
-  textBackgroundColour: RoseCelesteScheme.Celeste,
+  textBackgroundColour: "white",
 
   listBackgroundColour: "lightgreen",
   listTextColour: "darkgreen",
@@ -80,7 +54,7 @@ const RoseCelesteDark = {
   mainTextColour: RoseCelesteScheme.IndigoDye,
   secondaryTextColour: RoseCelesteScheme.IndigoDye,
   inputTextColour: RoseCelesteScheme.IndigoDye,
-  textBackgroundColour: "white",
+  textBackgroundColour: RoseCelesteScheme.Celeste,
 
   listBackgroundColour: "lightgreen",
   listTextColour: "darkgreen",
