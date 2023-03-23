@@ -62,7 +62,7 @@ const RoseCelesteDark = {
   footerBackgroundColour: RoseCelesteScheme.Cerulean,
   footerColour: RoseCelesteScheme.Celeste,
 
-  successColour: RoseCelesteScheme.Cerulean,
+  successColour: RoseCelesteScheme.IndigoDye,
   warningColour: "#c46913",
   errorColour: RoseCelesteScheme.RoseRed
 }
