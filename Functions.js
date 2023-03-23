@@ -630,6 +630,7 @@ const resolveConflicts = (taskConflicts, userLoad, retrievedAllTaskNames, userId
             // prev task end and conflict task end
             taskConflict.endDate - taskConflict.effort * 60000 >= prevTask.endDate
             &&
+            // check if conflict task end date is before latest possible start of current task
             (allTask.endDate - allTask.effort * 60000) >= taskConflict.endDate
             // // check if there's at least conflict task effort time between 
             // // conflict task start and current task start
