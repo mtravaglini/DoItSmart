@@ -15,18 +15,45 @@ const RoseCelesteScheme = {
   "NonPhotoBlue": "#8ee3ef",
   "Celeste": "#aef3e7"
 }
+// const RoseCelesteLight = {
+
+//   headerBackgroundColour: RoseCelesteScheme.IndigoDye,
+//   headerColour: RoseCelesteScheme.NonPhotoBlue,
+
+//   mainScreenColour: RoseCelesteScheme.NonPhotoBlue,
+//   secondaryScreenColour: RoseCelesteScheme.IndigoDye,
+
+//   labelColour: RoseCelesteScheme.RoseRed,
+
+//   mainTextColour: RoseCelesteScheme.Cerulean,
+//   secondaryTextColour: RoseCelesteScheme.NonPhotoBlue,
+  
+//   inputTextColour: RoseCelesteScheme.Cerulean,
+//   textBackgroundColour: "white",
+
+//   listBackgroundColour: "lightgreen",
+//   listTextColour: "darkgreen",
+
+//   footerBackgroundColour: RoseCelesteScheme.IndigoDye,
+//   footerColour: RoseCelesteScheme.NonPhotoBlue,
+
+//   successColour: RoseCelesteScheme.Cerulean,
+//   warningColour: "#c46913",
+//   errorColour: RoseCelesteScheme.RoseRed
+// }
+
 const RoseCelesteLight = {
 
-  headerBackgroundColour: RoseCelesteScheme.IndigoDye,
-  headerColour: RoseCelesteScheme.NonPhotoBlue,
+  headerBackgroundColour: RoseCelesteScheme.NonPhotoBlue,
+  headerColour: RoseCelesteScheme.Cerulean,
 
-  mainScreenColour: RoseCelesteScheme.NonPhotoBlue,
-  secondaryScreenColour: RoseCelesteScheme.IndigoDye,
+  mainScreenColour: RoseCelesteScheme.Celeste,
+  secondaryScreenColour: RoseCelesteScheme.NonPhotoBlue,
 
   labelColour: RoseCelesteScheme.RoseRed,
 
   mainTextColour: RoseCelesteScheme.Cerulean,
-  secondaryTextColour: RoseCelesteScheme.NonPhotoBlue,
+  secondaryTextColour: RoseCelesteScheme.IndigoDye,
   
   inputTextColour: RoseCelesteScheme.Cerulean,
   textBackgroundColour: "white",
@@ -34,25 +61,27 @@ const RoseCelesteLight = {
   listBackgroundColour: "lightgreen",
   listTextColour: "darkgreen",
 
-  footerBackgroundColour: RoseCelesteScheme.IndigoDye,
-  footerColour: RoseCelesteScheme.NonPhotoBlue,
+  footerBackgroundColour: RoseCelesteScheme.Cerulean,
+  footerColour: RoseCelesteScheme.Celeste,
 
   successColour: RoseCelesteScheme.Cerulean,
   warningColour: "#c46913",
   errorColour: RoseCelesteScheme.RoseRed
 }
+
 const RoseCelesteDark = {
 
   headerBackgroundColour: RoseCelesteScheme.Cerulean,
-  headerColour: RoseCelesteScheme.Celeste,
+  headerColour: RoseCelesteScheme.NonPhotoBlue,
 
   mainScreenColour: RoseCelesteScheme.IndigoDye,
-  secondaryScreenColour: RoseCelesteScheme.NonPhotoBlue,
+  secondaryScreenColour: RoseCelesteScheme.Cerulean,
 
   labelColour: RoseCelesteScheme.RoseRed,
 
-  mainTextColour: RoseCelesteScheme.IndigoDye,
-  secondaryTextColour: RoseCelesteScheme.IndigoDye,
+  mainTextColour: RoseCelesteScheme.NonPhotoBlue,
+  secondaryTextColour: RoseCelesteScheme.Celeste,
+
   inputTextColour: RoseCelesteScheme.IndigoDye,
   textBackgroundColour: RoseCelesteScheme.Celeste,
 
@@ -60,9 +89,9 @@ const RoseCelesteDark = {
   listTextColour: "darkgreen",
 
   footerBackgroundColour: RoseCelesteScheme.Cerulean,
-  footerColour: RoseCelesteScheme.Celeste,
+  footerColour: RoseCelesteScheme.NonPhotoBlue,
 
-  successColour: RoseCelesteScheme.IndigoDye,
+  successColour: RoseCelesteScheme.NonPhotoBlue,
   warningColour: "#c46913",
   errorColour: RoseCelesteScheme.RoseRed
 }
@@ -192,7 +221,7 @@ module.exports = StyleSheet.create({
   buttonText: {
     textAlign: "center",
     textAlignVertical: "center",
-    color: "white",
+    color: colourObj.mainScreenColour,
     fontWeight: "bold",
     fontSize: 20
   },
@@ -202,7 +231,7 @@ module.exports = StyleSheet.create({
     borderRadius: 15,
     marginTop: 10,
     marginBottom: 10,
-    backgroundColor: colourObj.textBackgroundColour,
+    backgroundColor: colourObj.mainScreenColour,
     justifyContent: "center",
     borderWidth: 1,
     borderColor: colourObj.secondaryScreenColour,
@@ -218,7 +247,7 @@ module.exports = StyleSheet.create({
   secondaryButtonText: {
     textAlign: "center",
     textAlignVertical: "center",
-    color: colourObj.secondaryScreenColour,
+    color: colourObj.headerColour,
     // fontWeight: "bold",
     fontSize: 15,
   },

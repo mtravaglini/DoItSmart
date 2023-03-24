@@ -16,7 +16,6 @@ import {
 import {
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
-import { FontAwesome } from '@expo/vector-icons';
 import { db, auth } from './firebase.config';
 import { signOut, updateEmail } from "firebase/auth";
 import { doc, collection, collectionGroup, query, getDoc, getDocs, getParent, getRef, setDoc, addDoc, deleteDoc, onSnapshot, where, orderBy } from "firebase/firestore";

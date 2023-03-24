@@ -163,7 +163,7 @@ export function ResourcesScreen({ route, navigation }) {
               autoCapitalize='none'
             />
             <TouchableOpacity
-              style={[styles.inputButton, { opacity: (!newResourceName ? 0.5 : 1.0) }]}
+              style={[styles.inputButton, styles.btnSuccess, { opacity: (!newResourceName ? 0.5 : 1.0) }]}
               disabled={!newResourceName}
               onPress={() => {
                 Keyboard.dismiss();

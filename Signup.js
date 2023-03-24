@@ -142,7 +142,7 @@ export function SignupScreen({ route, navigation }) {
 
 
               <View style={{ alignItems: "center" }}>
-                <TouchableOpacity style={[styles.mainButton,
+                <TouchableOpacity style={[styles.mainButton, styles.btnSuccess,
                 { opacity: (!name || !email || !password || !passwordConf) ? 0.5 : 1.0 }
                 ]}
                   onPress={async () => {

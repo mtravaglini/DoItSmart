@@ -170,7 +170,7 @@ export function GroupsScreen({ route, navigation }) {
               autoCapitalize='none'
             />
             <TouchableOpacity
-              style={[styles.inputButton, { opacity: (!newGroupName ? 0.5 : 1.0) }]}
+              style={[styles.inputButton, styles.btnSuccess, { opacity: (!newGroupName ? 0.5 : 1.0) }]}
               disabled={!newGroupName}
               onPress={() => {
                 Keyboard.dismiss();

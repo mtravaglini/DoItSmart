@@ -120,7 +120,7 @@ export function SigninScreen({ route, navigation }) {
             />
 
             <View style={{ alignItems: "center" }}>
-              <TouchableOpacity style={[styles.mainButton,
+              <TouchableOpacity style={[styles.mainButton, styles.btnSuccess,
               { opacity: (!email || !password) ? 0.5 : 1.0 }
               ]}
                 onPress={async () => {
@@ -149,7 +149,7 @@ export function SigninScreen({ route, navigation }) {
                   Don't have an account?
                 </Text>
                 <Text onPress={() => { navigation.navigate('Signup') }}
-                  style={[styles.textLink]}
+                  style={[styles.textLink,  styles.txtSuccess]}
                 > Sign up
                 </Text>
               </View>
@@ -161,7 +161,7 @@ export function SigninScreen({ route, navigation }) {
                 <Text 
                 disabled={!email}
                 onPress={() => { emailUser() }}
-                  style={[styles.textLink]}
+                  style={[styles.textLink, styles.txtSuccess]}
                 > Reset
                 </Text>
               </View>

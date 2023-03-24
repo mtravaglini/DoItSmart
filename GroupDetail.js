@@ -291,8 +291,8 @@ export function GroupDetailScreen({ route, navigation }) {
                     style={[styles.buttonText]}
                   >
                     <FontAwesome
-                      style={{ color: "white", fontSize: 24 }}
-                      name='trash-o'
+                    style={[styles.buttonText]}
+                    name='trash-o'
                     />
                   </Text>
                 </TouchableOpacity>
@@ -312,8 +312,8 @@ export function GroupDetailScreen({ route, navigation }) {
                     style={[styles.buttonText]}
                   >
                     <FontAwesome5
-                      style={{ color: "white", fontSize: 24 }}
-                      name='save'
+                    style={[styles.buttonText]}
+                    name='save'
                     /> Save
                   </Text>
                 </TouchableOpacity>

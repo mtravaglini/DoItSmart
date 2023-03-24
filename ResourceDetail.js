@@ -309,8 +309,8 @@ export function ResourceDetailScreen({ route, navigation }) {
                     style={[styles.buttonText]}
                   >
                     <FontAwesome5
-                      style={{ color: "white", fontSize: 24 }}
-                      name='save'
+                    style={[styles.buttonText]}
+                    name='save'
                     /> Save
                   </Text>
                 </TouchableOpacity>

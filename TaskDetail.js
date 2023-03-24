@@ -468,7 +468,7 @@ export function TaskDetailScreen({ route, navigation }) {
       return true;
     }
     for (let key of keys1) {
-      if (task[key] !== origTask[key]) {
+      if (key != "userList" && task[key] !== origTask[key]) {
         return true;
       }
     }
@@ -756,8 +756,8 @@ export function TaskDetailScreen({ route, navigation }) {
                         style={[styles.buttonText]}
                       >
                         <FontAwesome
-                          style={{ color: "white", fontSize: 24 }}
-                          name='trash-o'
+                        style={[styles.buttonText]}
+                        name='trash-o'
                         />
                       </Text>
                     </TouchableOpacity>
@@ -779,8 +779,8 @@ export function TaskDetailScreen({ route, navigation }) {
                         style={[styles.buttonText]}
                       >
                         <FontAwesome5
-                          style={{ color: "white", fontSize: 24 }}
-                          name='save'
+                    style={[styles.buttonText]}
+                    name='save'
                         /> Save
                       </Text>
                     </TouchableOpacity>
@@ -801,8 +801,8 @@ export function TaskDetailScreen({ route, navigation }) {
                     >
                       <Text style={styles.buttonText}>
                         <FontAwesome
-                          style={{ color: "white", fontSize: 24 }}
-                          name='user'
+                        style={[styles.buttonText]}
+                        name='user'
                         /> Reassign
                       </Text>
                     </Pressable>
@@ -820,8 +820,8 @@ export function TaskDetailScreen({ route, navigation }) {
                     >
                       <Text style={styles.buttonText}>
                         <FontAwesome
-                          style={{ color: "white", fontSize: 24 }}
-                          name='check'
+                        style={[styles.buttonText]}
+                        name='check'
                         /> Complete
                       </Text>
                     </Pressable>
