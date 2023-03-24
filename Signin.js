@@ -91,7 +91,7 @@ export function SigninScreen({ route, navigation }) {
         <View>
 
           <View style={styles.mainTitleContainer}>
-            <Text style={styles.titleText}>
+            <Text style={[styles.titleText, styles.txtSuccess]}>
               Do It. Smart.
             </Text>
           </View>

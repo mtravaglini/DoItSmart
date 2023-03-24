@@ -164,7 +164,7 @@ export function SignupScreen({ route, navigation }) {
                   </Text>
                 </TouchableOpacity>
 
-                <Text>{screenMsg}</Text>
+                <Text style={[styles.standardText, styles.txtError]}>{screenMsg}</Text>
 
               </View>
             </View>

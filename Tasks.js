@@ -400,10 +400,10 @@ export function TasksScreen({ route, navigation }) {
                   />
                 </Text>
               </Pressable>
-              <Text style={[styles.pageTitleText, { marginBottom: "20%" }]}>Task View</Text>
+              <Text style={[styles.pageTitleText, { marginBottom: "10%" }]}>Task View</Text>
 
               <Pressable
-                style={[styles.secondaryButton, styles.menuButton]}
+                style={[styles.secondaryButton, styles.menuButton, {marginTop: "1%", marginBottom: "1%"}]}
                 onPress={() => {
                   determineTaskDisplayLimit('Day')
                   setTaskMenuVisible(false)
@@ -420,7 +420,7 @@ export function TasksScreen({ route, navigation }) {
               </Pressable>
 
               <Pressable
-                style={[styles.secondaryButton, styles.menuButton]}
+                style={[styles.secondaryButton, styles.menuButton, {marginTop: "1%", marginBottom: "1%"}]}
                 onPress={() => {
                   determineTaskDisplayLimit('Week')
                   setTaskMenuVisible(false)
@@ -437,7 +437,7 @@ export function TasksScreen({ route, navigation }) {
               </Pressable>
 
               <Pressable
-                style={[styles.secondaryButton, styles.menuButton]}
+                style={[styles.secondaryButton, styles.menuButton, {marginTop: "1%", marginBottom: "1%"}]}
                 onPress={() => {
                   determineTaskDisplayLimit('Month')
                   setTaskMenuVisible(false)
@@ -454,7 +454,7 @@ export function TasksScreen({ route, navigation }) {
               </Pressable>
 
               <Pressable
-                style={[styles.secondaryButton, styles.menuButton]}
+                style={[styles.secondaryButton, styles.menuButton, {marginTop: "1%", marginBottom: "1%"}]}
                 onPress={() => {
                   determineTaskDisplayLimit('All')
                   setTaskMenuVisible(false)
