@@ -759,7 +759,8 @@ const autoReassignTask = async (task, assignee, startDate, endDate) => {
   try {
     var taskDoc = await getDoc(doc(db, "Tasks", task.taskId))
 
-    var data = { ...taskDoc.data(), "assignee": assignee, "startDate": startDate, "endDate": endDate }
+    var newUserList = [taskDoc.data().userList[0], assignee]
+    var data = { ...taskDoc.data(), "assignee": assignee, "startDate": startDate, "endDate": endDate, "userList": newUserList }
     await setDoc(doc(db, "Tasks", task.taskId), data)
 
   } catch (error) {
