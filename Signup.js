@@ -5,7 +5,6 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   View,
 } from 'react-native';
 import {
@@ -17,13 +16,13 @@ import { doc, getDoc, setDoc } from "firebase/firestore";
 
 // use custom style sheet
 const styles = require('./Style.js');
-// use custom components
+// import custom components
 import { Title, Footer } from './Components.js'
 
 export function SignupScreen({ route, navigation }) {
 
   const insets = useSafeAreaInsets();
-  
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -48,7 +47,7 @@ export function SignupScreen({ route, navigation }) {
       return 1;
     }
 
-    const timestamp = Math.floor(Date.now()) //serverTimestamp();
+    const timestamp = Math.floor(Date.now())
     const data = {
       name: name,
       email: email,
@@ -58,16 +57,10 @@ export function SignupScreen({ route, navigation }) {
     setDoc(doc(db, "Users", auth.currentUser.uid), data)
       .then(() => {
         Keyboard.dismiss();
-        // success message
-        // alert("Added!");
       })
       .catch(error => {
         console.log(error.message);
       })
-
-
-
-
 
     // console.log("Signuped successfully.");
     // console.log("currentuser=", auth.currentUser);
@@ -76,7 +69,6 @@ export function SignupScreen({ route, navigation }) {
     setScreenMsg("");
     return 0;
   }
-
 
   return (
     <View style={[styles.safeView, {
@@ -88,89 +80,73 @@ export function SignupScreen({ route, navigation }) {
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        {/* <TouchableWithoutFeedback onPress={Keyboard.dismiss}> */}
-          <View>
+        <View>
 
-            <Title
-              title="Sign up"
-              name="Welcome to Do It. Smart."
-              navigation={navigation}
-              enableBack={true} />
+          <Title
+            title="Sign up"
+            name="Welcome to Do It. Smart."
+            navigation={navigation}
+            enableBack={true} />
 
-            <View style={styles.inputFormContainer}>
-              <Text style={styles.textLabel}>Name</Text>
-              <TextInput
-                // display icon in the textinput box
-                // left={<TextInput.Icon name="account" />}
-                style={styles.input}
-                onChangeText={(newText) => setName(newText)}
-                // defaultValue={usernameText}
-                autoCapitalize="none"
-              />
+          <View style={styles.inputFormContainer}>
+            <Text style={styles.textLabel}>Name</Text>
+            <TextInput
+              style={styles.input}
+              onChangeText={(newText) => setName(newText)}
+              autoCapitalize="none"
+            />
 
-              <Text style={styles.textLabel}>Email</Text>
-              <TextInput
-                // display icon in the textinput box
-                // left={<TextInput.Icon name="account" />}
-                style={styles.input}
-                onChangeText={(newText) => setEmail(newText)}
-                // defaultValue={usernameText}
-                autoCapitalize="none"
-              />
+            <Text style={styles.textLabel}>Email</Text>
+            <TextInput
+              style={styles.input}
+              onChangeText={(newText) => setEmail(newText)}
+              autoCapitalize="none"
+            />
 
-              <Text style={styles.textLabel}>Password</Text>
-              <TextInput
-                // display icon in the textinput box
-                // left={<TextInput.Icon name="form-textbox-password" />}
-                style={styles.input}
-                onChangeText={(newText) => setPassword(newText)}
-                // defaultValue={pwdText}
-                autoCapitalize="none"
-                secureTextEntry={true}
-              />
+            <Text style={styles.textLabel}>Password</Text>
+            <TextInput
+              style={styles.input}
+              onChangeText={(newText) => setPassword(newText)}
+              autoCapitalize="none"
+              secureTextEntry={true}
+            />
 
-              <Text style={styles.textLabel}>Confirm Password</Text>
-              <TextInput
-                // display icon in the textinput box
-                // left={<TextInput.Icon name="form-textbox-password" />}
-                style={styles.input}
-                onChangeText={(newText) => setPasswordConf(newText)}
-                // defaultValue={pwdText}
-                autoCapitalize="none"
-                secureTextEntry={true}
-              />
+            <Text style={styles.textLabel}>Confirm Password</Text>
+            <TextInput
+              style={styles.input}
+              onChangeText={(newText) => setPasswordConf(newText)}
+              autoCapitalize="none"
+              secureTextEntry={true}
+            />
 
-
-              <View style={{ alignItems: "center" }}>
-                <TouchableOpacity style={[styles.mainButton, styles.btnSuccess,
-                { opacity: (!name || !email || !password || !passwordConf) ? 0.5 : 1.0 }
-                ]}
-                  onPress={async () => {
-                    await SignupNewUser().then(
-                      (result) => {
-                        // console.log("return code=", result)
-                        if (result == 0) {
-                          navigation.navigate('Tasks', { uid: auth.currentUser.uid });
-                          // navigation.navigate('Tasks');
-                        }
+            <View style={{ alignItems: "center" }}>
+              <TouchableOpacity style={[styles.mainButton, styles.btnSuccess,
+              { opacity: (!name || !email || !password || !passwordConf) ? 0.5 : 1.0 }
+              ]}
+                onPress={async () => {
+                  await SignupNewUser().then(
+                    (result) => {
+                      // console.log("return code=", result)
+                      if (result == 0) {
+                        navigation.navigate('Tasks', { uid: auth.currentUser.uid });
                       }
-                    )
-                  }}
-                  disabled={!name || !email || !password || !passwordConf}
-                >
-                  <Text
-                    style={styles.buttonText}
-                  >Sign up
-                  </Text>
-                </TouchableOpacity>
+                    }
+                  )
+                }}
+                disabled={!name || !email || !password || !passwordConf}
+              >
+                <Text
+                  style={styles.buttonText}
+                >Sign up
+                </Text>
+              </TouchableOpacity>
 
-                <Text style={[styles.standardText, styles.txtError]}>{screenMsg}</Text>
+              <Text style={[styles.standardText, styles.txtError]}>{screenMsg}</Text>
 
-              </View>
             </View>
-
           </View>
-        {/* </TouchableWithoutFeedback> */}
+
+        </View>
       </KeyboardAvoidingView>
     </View >
   );

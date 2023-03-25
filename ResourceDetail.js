@@ -19,8 +19,9 @@ import { doc, collection, query, addDoc, getDoc, getDocs, setDoc, deleteDoc, onS
 
 // use custom style sheet
 const styles = require('./Style.js');
-// use custom components
+// import custom components
 import { Title, Footer } from './Components.js'
+// import required functions
 import { getAllGroupsForUser, deleteResource } from './Functions.js'
 
 export function ResourceDetailScreen({ route, navigation }) {
@@ -46,16 +47,14 @@ export function ResourceDetailScreen({ route, navigation }) {
 
     async function getResoureceInfo() {
 
-      var userSnap = await getUser()
-      var resoureceSnap = await getResource()
+      await getUser()
+      await getResource()
 
-      // promise chaining //////////////////////////////////////////
+      // Promise Chaining
       var groupResourcesSnap = await getGroupResourcesByResource()
       var retrievedGroupResourceNames = await processGroupSubcollection(groupResourcesSnap)
       setGroupResourceNames(retrievedGroupResourceNames)
 
-      // var userGroupsSnap = await getGroupUsersByUser(userSnap)
-      // var retrievedUserGroupNames = await processGroupSubcollection(userGroupsSnap)
       var retrievedUserGroupNames = await getAllGroupsForUser(uid)
 
       var filterGroupsResult = await filterGroups(retrievedGroupResourceNames, retrievedUserGroupNames)
@@ -66,12 +65,12 @@ export function ResourceDetailScreen({ route, navigation }) {
         try {
           const docSnap = await getDoc(doc(db, "Users", uid));
           setUser(docSnap.data());
-          return docSnap;
         } catch (error) {
           console.error(error);
         }
       }
 
+      // get group
       async function getResource() {
         try {
           var docSnap = await getDoc(doc(db, "Resources", resourceId));
@@ -80,7 +79,6 @@ export function ResourceDetailScreen({ route, navigation }) {
           // get user info for the user that created this resource
           docSnap = await getDoc(doc(db, "Users", docSnap.data().creator));
           setCreatedByUser(docSnap.data().name + " (" + docSnap.data().email + ")")
-          return docSnap
         } catch (error) {
           console.error(error);
         }
@@ -97,15 +95,6 @@ export function ResourceDetailScreen({ route, navigation }) {
         }
       }
 
-      // async function getGroupUsersByUser(userSnap) {
-      //   try {
-      //     var querySnapshot = await getDocs(query(collectionGroup(db, 'GroupUsers'), where('userId', '==', uid)));
-      //     return querySnapshot
-      //   } catch (error) {
-      //     console.error(error);
-      //   }
-      // }
-
       async function processGroupSubcollection(querySnapshot) {
         try {
           var retrievedGroupNames = await getGroupUsersParents(querySnapshot.docs)
@@ -114,7 +103,6 @@ export function ResourceDetailScreen({ route, navigation }) {
           console.error(error);
         }
       }
-
 
       async function getGroupUsersParents(groupUsersSnaps) {
         try {
@@ -231,8 +219,8 @@ export function ResourceDetailScreen({ route, navigation }) {
 
   // add a group membership
   const addGroupResource = async (groupId) => {
-    console.log("adding resource group", resourceId, groupId)
-    const timestamp = Math.floor(Date.now()) //serverTimestamp();
+    // console.log("adding resource group", resourceId, groupId)
+    const timestamp = Math.floor(Date.now())
 
     var data = {
       resourceId: resourceId,
@@ -259,7 +247,6 @@ export function ResourceDetailScreen({ route, navigation }) {
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        {/* <TouchableWithoutFeedback onPress={Keyboard.dismiss}> */}
         <View style={{ flex: 1 }}>
 
           <Title
@@ -268,7 +255,6 @@ export function ResourceDetailScreen({ route, navigation }) {
             navigation={navigation}
             enableBack={true} />
 
-          {/* <ScrollView style={{ height: "81%", marginBottom: 15 }}> */}
           <ScrollView>
 
             <View style={styles.inputFormContainer}>
@@ -278,7 +264,6 @@ export function ResourceDetailScreen({ route, navigation }) {
               <View style={{ flexDirection: "row" }}>
                 <View style={{ flex: 3 }}></View>
                 <TouchableOpacity style={[styles.mainButton, styles.btnDanger, styles.btnNarrow, { flex: 1 }]}
-                  // disabled={!groupChanged()}
                   onPress={() => {
                     deleteResource(resourceId)
                     navigation.goBack()
@@ -309,8 +294,8 @@ export function ResourceDetailScreen({ route, navigation }) {
                     style={[styles.buttonText]}
                   >
                     <FontAwesome5
-                    style={[styles.buttonText]}
-                    name='save'
+                      style={[styles.buttonText]}
+                      name='save'
                     /> Save
                   </Text>
                 </TouchableOpacity>
@@ -339,7 +324,6 @@ export function ResourceDetailScreen({ route, navigation }) {
                 autoCapitalize='none'
               />
 
-
               <Text style={styles.textLabel}>Resource Groups</Text>
               <View style={styles.tagContainer}>
                 {
@@ -367,7 +351,6 @@ export function ResourceDetailScreen({ route, navigation }) {
 
               </View>
             </View>
-
 
             {/* modal for selecting groups  */}
             <Modal
@@ -429,7 +412,6 @@ export function ResourceDetailScreen({ route, navigation }) {
             uid={uid} />
 
         </View>
-        {/* </TouchableWithoutFeedback> */}
       </KeyboardAvoidingView>
     </View>
   );

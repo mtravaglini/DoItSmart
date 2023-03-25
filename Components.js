@@ -10,6 +10,7 @@ import { signOut } from "firebase/auth";
 // use custom style sheet
 const styles = require('./Style.js');
 
+// define the title component to use on each screen
 export const Title = props => {
   return (
     <View style={styles.header}>
@@ -39,11 +40,11 @@ export const Title = props => {
   )
 }
 
+// define the title component to use on each screen
 export const Footer = props => {
   return (
     <View style={styles.footer}>
 
-      {/* <View style={{ flexDirection: "column", alignItems: "center" }}> */}
       <Pressable style={{ paddingHorizontal: 10 }}
         onPress={() => { props.navigation.navigate('Tasks', { uid: props.uid }) }}
       >
@@ -54,21 +55,16 @@ export const Footer = props => {
         />
         <Text style={styles.footerText}>Tasks</Text>
       </Pressable>
-      {/* </View> */}
 
-
-      {/* <View style={{ flexDirection: "column", alignItems: "center" }}> */}
       <Pressable style={{ paddingHorizontal: 10 }}
         onPress={() => { props.navigation.navigate('Groups', { uid: props.uid }) }}
       >
         <FontAwesome
           style={styles.footerIcon}
           name='group'
-        // color='cornflowerblue'
         />
         <Text style={styles.footerText}>Groups</Text>
       </Pressable>
-      {/* </View> */}
 
       <View style={{ flexDirection: "column", alignItems: "center" }}>
         <Pressable style={{ paddingHorizontal: 10 }}
@@ -77,7 +73,6 @@ export const Footer = props => {
           <FontAwesome
             style={styles.footerIcon}
             name='car'
-          // color='cornflowerblue'
           />
           <Text style={styles.footerText}>Resources</Text>
         </Pressable>
@@ -90,7 +85,6 @@ export const Footer = props => {
           <FontAwesome
             style={styles.footerIcon}
             name='user'
-          // color='cornflowerblue'
           />
           <Text style={styles.footerText}>Profile</Text>
         </Pressable>
@@ -100,8 +94,6 @@ export const Footer = props => {
         <Pressable style={{ paddingHorizontal: 10 }}
           onPress={() => {
             signOut(props.auth).then(() => {
-              // Sign-out successful.
-              //   alert("SIGNED OUT")
               props.navigation.navigate('Signin')
             }).catch((error) => {
               console.log(error.message)
@@ -111,7 +103,6 @@ export const Footer = props => {
           <FontAwesome
             style={styles.footerIcon}
             name='sign-out'
-          // color='cornflowerblue'
           />
           <Text style={styles.footerText}>SignOut</Text>
         </Pressable>

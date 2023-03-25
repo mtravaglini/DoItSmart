@@ -17,15 +17,16 @@ import {
 } from 'react-native-safe-area-context';
 import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
 import { db, auth } from './firebase.config';
-import { doc, collection, collectionGroup, query, getDoc, getDocs, setDoc, addDoc, deleteDoc, onSnapshot, where, orderBy } from "firebase/firestore";
+import { doc, collection, query, getDoc, getDocs, setDoc, addDoc, deleteDoc, where } from "firebase/firestore";
 
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import InputSpinner from "react-native-input-spinner";
 
 // use custom style sheet
 const styles = require('./Style.js');
-// use custom components
+// import custom components
 import { Title, Footer } from './Components.js'
+// import required functions
 import { completeTask, unCompleteTask, deleteTask, unDeleteTask, scheduleTasks, getAllGroupsForUser, getAllUsersForGroups } from './Functions.js'
 
 export function TaskDetailScreen({ route, navigation }) {
@@ -42,10 +43,8 @@ export function TaskDetailScreen({ route, navigation }) {
 
   const [userGroupNames, setUserGroupNames] = useState([]);
   const [taskGroupNames, setTaskGroupNames] = useState([]);
-  // const [taskGroupUpdated, setTaskGroupUpdated] = useState(0);
   const [userResourceNames, setUserResourceNames] = useState([]);
   const [taskResourceNames, setTaskResourceNames] = useState([]);
-  // const [taskResourceUpdated, setTaskResourceUpdated] = useState(0);
 
   // date picker variables
   const [isStartDatePickerVisible, setStartDatePickerVisibility] = useState(false);
@@ -64,11 +63,10 @@ export function TaskDetailScreen({ route, navigation }) {
 
   const [triggerRefresh, setTriggerRefresh] = useState(0);
 
-
   const handleStartDatePickerConfirm = (date) => {
     setTask((prevState) => ({ ...prevState, startDate: Date.parse(date) }));
     if (Date.parse(date) + task.effort * 60000 > task.endDate) {
-      console.log("set end time")
+      // console.log("set end time")
       setTask((prevState) => ({ ...prevState, endDate: Date.parse(date) + task.effort * 60000 }));
     }
     setStartDatePickerVisibility(false);
@@ -103,37 +101,29 @@ export function TaskDetailScreen({ route, navigation }) {
 
       /////////////////////// Promise Chaining //////////////////////
 
-      var userSnap = await getUser()
-      var taskSnap = await getTask()
+      await getUser()
+      await getTask()
 
       var taskGroupsSnap = await getTaskGroupsByTask()
       var retrievedTaskGroupNames = await processTaskGroups(taskGroupsSnap)
       setTaskGroupNames(retrievedTaskGroupNames)
 
-      // var userGroupsSnap = await getGroupUsersByUser(retrievedTaskGroupNames)
-      // var retrievedUserGroupNames = await processUserGroups(userGroupsSnap)
       var retrievedUserGroupNames = await getAllGroupsForUser(uid)
 
       var filterGroupsResult = await filterGroups(retrievedTaskGroupNames, retrievedUserGroupNames)
       setUserGroupNames(filterGroupsResult)
 
       // get info for reassigning tasks
-      // var userArray = await processGroups(retrievedUserGroupNames)
-      // var userNameArray = await processUsers(userArray)
 
       var retrievedUserNames = await getAllUsersForGroups(retrievedUserGroupNames)
       // setUserPool(userNameArray)
       setUserPool(retrievedUserNames)
 
-
-
-
       // get resource info
       var taskResourceSnaps = await getTaskResourcesByTask()
       var retrievedTaskResourceNames = await processTaskResources(taskResourceSnaps)
       setTaskResourceNames(retrievedTaskResourceNames)
-      // console.log("taskResources", retrievedTaskResourceNames)
-      // console.log("######################################################################")
+
       var retrievedUserResourceNames = []
       for (var group of retrievedUserGroupNames) {
         var groupResourcesSnaps = await getGroupResourcesByGroup(group)
@@ -151,14 +141,10 @@ export function TaskDetailScreen({ route, navigation }) {
         retrievedUserResourceNames.push(x)
       }
       // console.log("retrievedUserResourceNames", retrievedUserResourceNames)
-      //////////////////////////////////////////////////
-
 
       var filterResourcesResult = await filterGroups(retrievedTaskResourceNames, retrievedUserResourceNames)
       setUserResourceNames(filterResourcesResult)
       // console.log("groupResources", filterResourcesResult)
-
-      /////////////////////////////////////////////////////////////////
     }
 
     async function getUser() {
@@ -192,8 +178,6 @@ export function TaskDetailScreen({ route, navigation }) {
     }
 
     async function getTaskGroupsByTask() {
-      // console.log("getTaskGroupsByTask")
-      // unsubscribe = onSnapshot(
       // get groups subcollection for the task
       try {
         var querySnapshot = await getDocs(query(collection(db, "Tasks", taskId, "TaskGroups")));
@@ -232,42 +216,6 @@ export function TaskDetailScreen({ route, navigation }) {
       }
     }
 
-    // async function getGroupUsersByUser(savedTaskGroups) {
-    //   try {
-    //     var querySnapshot = await getDocs(query(collectionGroup(db, 'GroupUsers'), where('userId', '==', uid)));
-    //     return querySnapshot
-    //   } catch (error) {
-    //     console.error(error);
-    //   }
-    // }
-
-    // async function processUserGroups(querySnapshot) {
-    //   try {
-    //     var retrievedUserGroupNames = await getGroupUsersParents(querySnapshot.docs)
-    //     return retrievedUserGroupNames
-    //   } catch (error) {
-    //     console.error(error);
-    //   }
-    // }
-
-    // async function getGroupUsersParents(groupUsersSnaps) {
-    //   try {
-    //     return Promise.all(groupUsersSnaps.map(async (groupUser) => {
-    //       const docRef = groupUser.ref;
-    //       const parentCollectionRef = docRef.parent; // CollectionReference
-    //       const immediateParentDocumentRef = parentCollectionRef.parent; // DocumentReference
-    //       const parentDoc = await getDoc(immediateParentDocumentRef)
-
-    //       return {
-    //         "id": parentDoc?.id,
-    //         "name": parentDoc?.data().name,
-    //       }
-    //     }))
-    //   } catch (error) {
-    //     console.error(error);
-    //   }
-    // }
-
     async function filterGroups(savedTaskGroups, savedUserGroups) {
       // check if task is already in a group, if so don't need to save it
 
@@ -289,45 +237,6 @@ export function TaskDetailScreen({ route, navigation }) {
       // console.log("contents of newusergroupnames", newUserGroupNames.length)
       return newUserGroupNames
     }
-
-    // // get all the users in each groupid 
-    // async function processGroups(groupArray) {
-    //   // console.log("processGroups", groupArray)
-    //   // use a set to just store unique values
-    //   var userArray = new Set();
-
-    //   for (var groupId of groupArray) {
-    //     // console.log("Getting users for group", groupId)
-    //     var querySnapshot = await getDocs(query(collection(db, "Groups", groupId.id, "GroupUsers")));
-    //     querySnapshot.forEach((doc) => {
-    //       // console.log("xxxxx",groupId, doc.data().userId, uid)
-    //       if (doc.data().userId !== uid) {
-    //         userArray.add(doc.data().userId)
-    //       }
-    //     })
-    //   }
-    //   // console.log(userArray)
-    //   return userArray
-    // }
-
-    // // get user info for the userids retrieved above
-    // async function processUsers(userArray) {
-    //   // console.log("processUsers", userArray)
-    //   var userNameArray = []
-    //   for (var userId of userArray) {
-    //     // const querySnapshot = await getDocs(query(collection(db, "Users"), where("userId", "==", userId)));
-    //     const userDoc = await getDoc(doc(db, "Users", userId));
-    //     var data = {
-    //       id: userId,
-    //       userName: userDoc.data().name
-    //     }
-    //     userNameArray.push(data)
-    //   }
-    //   // console.log(userNameArray)
-    //   // setUserPool(userNameArray)
-    //   return userNameArray
-    // }
-
 
     // get the resources assigned to this task
     async function getTaskResourcesByTask() {
@@ -366,7 +275,6 @@ export function TaskDetailScreen({ route, navigation }) {
       }
     }
 
-
     // get the resources available to assign to this task
     async function getGroupResourcesByGroup(group) {
       // console.log("Entered getGroupResourcesByGroup", group)
@@ -378,7 +286,6 @@ export function TaskDetailScreen({ route, navigation }) {
         console.error(error);
       }
     }
-
 
     async function processGroupResources(querySnapshot) {
       // console.log("processTaskGroups", querySnapshot.docs.length)
@@ -409,27 +316,13 @@ export function TaskDetailScreen({ route, navigation }) {
       }
     }
 
-
-
-
-
-
-
-
     getTaskInfo();
-    // for (var x = 0; x<1000000000; x++){var i=x}
-
-
-
     setIsTaskDetailLoading(false)
 
-    // }, [taskGroupUpdated, taskResourceUpdated, triggerRefresh])
   }, [triggerRefresh])
 
 
   const reassignTask = async (userId, userName) => {
-    // add logic to reassign task to selected user
-    // console.log("reassign task", taskId, "to user", userId)
 
     var newTask = { ...task, assignee: userId, userList: [uid, userId] }
     setTask(newTask)
@@ -444,22 +337,15 @@ export function TaskDetailScreen({ route, navigation }) {
       return 1;
     }
 
-
     setReassignVisible(false);
     setBackgroundOpacity(1.0);
-
 
     Alert.alert("Task Reassigned", "Task has been reassigned to " + userName,
       [
         {
           text: "Ok"
         }])
-
-
-
   }
-
-
 
   const taskChanged = () => {
     const keys1 = Object.keys(task);
@@ -474,8 +360,6 @@ export function TaskDetailScreen({ route, navigation }) {
     }
     return false;
   }
-
-
 
   const SaveTask = async () => {
 
@@ -510,9 +394,6 @@ export function TaskDetailScreen({ route, navigation }) {
     return 0;
   }
 
-
-
-
   // add a group membership
   const addTaskGroup = async (groupId) => {
     // console.log("adding task group", taskId, groupId)
@@ -520,7 +401,6 @@ export function TaskDetailScreen({ route, navigation }) {
     var data = { groupId: groupId }
     try {
       addDoc(collection(db, "Tasks", taskId, "TaskGroups"), data)
-      // setTaskGroupUpdated(taskGroupUpdated + 1);
       setTriggerRefresh(triggerRefresh + 1);
       setTaskGroupPickerVisible(false)
       setBackgroundOpacity(1.0)
@@ -552,34 +432,17 @@ export function TaskDetailScreen({ route, navigation }) {
 
     // console.log("deleting task group", taskId, groupId)
     try {
-      // await deleteDoc(doc(db, "Tasks", taskId, "TaskGroups", groupId));
-
-
-
       const querySnapshot = await getDocs(query(collection(db, "Tasks", taskId, "TaskGroups"), where('groupId', '==', groupId)));
       // console.log(typeof querySnapshot)
       querySnapshot.forEach((doc) => {
         // console.log("deleting docref", doc.ref)
         deleteDoc(doc.ref)
-        // setTaskGroupUpdated(taskGroupUpdated + 1);
         setTriggerRefresh(triggerRefresh + 1);
       })
-
-
     } catch (error) {
       console.error(error);
     }
   }
-
-
-
-
-
-
-
-
-
-
 
   // add a resource 
   const addTaskResource = async (resourceId) => {
@@ -587,7 +450,6 @@ export function TaskDetailScreen({ route, navigation }) {
     var data = { resourceId: resourceId }
     try {
       addDoc(collection(db, "Tasks", taskId, "TaskResources"), data)
-      // setTaskResourceUpdated(taskResourceUpdated + 1);
       setTriggerRefresh(triggerRefresh + 1);
       setTaskResourcePickerVisible(false)
       setBackgroundOpacity(1.0)
@@ -595,8 +457,6 @@ export function TaskDetailScreen({ route, navigation }) {
     } catch (error) {
       console.error(error);
     }
-
-
   }
 
   // confirm delete a resource membership
@@ -619,16 +479,11 @@ export function TaskDetailScreen({ route, navigation }) {
 
     // console.log("deleting task group", taskId, groupId)
     try {
-      // await deleteDoc(doc(db, "Tasks", taskId, "TaskGroups", groupId));
-
-
-
       const querySnapshot = await getDocs(query(collection(db, "Tasks", taskId, "TaskResources"), where('resourceId', '==', resourceId)));
       // console.log(typeof querySnapshot)
       querySnapshot.forEach((doc) => {
         // console.log("deleting docref", doc.ref)
         deleteDoc(doc.ref)
-        // setTaskResourceUpdated(taskResourceUpdated + 1);
         setTriggerRefresh(triggerRefresh + 1);
       })
       scheduleTasks(uid)
@@ -655,7 +510,6 @@ export function TaskDetailScreen({ route, navigation }) {
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        {/* <TouchableWithoutFeedback style={{flex: 1}} onPress={Keyboard.dismiss}> */}
         <View style={{ flex: 1 }}>
 
           <Title
@@ -729,7 +583,6 @@ export function TaskDetailScreen({ route, navigation }) {
             )
             :
             (
-              // <ScrollView style={{ height: "81%", marginBottom: 15 }}>
               <ScrollView style={{ opacity: (task.status == 'complete' || task.status == 'deleted' || task.assignee != uid ? .50 : backgroundOpacity) }}>
 
                 <View style={styles.inputFormContainer}>
@@ -745,9 +598,7 @@ export function TaskDetailScreen({ route, navigation }) {
                     {/* delete task button */}
                     <TouchableOpacity style={[styles.mainButton, styles.btnDanger, styles.btnNarrow, { flex: 1 }]}
                       disabled={task.status == 'complete' || task.status == 'deleted' || task.assignee != uid ? (true) : (false)}
-                      // disabled={!groupChanged()}
                       onPress={() => {
-                        // deleteTask(taskId)
                         deleteTask(task)
                         navigation.goBack()
                       }}
@@ -756,8 +607,8 @@ export function TaskDetailScreen({ route, navigation }) {
                         style={[styles.buttonText]}
                       >
                         <FontAwesome
-                        style={[styles.buttonText]}
-                        name='trash-o'
+                          style={[styles.buttonText]}
+                          name='trash-o'
                         />
                       </Text>
                     </TouchableOpacity>
@@ -779,8 +630,8 @@ export function TaskDetailScreen({ route, navigation }) {
                         style={[styles.buttonText]}
                       >
                         <FontAwesome5
-                    style={[styles.buttonText]}
-                    name='save'
+                          style={[styles.buttonText]}
+                          name='save'
                         /> Save
                       </Text>
                     </TouchableOpacity>
@@ -793,16 +644,14 @@ export function TaskDetailScreen({ route, navigation }) {
                     <Pressable style={[styles.mainButton, styles.btnSuccess, { flex: 1 }]}
                       disabled={task.status == 'complete' || task.status == 'deleted' || task.assignee != uid ? (true) : (false)}
                       onPress={async () => {
-                        // await getUserPool()
-                        // console.log("USERPOOL at invoke reassign", userPool)
                         setReassignVisible(true)
                         setBackgroundOpacity(.33)
                       }}
                     >
                       <Text style={styles.buttonText}>
                         <FontAwesome
-                        style={[styles.buttonText]}
-                        name='user'
+                          style={[styles.buttonText]}
+                          name='user'
                         /> Reassign
                       </Text>
                     </Pressable>
@@ -820,15 +669,14 @@ export function TaskDetailScreen({ route, navigation }) {
                     >
                       <Text style={styles.buttonText}>
                         <FontAwesome
-                        style={[styles.buttonText]}
-                        name='check'
+                          style={[styles.buttonText]}
+                          name='check'
                         /> Complete
                       </Text>
                     </Pressable>
 
                   </View>
 
-                  {/* <Text style={[styles.textLabel, { paddingTop: 15 }]}>Task Info</Text> */}
                   <View style={[styles.input, { height: null }]}>
                     <Text style={styles.standardTextLight}>Created by {createdByUser}</Text>
                     <Text style={styles.standardTextLight}>Created on {new Date(task.createdDate).toString().slice(0, 24)}</Text>
@@ -838,14 +686,10 @@ export function TaskDetailScreen({ route, navigation }) {
                     {task.status == 'deleted' ? (
                       <Text style={styles.standardTextLight}>Deleted on {new Date(task.deletedDate).toString().slice(0, 24)}</Text>
                     ) : (null)}
-                    {/* {task.assignee != uid ? (
-                      <Text style={styles.standardTextLight}>Assigned to {assigneeUser}</Text>
-                    ) : (null)} */}
                   </View>
 
-
-
                   <Text style={[styles.textLabel, { paddingTop: 15 }]}>Name</Text>
+
                   <TextInput
                     style={styles.input}
                     onChangeText={(newValue) => { setTask((prevState) => ({ ...prevState, name: newValue })) }}
@@ -854,16 +698,6 @@ export function TaskDetailScreen({ route, navigation }) {
                     autoCapitalize='none'
                     editable={task.status == 'complete' || task.status == 'deleted' || task.assignee != uid ? (false) : (true)}
                   />
-
-                  {/* <TextInput
-                  readOnly={true}
-                  style={styles.input}
-                  // onChangeText={(newValue) => { setTask((prevState) => ({ ...prevState, creator: newValue })) }}
-                  // value={task.creator}
-                  value={createdByUser}
-                  underlineColorAndroid='transparent'
-                  autoCapitalize='none'
-                /> */}
 
                   <Text style={styles.textLabel}>Notes</Text>
                   <TextInput
@@ -956,7 +790,6 @@ export function TaskDetailScreen({ route, navigation }) {
                         style={[styles.input,
                         {
                           borderRadius: 15,
-                          // shadowColor: "cornflowerblue",
                           marginBottom: 15
                         }]}
                         inputStyle={[
@@ -967,8 +800,6 @@ export function TaskDetailScreen({ route, navigation }) {
                         max={10}
                         min={0}
                         step={1}
-                        // colorMax={"#f04048"}
-                        // colorMin={"#40c5f4"}
                         value={task.priority?.toString()}
                         onChange={(newValue) => { setTask((prevState) => ({ ...prevState, priority: +newValue })) }}
                       />
@@ -985,7 +816,6 @@ export function TaskDetailScreen({ route, navigation }) {
                         style={[styles.input,
                         {
                           borderRadius: 15,
-                          // shadowColor: "cornflowerblue",
                           marginBottom: 15
                         }]}
                         inputStyle={[
@@ -998,10 +828,7 @@ export function TaskDetailScreen({ route, navigation }) {
                         step={5}
                         longStep={30}
                         speed={4}
-                        // colorMax={"#f04048"}
-                        // colorMin={"#40c5f4"}
                         value={task.effort?.toString()}
-                        // value={formatEffort(task.effort)}
                         onChange={
                           (newValue) => {
                             setTask((prevState) => ({ ...prevState, effort: +newValue }))
@@ -1129,10 +956,6 @@ export function TaskDetailScreen({ route, navigation }) {
                           No Users in your Groups!
                         </Text>
                       </View>)}
-
-
-
-
                   </View>
                 </Modal>
 
@@ -1157,7 +980,6 @@ export function TaskDetailScreen({ route, navigation }) {
                         <FontAwesome
                           style={styles.headerIcon}
                           name='arrow-circle-o-left'
-                        // color='cornflowerblue'
                         />
                       </Text>
                     </Pressable>
@@ -1251,7 +1073,6 @@ export function TaskDetailScreen({ route, navigation }) {
             uid={uid} />
 
         </View>
-        {/* </TouchableWithoutFeedback> */}
       </KeyboardAvoidingView>
     </View>
   );

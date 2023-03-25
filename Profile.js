@@ -17,14 +17,14 @@ import {
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
 import { db, auth } from './firebase.config';
-import { signOut, updateEmail } from "firebase/auth";
+import { updateEmail } from "firebase/auth";
 import { doc, collection, collectionGroup, query, getDoc, getDocs, getParent, getRef, setDoc, addDoc, deleteDoc, onSnapshot, where, orderBy } from "firebase/firestore";
-
 
 // use custom style sheet
 const styles = require('./Style.js');
-// use custom components
+// import custom components
 import { Title, Footer } from './Components.js'
+// import required functions
 import { scheduleTasks, getAllGroupsForUser } from './Functions.js'
 
 export function ProfileScreen({ route, navigation }) {
@@ -41,20 +41,14 @@ export function ProfileScreen({ route, navigation }) {
   const [profileGroupUpdated, setProfileGroupUpdated] = useState(0);
 
   useEffect(() => {
-    // var unsubscribe;
 
-    //promise chaining
+    // get profile
     async function getProfile() {
       var userSnap = await getUser()
 
-      // var groupSnaps = await getGroupUsersByUser()
-      // var retrievedUserGroupNames = await processGroupUsers(groupSnaps)
       var retrievedUserGroupNames = await getAllGroupsForUser(uid)
-      
-      // await saveGroupNames(retrievedUserGroupNames)
+
       setGroupNames(retrievedUserGroupNames)
-
-
 
       var inviteInfo = await getInvites(userSnap)
       // console.log("inviteinfo", inviteInfo)
@@ -62,7 +56,6 @@ export function ProfileScreen({ route, navigation }) {
 
       setInvites(retrievedInvites)
       // console.log(retrievedInvites)
-      // await saveInvites(retrievedInvites)
     }
 
     // get user 
@@ -79,73 +72,11 @@ export function ProfileScreen({ route, navigation }) {
       }
     }
 
-    // // get all the groupuser subcollection of the groups collection for the user
-    // async function getGroupUsersByUser() {
-    //   try {
-    //     // var querySnapshot;
-    //     // unsubscribe = onSnapshot(
-    //     querySnapshot = await
-    //       getDocs(query(collectionGroup(db, 'GroupUsers'), where('userId', '==', uid)))
-    //     //     , () => {
-    //     //     });
-    //     console.log("groupSnaps", typeof querySnapshot)
-    //     return querySnapshot
-    //   } catch (error) {
-    //     console.error(error);
-    //   }
-    // }
-
-    // // process all the groupuser docs
-    // async function processGroupUsers(querySnapshot) {
-    //   try {
-    //     var retrievedUserGroupNames = await getGroupUsersParents(querySnapshot.docs)
-    //     console.log("retreivedGroupNames", retrievedUserGroupNames)
-    //     return retrievedUserGroupNames
-    //   } catch (error) {
-    //     console.error(error);
-    //   }
-    // }
-
-    // // from the groupuser doc, get user's group informtion from the parent group collection
-    // function getGroupUsersParents(groupUsersSnaps) {
-    //   return Promise.all(groupUsersSnaps.map(async (groupUser) => {
-
-    //     console.log("groupUsersSnaps IN", groupUsersSnaps.length)
-    //     const docRef = groupUser.ref;
-    //     const parentCollectionRef = docRef.parent; // CollectionReference
-    //     const immediateParentDocumentRef = parentCollectionRef.parent; // DocumentReference
-    //     const parentDoc = await getDoc(immediateParentDocumentRef)
-
-    //     return {
-    //       "id": parentDoc?.id,
-    //       "name": parentDoc?.data().name,
-    //     }
-    //   }))
-    // }
-
-    async function saveGroupNames(retrievedUserGroupNames) {
-      setGroupNames(retrievedUserGroupNames)
-      return retrievedUserGroupNames
-    }
-
     // get all the groupinvites for the user
     async function getInvites(userSnap) {
       try {
-        //     unsubscribe = onSnapshot(
         var querySnapshot = await
           getDocs(query(collectionGroup(db, 'GroupInvites'), where('invitee', '==', userSnap.data().email)))
-        // , () => {
-
-        // const retrievedInvites = [];
-        // querySnapshot.forEach((doc) => {
-        //     groupObj = doc.data();
-        //     groupObj.id = doc.id;
-        //     retrievedInvites.push(groupObj)
-        // })
-        // setInvites(retrievedInvites)
-        // console.log(invites);
-        // })
-        // console.log("inviteSnaps", typeof querySnapshot)
         return querySnapshot
       } catch (error) {
         console.error(error);
@@ -183,33 +114,9 @@ export function ProfileScreen({ route, navigation }) {
       }))
     }
 
-
-    async function saveInvites(retrievedInvites) {
-      setInvites(retrievedInvites)
-      return retrievedInvites
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     getProfile();
 
     return function cleanup() {
-      // unsubscribe();
     };
   }, [profileGroupUpdated])
 
@@ -260,6 +167,7 @@ export function ProfileScreen({ route, navigation }) {
     return
   }
 
+  // delete a group invite
   const deleteGroupInvite = async (inviteId) => {
     try {
       await deleteDoc(doc(db, "GroupInvites", inviteId))
@@ -271,9 +179,10 @@ export function ProfileScreen({ route, navigation }) {
     return;
   }
 
+  // accept a group invite
   const acceptInvite = async (groupId, inviteId) => {
     try {
-      const timestamp = Math.floor(Date.now()) //serverTimestamp();
+      const timestamp = Math.floor(Date.now())
       const data = {
         userId: uid,
         createdDate: timestamp
@@ -305,9 +214,6 @@ export function ProfileScreen({ route, navigation }) {
 
   const SaveUser = async () => {
 
-    // if (!userChanged()) {
-    //     return 0
-    // }
     try {
       await setDoc(doc(db, "Users", uid), user)
       // console.log(auth.currentUser, user.email)
@@ -317,9 +223,6 @@ export function ProfileScreen({ route, navigation }) {
     }
     return;
   }
-
-
-
 
   return (
     <View style={[styles.safeView, {
@@ -331,103 +234,97 @@ export function ProfileScreen({ route, navigation }) {
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        {/* <TouchableWithoutFeedback onPress={Keyboard.dismiss}> */}
         <View style={{ flex: 1 }}>
 
+          <Title
+            title="Profile"
+            name={user.name}
+            navigation={navigation}
+            enableBack={true} />
 
-            <Title
-              title="Profile"
-              name={user.name}
-              navigation={navigation}
-              enableBack={true} />
+          <ScrollView>
+            <View style={styles.inputFormContainer}>
 
-            {/* <ScrollView style={{ height: "81%", marginBottom: 15 }}> */}
-            <ScrollView>
-              <View style={styles.inputFormContainer}>
+              {/* show acivity indicator when waiting to return to groups screen */}
+              {isLoading ? (
+                <ActivityIndicator style={styles.standardText} size="large" />
+              ) : (
 
-                {/* show acivity indicator when waiting to return to groups screen */}
-                {isLoading ? (
-                  <ActivityIndicator style={styles.standardText} size="large" />
-                ) : (
+                <View>
 
-                  <View>
+                  <Text style={styles.textLabel}>Email</Text>
+                  <TextInput
+                    style={styles.input}
+                    onChangeText={(newValue) => { setUser((prevState) => ({ ...prevState, email: newValue })) }}
+                    value={user.email}
+                    underlineColorAndroid='transparent'
+                    autoCapitalize='none'
+                  />
 
-
-                    <Text style={styles.textLabel}>Email</Text>
-                    <TextInput
-                      style={styles.input}
-                      onChangeText={(newValue) => { setUser((prevState) => ({ ...prevState, email: newValue })) }}
-                      value={user.email}
-                      underlineColorAndroid='transparent'
-                      autoCapitalize='none'
-                    />
-
-                    {(groupNames.length > 0) ? <Text style={styles.textLabel}>Your groups</Text> : ''}
-                    <View style={(groupNames.length > 0) ? styles.tagContainer : ''}>
-                      {
-                        groupNames.map((item) =>
-                          <Pressable key={item.id} style={styles.tagButton}
-                            onPress={() => navigation.navigate('GroupDetail', { uid: uid, groupId: item.id })}
-                            onLongPress={() => confirmDeleteGroupMembership(item.id, item.name)}
-                          >
-                            <Text style={styles.tagText}>
-                              {item.name}
-                            </Text>
-                          </Pressable>
-                        )
-                      }
-                    </View>
-
-                    {(invites.length > 0) ? <Text style={styles.textLabel}>Your group invitations</Text> : ''}
-                    {/* <View style={styles.tagContainer}> */}
-                    <View style={(invites.length > 0) ? styles.tagContainer : ''}>
-
-                      {
-                        invites.map((item) =>
-                          <Pressable key={item.groupId}
-                            onPress={() => acceptInvite(item.groupId, item.inviteId)}
-                            onLongPress={() => confirmDeleteGroupInvite(item.inviteId, item.groupName)}
-
-                          >
-                            <Text style={styles.tagText}>
-                              {item.groupName} (Invited by {item.inviterName})
-                            </Text>
-                          </Pressable>
-                        )
-                      }
-                    </View>
-
-                  </View>
-                )}
-
-                <View style={{ alignItems: "center" }}>
-                  <TouchableOpacity style={[styles.mainButton, styles.btnSuccess, { opacity: (!userChanged()) ? 0.5 : 1.0 }]}
-                    disabled={!userChanged()}
-                    onPress={async () => {
-                      await SaveUser().then(
-                        (result) => {
-                          if (result == 0) {
-                            navigation.goBack();
-                          }
-                        }
+                  {(groupNames.length > 0) ? <Text style={styles.textLabel}>Your groups</Text> : ''}
+                  <View style={(groupNames.length > 0) ? styles.tagContainer : ''}>
+                    {
+                      groupNames.map((item) =>
+                        <Pressable key={item.id} style={styles.tagButton}
+                          onPress={() => navigation.navigate('GroupDetail', { uid: uid, groupId: item.id })}
+                          onLongPress={() => confirmDeleteGroupMembership(item.id, item.name)}
+                        >
+                          <Text style={styles.tagText}>
+                            {item.name}
+                          </Text>
+                        </Pressable>
                       )
-                    }}
-                  >
-                    <Text
-                      style={styles.buttonText}
-                    >Save
-                    </Text>
-                  </TouchableOpacity>
+                    }
+                  </View>
+
+                  {(invites.length > 0) ? <Text style={styles.textLabel}>Your group invitations</Text> : ''}
+                  <View style={(invites.length > 0) ? styles.tagContainer : ''}>
+
+                    {
+                      invites.map((item) =>
+                        <Pressable key={item.groupId}
+                          onPress={() => acceptInvite(item.groupId, item.inviteId)}
+                          onLongPress={() => confirmDeleteGroupInvite(item.inviteId, item.groupName)}
+
+                        >
+                          <Text style={styles.tagText}>
+                            {item.groupName} (Invited by {item.inviterName})
+                          </Text>
+                        </Pressable>
+                      )
+                    }
+                  </View>
+
                 </View>
+              )}
+
+              <View style={{ alignItems: "center" }}>
+                <TouchableOpacity style={[styles.mainButton, styles.btnSuccess, { opacity: (!userChanged()) ? 0.5 : 1.0 }]}
+                  disabled={!userChanged()}
+                  onPress={async () => {
+                    await SaveUser().then(
+                      (result) => {
+                        if (result == 0) {
+                          navigation.goBack();
+                        }
+                      }
+                    )
+                  }}
+                >
+                  <Text
+                    style={styles.buttonText}
+                  >Save
+                  </Text>
+                </TouchableOpacity>
               </View>
-            </ScrollView>
+            </View>
+          </ScrollView>
 
-            <Footer auth={auth}
-              navigation={navigation}
-              uid={uid} />
+          <Footer auth={auth}
+            navigation={navigation}
+            uid={uid} />
 
-          </View>
-        {/* </TouchableWithoutFeedback> */}
+        </View>
       </KeyboardAvoidingView>
     </View>
   );

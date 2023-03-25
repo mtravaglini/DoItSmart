@@ -6,7 +6,7 @@ import {
 } from 'react-native';
 
 const colorScheme = Appearance.getColorScheme();
-console.log("COLOR SCHEME", colorScheme)
+// console.log("COLOR SCHEME", colorScheme)
 
 const RoseCelesteScheme = {
   "RoseRed": "#c33c54",
@@ -15,32 +15,6 @@ const RoseCelesteScheme = {
   "NonPhotoBlue": "#8ee3ef",
   "Celeste": "#aef3e7"
 }
-// const RoseCelesteLight = {
-
-//   headerBackgroundColour: RoseCelesteScheme.IndigoDye,
-//   headerColour: RoseCelesteScheme.NonPhotoBlue,
-
-//   mainScreenColour: RoseCelesteScheme.NonPhotoBlue,
-//   secondaryScreenColour: RoseCelesteScheme.IndigoDye,
-
-//   labelColour: RoseCelesteScheme.RoseRed,
-
-//   mainTextColour: RoseCelesteScheme.Cerulean,
-//   secondaryTextColour: RoseCelesteScheme.NonPhotoBlue,
-  
-//   inputTextColour: RoseCelesteScheme.Cerulean,
-//   textBackgroundColour: "white",
-
-//   listBackgroundColour: "lightgreen",
-//   listTextColour: "darkgreen",
-
-//   footerBackgroundColour: RoseCelesteScheme.IndigoDye,
-//   footerColour: RoseCelesteScheme.NonPhotoBlue,
-
-//   successColour: RoseCelesteScheme.Cerulean,
-//   warningColour: "#c46913",
-//   errorColour: RoseCelesteScheme.RoseRed
-// }
 
 const RoseCelesteLight = {
 
@@ -54,7 +28,7 @@ const RoseCelesteLight = {
 
   mainTextColour: RoseCelesteScheme.Cerulean,
   secondaryTextColour: RoseCelesteScheme.IndigoDye,
-  
+
   inputTextColour: RoseCelesteScheme.Cerulean,
   textBackgroundColour: "white",
 
@@ -117,16 +91,8 @@ module.exports = StyleSheet.create({
   // most pages will have safeview and container at top level
   safeView: {
     flex: 1,
-    // marginTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
-    // paddingTop: 0,
-    // padding: 0,
     backgroundColor: colourObj.mainScreenColour,
-    // paddingTop: 5,
   },
-  // container: {
-  //   alignItems: 'center',
-  // },
-  // ########################################
 
   // main title screen text ########################################
   mainTitleContainer: {
@@ -138,13 +104,10 @@ module.exports = StyleSheet.create({
     backgroundColor: colourObj.secondaryScreenColour,
     marginTop: 0,
     marginBottom: "5%",
-    // marginHorizontal: "1%",
-    // borderRadius: 5,
   },
   titleText: {
     fontSize: 35,
     fontWeight: "bold",
-    // fontFamily: Platform.OS === "android" ? "sans-serif" : "AppleSDGothicNeo",
     color: colourObj.labelColour,
   },
   textLink: {
@@ -153,7 +116,6 @@ module.exports = StyleSheet.create({
     fontSize: 20,
     color: colourObj.secondaryScreenColour,
   },
-  // ########################################
 
   // header ###########################
   header: {
@@ -161,22 +123,16 @@ module.exports = StyleSheet.create({
   },
 
   // page title screen text ########################################
-  pageTitleContainer: {
-    alignItems: 'center',
-  },
   pageTitleText: {
     // width: 'auto',
     fontSize: 25,
     fontWeight: "bold",
-    // fontFamily: Platform.OS === "android" ? "sans-serif-thin" : "AppleSDGothicNeo-Thin",
     color: colourObj.headerColour,
     marginTop: 5,
-    // marginBottom: 5,
   },
   pageSubTitleText: {
     fontSize: 15,
     fontWeight: "bold",
-    // fontFamily: Platform.OS === "android" ? "sans-serif-thin" : "AppleSDGothicNeo-Thin",
     color: colourObj.headerColour,
     borderColor: colourObj.headerColour,
     borderWidth: 1,
@@ -187,8 +143,6 @@ module.exports = StyleSheet.create({
   },
   headerIcon: {
     fontSize: 30,
-    // marginLeft: "3%",
-    // marginRight: "5%",
     color: colourObj.headerColour,
   },
   headerIconText: {
@@ -199,7 +153,6 @@ module.exports = StyleSheet.create({
     width: 70,
     color: colourObj.headerColour,
   },
-  // ########################################
 
   // standard buttons ########################################
   mainButton: {
@@ -248,7 +201,6 @@ module.exports = StyleSheet.create({
     textAlign: "center",
     textAlignVertical: "center",
     color: colourObj.headerColour,
-    // fontWeight: "bold",
     fontSize: 15,
   },
   menuButton: {
@@ -262,7 +214,6 @@ module.exports = StyleSheet.create({
   btnNarrow: {
     width: "25%",
     marginHorizontal: 5,
-    // height: 35,
   },
   btnSuccess: {
     backgroundColor: colourObj.successColour,
@@ -276,12 +227,10 @@ module.exports = StyleSheet.create({
     backgroundColor: colourObj.errorColour,
     shadowColor: colourObj.errorColour,
   },
-  // ########################################
 
   // input + button form ########################################
   inputBtnFormContainer: {
     flexDirection: 'row',
-    // height: 80,
     marginHorizontal: "5%",
     marginVertical: "2%"
   },
@@ -291,7 +240,6 @@ module.exports = StyleSheet.create({
     borderRadius: 15,
     overflow: 'hidden',
     paddingLeft: 10,
-    // marginLeft: 0,
     marginRight: "2%",
     fontSize: 18,
     backgroundColor: colourObj.textBackgroundColour,
@@ -321,16 +269,12 @@ module.exports = StyleSheet.create({
     elevation: 5,
 
   },
-  // ########################################
 
   // input + title form ########################################
   inputFormContainer: {
     flexDirection: 'column',
-    // height: 80,
     marginLeft: 10,
     marginRight: 10,
-    // marginTop: 0,
-    // marginBottom: 0,
   },
   textLabel: {
     paddingLeft: 10,
@@ -341,12 +285,10 @@ module.exports = StyleSheet.create({
   input: {
     height: 48,
     marginHorizontal: "1%",
-    // width: "95%",
     borderRadius: 15,
     overflow: 'hidden',
     paddingLeft: 10,
     marginLeft: 0,
-    // marginRight: "2%",
     marginBottom: 15,
     fontSize: 18,
     fontWeight: "bold",
@@ -361,24 +303,12 @@ module.exports = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
-
-
-    // borderColor: colourObj.secondaryScreenColour,
-    // borderBottomWidth: 4,
-    // borderTopWidth: 1,
-    // borderLeftWidth: 4,
-    // borderRightWidth: 1,
-    // justifyContent: "center"
   },
-  // ########################################
 
   // task list  ########################################
   listContainer: {
     backgroundColor: colourObj.listBackgroundColour,
-    // borderRadius: 15,
-    // margin: "1%",
     height: 48,
-    // marginHorizontal: "5%",
     flexDirection: 'row',
     alignItems: 'center',
   },
@@ -410,7 +340,6 @@ module.exports = StyleSheet.create({
     color: colourObj.listTextColour,
     paddingLeft: "5%",
   },
-  // ########################################
 
   // Standard Text
   standardText: {
@@ -419,7 +348,6 @@ module.exports = StyleSheet.create({
     color: colourObj.mainTextColour,
   },
   standardTextLight: {
-    // fontWeight: "bold",
     fontSize: 16,
     color: colourObj.mainTextColour,
   },
@@ -446,7 +374,6 @@ module.exports = StyleSheet.create({
     borderRadius: 15,
     paddingLeft: 10,
     marginBottom: 15,
-    // marginHorizontal: "5%",
     fontSize: 16,
     backgroundColor: colourObj.textBackgroundColour,
     shadowColor: colourObj.mainScreenColour,
@@ -478,12 +405,10 @@ module.exports = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 5,
     paddingHorizontal: 15,
-    // marginBottom: 10
   },
   tagButton: {
     padding: 2,
   },
-  ////////////////////////////////////////////////
 
   // footer
   footer: {
@@ -503,17 +428,6 @@ module.exports = StyleSheet.create({
   },
 
   // OTHER ########################################
-  // textDisplay: {
-  //   color: colourObj.secondaryScreenColour,
-  //   width: "90%",
-  //   height: 48,
-  //   lineHeight: 48,
-  //   marginBottom: 15,
-  //   paddingLeft: "5%",
-  //   fontSize: 18,
-  //   backgroundColor: colourObj.textBackgroundColour,
-  //   borderRadius: 15,
-  // },
   closeBox: {
     position: 'absolute',
     bottom: "2%",
@@ -530,25 +444,16 @@ module.exports = StyleSheet.create({
     color: colourObj.mainTextColour,
     fontWeight: "bold",
   },
-  // ########################################
-
-  // centeredView: {
-
-  // },
   modalView: {
-    // flex: 1,
-    // justifyContent: 'center',
     alignItems: 'center',
     marginHorizontal: "3%",
     marginTop: "20%",
     marginBottom: "60%",
-    // marginVertical: "50%",
     backgroundColor: colourObj.headerBackgroundColour,
     borderRadius: 15,
     borderColor: colourObj.secondaryScreenColour,
     borderWidth: 1,
     padding: 35,
-    // paddingHorizontal: 0,
     alignItems: 'center',
     shadowColor: colourObj.mainScreenColour,
     shadowOffset: {
@@ -561,12 +466,10 @@ module.exports = StyleSheet.create({
   },
   modalMenuView: {
     flex: 1,
-    // justifyContent: 'center',
     alignItems: 'flex-start',
     marginLeft: "35%",
     marginBottom: "60%",
     marginTop: "10%",
-    // marginVertical: "50%",
     backgroundColor: colourObj.headerBackgroundColour,
     borderTopLeftRadius: 15,
     borderBottomLeftRadius: 15,
@@ -582,28 +485,4 @@ module.exports = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
   },
-  // button: {
-  //   borderRadius: 20,
-  //   padding: 10,
-  //   elevation: 2,
-  // },
-  // buttonOpen: {
-  //   backgroundColor: '#F194FF',
-  // },
-  // buttonClose: {
-  //   backgroundColor: '#2196F3',
-  // },
-  // textStyle: {
-  //   color: 'white',
-  //   fontWeight: 'bold',
-  //   textAlign: 'center',
-  // },
-  // modalText: {
-  //   marginBottom: 15,
-  //   textAlign: 'center',
-  // },
-
-
-
-
 });

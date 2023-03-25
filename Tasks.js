@@ -26,7 +26,7 @@ import { doc, collection, query, getDoc, getDocs, setDoc, addDoc, deleteDoc, onS
 
 // use custom style sheet
 const styles = require('./Style.js');
-// use custom components
+// import custom components
 import { Title, Footer } from './Components.js'
 import { completeTask, deleteTask, scheduleTasks } from './Functions.js'
 
@@ -85,7 +85,7 @@ export function TasksScreen({ route, navigation }) {
             taskObj.id = doc.id;
             retrievedTasks.push(taskObj)
           })
-          console.log("retrievedTasks", retrievedTasks)
+          // console.log("retrievedTasks", retrievedTasks)
           setTasks(tasks.concat(retrievedTasks))
           setLoading(false);
           // return retrievedTasks
@@ -154,7 +154,7 @@ export function TasksScreen({ route, navigation }) {
 
   const addTask = async () => {
     try {
-      const timestamp = Math.floor(Date.now()) //serverTimestamp();
+      const timestamp = Math.floor(Date.now())
       const data = {
         name: newTaskName,
         creator: uid,
@@ -312,7 +312,6 @@ export function TasksScreen({ route, navigation }) {
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        {/* <TouchableWithoutFeedback onPress={Keyboard.dismiss}> */}
         <View style={{ flex: 1 }}>
 
           <TouchableOpacity
@@ -361,10 +360,6 @@ export function TasksScreen({ route, navigation }) {
                 fontSize: 30,
                 paddingTop: 5
               }}>
-                {/* <FontAwesome
-                style={styles.headerIcon}
-                name='bars'
-              /> */}
                 <Feather
                   style={[styles.headerIcon]}
                   name="filter" />
@@ -403,7 +398,7 @@ export function TasksScreen({ route, navigation }) {
               <Text style={[styles.pageTitleText, { marginBottom: "10%" }]}>Task View</Text>
 
               <Pressable
-                style={[styles.secondaryButton, styles.menuButton, {marginTop: "1%", marginBottom: "1%"}]}
+                style={[styles.secondaryButton, styles.menuButton, { marginTop: "1%", marginBottom: "1%" }]}
                 onPress={() => {
                   determineTaskDisplayLimit('Day')
                   setTaskMenuVisible(false)
@@ -420,7 +415,7 @@ export function TasksScreen({ route, navigation }) {
               </Pressable>
 
               <Pressable
-                style={[styles.secondaryButton, styles.menuButton, {marginTop: "1%", marginBottom: "1%"}]}
+                style={[styles.secondaryButton, styles.menuButton, { marginTop: "1%", marginBottom: "1%" }]}
                 onPress={() => {
                   determineTaskDisplayLimit('Week')
                   setTaskMenuVisible(false)
@@ -437,7 +432,7 @@ export function TasksScreen({ route, navigation }) {
               </Pressable>
 
               <Pressable
-                style={[styles.secondaryButton, styles.menuButton, {marginTop: "1%", marginBottom: "1%"}]}
+                style={[styles.secondaryButton, styles.menuButton, { marginTop: "1%", marginBottom: "1%" }]}
                 onPress={() => {
                   determineTaskDisplayLimit('Month')
                   setTaskMenuVisible(false)
@@ -454,7 +449,7 @@ export function TasksScreen({ route, navigation }) {
               </Pressable>
 
               <Pressable
-                style={[styles.secondaryButton, styles.menuButton, {marginTop: "1%", marginBottom: "1%"}]}
+                style={[styles.secondaryButton, styles.menuButton, { marginTop: "1%", marginBottom: "1%" }]}
                 onPress={() => {
                   determineTaskDisplayLimit('All')
                   setTaskMenuVisible(false)
@@ -517,113 +512,6 @@ export function TasksScreen({ route, navigation }) {
             name={user.name}
             navigation={navigation}
             enableBack={false} />
-
-
-          {/* <View style={[{ flexDirection: "row" }]}>
-            <Pressable
-              style={[styles.mainButton, styles.menuButton]}
-              onPress={() => {
-                determineTaskDisplayLimit('Day')
-                setTaskMenuVisible(false)
-                setBackgroundOpacity(1.0)
-              }}>
-              <Text style={[styles.buttonText]}>
-                <FontAwesome5
-                  style={[styles.buttonText]}
-                  // icon={faCalendarDay}
-                  name='calendar-day'
-                // color='white'
-                /> Day
-              </Text>
-            </Pressable>
-
-            <Pressable
-              style={[styles.mainButton, styles.menuButton]}
-              onPress={() => {
-                determineTaskDisplayLimit('Week')
-                setTaskMenuVisible(false)
-                setBackgroundOpacity(1.0)
-              }}>
-              <Text style={[styles.buttonText]}>
-                <FontAwesome5
-                  style={[styles.buttonText]}
-                  // icon={faCalendarDay}
-                  name='calendar-week'
-                // color='white'
-                /> Week
-              </Text>
-            </Pressable>
-
-            <Pressable
-              style={[styles.mainButton, styles.menuButton]}
-              onPress={() => {
-                determineTaskDisplayLimit('Month')
-                setTaskMenuVisible(false)
-                setBackgroundOpacity(1.0)
-              }}>
-              <Text style={[styles.buttonText]}>
-                <FontAwesome5
-                  style={[styles.buttonText]}
-                  // icon={faCalendarDay}
-                  name='calendar'
-                // color='white'
-                /> Month
-              </Text>
-            </Pressable>
-
-            <Pressable
-              style={[styles.mainButton, styles.menuButton]}
-              onPress={() => {
-                determineTaskDisplayLimit('All')
-                setTaskMenuVisible(false)
-                setBackgroundOpacity(1.0)
-              }}>
-              <Text style={[styles.buttonText]}>
-                <FontAwesome
-                  style={[styles.buttonText]}
-                  // icon={faCalendarDay}
-                  name='tasks'
-                // color='white'
-                /> All
-              </Text>
-            </Pressable>
-
-            <View style={{ flexDirection: "row", marginTop: "15%" }}>
-              <Switch
-                trackColor={{ false: 'grey', true: 'white' }}
-                thumbColor={includeCompleteTasks ? 'cornflowerblue' : 'lightgrey'}
-                ios_backgroundColor="grey"
-                onValueChange={() => setIncludeCompleteTasks(previousState => !previousState)}
-                value={includeCompleteTasks}
-              />
-              <Text style={styles.standardText}>Include Completed Tasks</Text>
-            </View>
-
-            <View style={{ flexDirection: "row", marginTop: "15%" }}>
-              <Switch
-                trackColor={{ false: 'grey', true: 'white' }}
-                thumbColor={includeDeletedTasks ? 'cornflowerblue' : 'lightgrey'}
-                ios_backgroundColor="grey"
-                onValueChange={() => setIncludeDeletedTasks(previousState => !previousState)}
-                value={includeDeletedTasks}
-              />
-              <Text style={styles.standardText}>Include Deleted Tasks</Text>
-            </View>
-
-            <View style={{ flexDirection: "row", marginTop: "15%" }}>
-              <Switch
-                trackColor={{ false: 'grey', true: 'white' }}
-                thumbColor={includeReassignedTasks ? 'cornflowerblue' : 'lightgrey'}
-                ios_backgroundColor="grey"
-                onValueChange={() => setIncludeReassignedTasks(previousState => !previousState)}
-                value={includeReassignedTasks}
-              />
-              <Text style={styles.standardText}>Include Re-Assigned Tasks</Text>
-            </View>
-          </View> */}
-
-
-
 
           <View style={styles.inputBtnFormContainer}>
             <TextInput
@@ -753,7 +641,6 @@ export function TasksScreen({ route, navigation }) {
             uid={uid} />
 
         </View>
-        {/* </TouchableWithoutFeedback> */}
       </KeyboardAvoidingView>
     </View>
   );

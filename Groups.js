@@ -22,15 +22,15 @@ import { doc, collection, query, getDoc, setDoc, addDoc, deleteDoc, onSnapshot, 
 
 // use custom style sheet
 const styles = require('./Style.js');
-// use custom components
+// import custom components
 import { Title, Footer } from './Components.js'
+// import required functions
 import { deleteGroup } from './Functions.js'
 
 export function GroupsScreen({ route, navigation }) {
 
   const insets = useSafeAreaInsets();
   const uid = route.params.uid;
-  // const groupsRef = db.collection("groups");
 
   const [user, setUser] = useState('');
   const [groups, setGroups] = useState([]);
@@ -98,7 +98,7 @@ export function GroupsScreen({ route, navigation }) {
 
       try {
         var data = {};
-        const timestamp = Math.floor(Date.now()) //serverTimestamp();
+        const timestamp = Math.floor(Date.now())
         // add the group
         data = {
           name: newGroupName,
@@ -151,7 +151,6 @@ export function GroupsScreen({ route, navigation }) {
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        {/* <TouchableWithoutFeedback onPress={Keyboard.dismiss}> */}
         <View style={{ flex: 1 }}>
 
           <Title
@@ -186,7 +185,6 @@ export function GroupsScreen({ route, navigation }) {
           {isLoading ? (
             <ActivityIndicator style={styles.standardText} size="large" />
           ) : (
-            // <FlatList style={{ height: "73%", marginBottom: 15 }}
             <FlatList
               data={groups}
               ListEmptyComponent={<Text style={[styles.listText, styles.txtWarning, { alignSelf: "center" }]}>
@@ -202,11 +200,8 @@ export function GroupsScreen({ route, navigation }) {
                 <View>
 
                   <Swipeable
-                    // ref={ref => swipeableRef.current[index] = ref}
-                    // renderLeftActions={LeftSwipeActions}
                     renderRightActions={rightSwipeActions}
                     onSwipeableRightOpen={() => deleteGroup(item.id)}
-                    // onSwipeableLeftOpen={() => completeTask(item, index)}
                     friction={1}
                   >
 
@@ -214,16 +209,9 @@ export function GroupsScreen({ route, navigation }) {
                       style={styles.listContainer}
                       onPress={() => navigation.navigate('GroupDetail', { uid: uid, groupId: item.id })}
                     >
-                      {/* <FontAwesome
-                      style={styles.listDelIcon}
-                      name='trash-o'
-                      color='lightgrey'
-                      onPress={() => deleteGroup(item.id)} /> */}
-                      {/* <View > */}
                       <Text style={styles.listText} >
                         {item.name}
                       </Text>
-                      {/* </View> */}
                     </Pressable>
                   </Swipeable>
                 </View>
@@ -236,7 +224,6 @@ export function GroupsScreen({ route, navigation }) {
             uid={uid} />
 
         </View>
-        {/* </TouchableWithoutFeedback> */}
       </KeyboardAvoidingView>
     </View>
   );

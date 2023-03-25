@@ -2,11 +2,9 @@ import React, { useState, useEffect } from 'react';
 import {
   Keyboard,
   KeyboardAvoidingView,
-  StatusBar,
   Text,
   TextInput,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   View,
 } from 'react-native';
 import {
@@ -14,13 +12,9 @@ import {
 } from 'react-native-safe-area-context';
 import { signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
 import { auth } from './firebase.config';
-import { SwipeGesture } from './Swipe.js';
-import { CardStyleInterpolators } from '@react-navigation/stack';
 
 // use custom style sheet
 const styles = require('./Style.js');
-
-
 
 export function SigninScreen({ route, navigation }) {
 
@@ -28,22 +22,20 @@ export function SigninScreen({ route, navigation }) {
   const [password, setPassword] = useState('');
   const [screenMsg, setScreenMsg] = useState('');
 
+  // store screen safe area insets
   const insets = useSafeAreaInsets();
-  // console.log("insets", insets)
-
 
   // clear password on screen load 
   useEffect(() => {
-      // console.log("page load")
-      setPassword("")
+    setPassword("")
   }, [])
 
+  // define function to send email to user for password reset
   const emailUser = async () => {
 
     try {
       await sendPasswordResetEmail(auth, email)
       setScreenMsg("Password reset email sent.")
-
     } catch (error) {
       const errorCode = error.code;
       const errorMessage = error.message;
@@ -52,30 +44,24 @@ export function SigninScreen({ route, navigation }) {
     }
   }
 
-
+  // define function to sign in user
   const SigninUser = async () => {
 
     try {
+      // call Firebase function to authenticate user
       await signInWithEmailAndPassword(auth, email, password);
     } catch (error) {
-      // const errorCode = error.code;
       const errorMessage = error.message;
-      // console.log("Sign in failed");
-      // console.log(errorCode);    // ..
-      // console.log(errorMessage);    // ..
       setScreenMsg(errorMessage);
       return 1;
     }
 
-    // console.log("Signed in successfully.");
-    // console.log("currentuser=", auth.currentUser);
-    // console.log("uid=", auth.currentUser.uid);
-    console.log(new Date(Date.now()).toString().slice(0, 24), auth.currentUser.email, "signed in")
+    // console.log(new Date(Date.now()).toString().slice(0, 24), auth.currentUser.email, "signed in")
+
+    // clear screen message on sign in
     setScreenMsg("");
     return 0;
   }
-
-  // console.log('Height on: ', Platform.OS, StatusBar.currentHeight);
 
   return (
     <View style={[styles.safeView, {
@@ -87,7 +73,6 @@ export function SigninScreen({ route, navigation }) {
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        {/* <TouchableWithoutFeedback onPress={Keyboard.dismiss}> */}
         <View>
 
           <View style={styles.mainTitleContainer}>
@@ -100,8 +85,6 @@ export function SigninScreen({ route, navigation }) {
 
             <Text style={styles.textLabel}>Email</Text>
             <TextInput
-              // display icon in the textinput box
-              // left={<TextInput.Icon name="account" />}
               style={styles.input}
               onChangeText={(newText) => setEmail(newText)}
               defaultValue={email}
@@ -110,8 +93,6 @@ export function SigninScreen({ route, navigation }) {
 
             <Text style={styles.textLabel}>Password</Text>
             <TextInput
-              // display icon in the textinput box
-              // left={<TextInput.Icon name="form-textbox-password" />}
               style={styles.input}
               onChangeText={(newText) => setPassword(newText)}
               defaultValue={password}
@@ -131,7 +112,6 @@ export function SigninScreen({ route, navigation }) {
                       if (result == 0) {
                         setPassword("");
                         navigation.navigate('Tasks', { uid: auth.currentUser.uid });
-                        // navigation.navigate('Tasks');
                       }
                     }
                   )
@@ -149,7 +129,7 @@ export function SigninScreen({ route, navigation }) {
                   Don't have an account?
                 </Text>
                 <Text onPress={() => { navigation.navigate('Signup') }}
-                  style={[styles.textLink,  styles.txtSuccess]}
+                  style={[styles.textLink, styles.txtSuccess]}
                 > Sign up
                 </Text>
               </View>
@@ -158,9 +138,9 @@ export function SigninScreen({ route, navigation }) {
                 <Text style={[styles.textLabel, { fontSize: 20 }]}>
                   Forgot password?
                 </Text>
-                <Text 
-                disabled={!email}
-                onPress={() => { emailUser() }}
+                <Text
+                  disabled={!email}
+                  onPress={() => { emailUser() }}
                   style={[styles.textLink, styles.txtSuccess]}
                 > Reset
                 </Text>
@@ -171,13 +151,7 @@ export function SigninScreen({ route, navigation }) {
             </View>
           </View>
         </View>
-        {/* </TouchableWithoutFeedback> */}
       </KeyboardAvoidingView>
     </View >
   );
-
-
-
-
-
 }

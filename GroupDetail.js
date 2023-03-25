@@ -19,8 +19,9 @@ import { doc, collection, query, addDoc, getDoc, getDocs, setDoc, deleteDoc, onS
 
 // use custom style sheet
 const styles = require('./Style.js');
-// use custom components
+// import components
 import { Title, Footer } from './Components.js'
+// import required functions
 import { deleteGroup } from './Functions.js'
 
 export function GroupDetailScreen({ route, navigation }) {
@@ -46,13 +47,12 @@ export function GroupDetailScreen({ route, navigation }) {
 
     async function getGroupInfo() {
 
-      var userSnap = await getUser()
-      var groupSnap = await getGroup()
+      await getUser()
+      await getGroup()
 
       // Promise Chaining
       var groupUsersSnap = await getGroupUsers()
       var retrievedUserNames = await processGroupUsers(groupUsersSnap)
-      // var savedGroupUsers = await saveTaskGroups(retrievedUserNames)
 
       // get user 
       async function getUser() {
@@ -64,6 +64,7 @@ export function GroupDetailScreen({ route, navigation }) {
         }
       }
 
+      // get group
       async function getGroup() {
         try {
           var docSnap = await getDoc(doc(db, "Groups", groupId));
@@ -118,9 +119,6 @@ export function GroupDetailScreen({ route, navigation }) {
               "name": docSnap.data().name,
               "email": docSnap.data().email,
             }
-
-
-
           }))
         } catch (error) {
           console.error(error);
@@ -135,7 +133,7 @@ export function GroupDetailScreen({ route, navigation }) {
   // invite a user to the group
   const inviteUser = async () => {
     var alreadyInvitedOrInGroup = false;
-    const timestamp = Math.floor(Date.now()) //serverTimestamp();
+    const timestamp = Math.floor(Date.now())
     var data = {
       groupId: groupId,
       inviter: uid,
@@ -145,9 +143,8 @@ export function GroupDetailScreen({ route, navigation }) {
 
     try {
       // see if user already in group or already invited
-      console.log("Checking if user is already in here:", groupUserNames)
+      // console.log("Checking if user is already in here:", groupUserNames)
       for (var groupUser of groupUserNames) {
-        console.log(groupUser.email)
         if (groupUser.email == emailInvite) {
           Alert.alert("Already in Group", emailInvite + " is already in this group.")
           alreadyInvitedOrInGroup = true;
@@ -180,7 +177,7 @@ export function GroupDetailScreen({ route, navigation }) {
     // check if user is group owner, don't allow removal
     if (userId == group.creator) {
       Alert.alert("Group Owner",
-        userName+ " is the group owner and can't be removed from the group",
+        userName + " is the group owner and can't be removed from the group",
         [
           {
             text: "Ok"
@@ -262,7 +259,6 @@ export function GroupDetailScreen({ route, navigation }) {
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        {/* <TouchableWithoutFeedback onPress={Keyboard.dismiss}> */}
         <View style={{ flex: 1 }}>
 
           <Title
@@ -271,7 +267,6 @@ export function GroupDetailScreen({ route, navigation }) {
             navigation={navigation}
             enableBack={true} />
 
-          {/* <ScrollView style={{ height: "81%", marginBottom: 15 }}> */}
           <ScrollView>
 
             <View style={styles.inputFormContainer}>
@@ -281,7 +276,6 @@ export function GroupDetailScreen({ route, navigation }) {
               <View style={{ flexDirection: "row" }}>
                 <View style={{ flex: 3 }}></View>
                 <TouchableOpacity style={[styles.mainButton, styles.btnDanger, styles.btnNarrow, { flex: 1 }]}
-                  // disabled={!groupChanged()}
                   onPress={() => {
                     deleteGroup(groupId)
                     navigation.goBack()
@@ -291,8 +285,8 @@ export function GroupDetailScreen({ route, navigation }) {
                     style={[styles.buttonText]}
                   >
                     <FontAwesome
-                    style={[styles.buttonText]}
-                    name='trash-o'
+                      style={[styles.buttonText]}
+                      name='trash-o'
                     />
                   </Text>
                 </TouchableOpacity>
@@ -312,8 +306,8 @@ export function GroupDetailScreen({ route, navigation }) {
                     style={[styles.buttonText]}
                   >
                     <FontAwesome5
-                    style={[styles.buttonText]}
-                    name='save'
+                      style={[styles.buttonText]}
+                      name='save'
                     /> Save
                   </Text>
                 </TouchableOpacity>
@@ -342,7 +336,6 @@ export function GroupDetailScreen({ route, navigation }) {
                 autoCapitalize='none'
               />
 
-
               <Text style={styles.textLabel}>Group Members</Text>
               <View style={styles.tagContainer}>
                 {
@@ -370,8 +363,6 @@ export function GroupDetailScreen({ route, navigation }) {
               </View>
             </View>
 
-
-
             {/* modal for inviting user to group */}
             <Modal
               animationType="slide"
@@ -394,17 +385,15 @@ export function GroupDetailScreen({ route, navigation }) {
                     <FontAwesome
                       style={styles.headerIcon}
                       name='arrow-circle-o-left'
-                    // color='cornflowerblue'
                     />
                   </Text>
                 </Pressable>
 
                 <Text style={[styles.pageTitleText, { paddingTop: 30 }]}>Invite User to Group</Text>
-                {/* <View style={{ marginBottom: 15, alignItems: "flex-start", flexWrap: "wrap", flexDirection: "row" }}> */}
                 <View style={styles.inputFormContainer}>
 
                   <Text style={[styles.textLabel, { paddingTop: 15 }]}>Email</Text>
-                  <TextInput style={[styles.input, {width: 350}]}
+                  <TextInput style={[styles.input, { width: 350 }]}
                     onChangeText={(newValue) => { setEmailInvite(newValue) }}
                     value={emailInvite}
                     underlineColorAndroid='transparent'
@@ -412,7 +401,6 @@ export function GroupDetailScreen({ route, navigation }) {
                   />
 
                 </View>
-                {/* </View> */}
 
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
 
@@ -433,7 +421,6 @@ export function GroupDetailScreen({ route, navigation }) {
             uid={uid} />
 
         </View>
-        {/* </TouchableWithoutFeedback> */}
       </KeyboardAvoidingView >
     </View >
   );
